@@ -3,12 +3,8 @@ import { createRoot } from 'react-dom/client'
 
 import { AppProviders } from 'app/providers/AppProviders';
 
-import App from 'app/App'
-
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<AppProviders>
-			<App />
-		</AppProviders>
+		<AppProviders />
 	</StrictMode>,
 )

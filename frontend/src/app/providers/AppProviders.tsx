@@ -1,9 +1,10 @@
 import { StoreProvider } from 'app/providers/StoreProvider';
+import { RouterProvider } from 'app/providers/RouterProvider';
 
-type AppProvidersProps = {
-	children: React.ReactNode;
-}
-
-export const AppProviders = ({ children }: AppProvidersProps) => {
-	return <StoreProvider>{children}</StoreProvider>
+export const AppProviders = () => {
+	return (
+		<StoreProvider>
+			<RouterProvider />
+		</StoreProvider>
+	)
 }
