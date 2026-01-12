@@ -1,0 +1,39 @@
+.authPageWrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("./../../shared/assets/images/FishtImage.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.formSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50%;
+    height: 600px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.logo {
+    padding: 20px;
+    margin-right: 25px;
+    width: 300px;
+    height: 60px;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 1024px) {
+    .formSection {
+        min-width: 100vw;
+        min-height: 100vh;
+    }
+}
