@@ -1,1 +1,1 @@
-export type AuthTab = "signIn" | "signUp";
+export type AuthTab = 'signIn' | 'signUp';
