@@ -1,45 +1,66 @@
-import {
-    Button,
-    FormControl,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-} from '@mui/material';
+import type { UseFormReturn } from 'react-hook-form';
+
+import { FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+
+import type { SignUpForm } from '@/types/auth';
 
 type SignUpFieldsProps = {
     showPassword: boolean;
+    form: UseFormReturn<SignUpForm>;
     handleClickShowPassword: () => void;
 };
 
-export const SignUpFields = ({ showPassword, handleClickShowPassword }: SignUpFieldsProps) => {
+export const SignUpFields = ({
+    showPassword,
+    form,
+    handleClickShowPassword,
+}: SignUpFieldsProps) => {
+    const {
+        register,
+        formState: { errors },
+    } = form;
+
     return (
         <>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.email}>
                 <InputLabel htmlFor="email">Почта</InputLabel>
-                <OutlinedInput id="email" type="text" label="Почта" autoComplete="email" />
+                <OutlinedInput
+                    id="email"
+                    type="text"
+                    label="Почта"
+                    autoComplete="email"
+                    {...register('email')}
+                />
             </FormControl>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.firstName}>
                 <InputLabel htmlFor="firstName">Имя</InputLabel>
-                <OutlinedInput id="firstName" type="text" label="Имя" autoComplete="firstName" />
+                <OutlinedInput
+                    id="firstName"
+                    type="text"
+                    label="Имя"
+                    autoComplete="firstName"
+                    {...register('firstName')}
+                />
             </FormControl>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.secondName}>
                 <InputLabel htmlFor="secondName">Фамилия</InputLabel>
                 <OutlinedInput
                     id="secondName"
                     type="text"
                     label="Фамилия"
                     autoComplete="secondName"
+                    {...register('secondName')}
                 />
             </FormControl>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.password}>
                 <InputLabel htmlFor="password">Пароль</InputLabel>
                 <OutlinedInput
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     label="Пароль"
                     autoComplete="new-password"
+                    {...register('password')}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -55,9 +76,6 @@ export const SignUpFields = ({ showPassword, handleClickShowPassword }: SignUpFi
                     }
                 />
             </FormControl>
-            <Button size="large" variant="contained">
-                Зарегистрироваться
-            </Button>
         </>
     );
 };

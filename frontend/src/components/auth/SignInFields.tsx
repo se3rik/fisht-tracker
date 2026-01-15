@@ -1,32 +1,46 @@
-import {
-    Button,
-    FormControl,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-} from '@mui/material';
+import type { UseFormReturn } from 'react-hook-form';
+
+import { FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+
+import type { SignInForm } from '@/types/auth';
 
 type SignInFieldsProps = {
     showPassword: boolean;
+    form: UseFormReturn<SignInForm>;
     handleClickShowPassword: () => void;
 };
 
-export const SignInFields = ({ showPassword, handleClickShowPassword }: SignInFieldsProps) => {
+export const SignInFields = ({
+    showPassword,
+    form,
+    handleClickShowPassword,
+}: SignInFieldsProps) => {
+    const {
+        register,
+        formState: { errors },
+    } = form;
+
     return (
         <>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.login}>
                 <InputLabel htmlFor="login">Логин</InputLabel>
-                <OutlinedInput id="login" type="text" label="Логин" autoComplete="user" />
+                <OutlinedInput
+                    id="login"
+                    type="text"
+                    label="Логин"
+                    autoComplete="user"
+                    {...register('login')}
+                />
             </FormControl>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" error={!!errors.password}>
                 <InputLabel htmlFor="password">Пароль</InputLabel>
                 <OutlinedInput
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     label="Пароль"
                     autoComplete="current-password"
+                    {...register('password')}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -42,9 +56,6 @@ export const SignInFields = ({ showPassword, handleClickShowPassword }: SignInFi
                     }
                 />
             </FormControl>
-            <Button size="large" variant="contained">
-                Войти
-            </Button>
         </>
     );
 };

@@ -17,6 +17,9 @@ export default defineConfig([
             reactRefresh.configs.vite,
             eslintConfigPrettier,
         ],
+        rules: {
+            '@typescript-eslint/no-explicit-any': ['warn'],
+        },
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,
