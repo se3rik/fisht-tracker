@@ -1,6 +1,13 @@
 import type { UseFormReturn } from 'react-hook-form';
 
-import { FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
+import {
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import type { SignInForm } from '@/types/auth';
@@ -32,6 +39,7 @@ export const SignInFields = ({
                     autoComplete="user"
                     {...register('login')}
                 />
+                <FormHelperText>{errors.login?.message}</FormHelperText>
             </FormControl>
             <FormControl variant="outlined" error={!!errors.password}>
                 <InputLabel htmlFor="password">Пароль</InputLabel>
@@ -55,6 +63,7 @@ export const SignInFields = ({
                         </InputAdornment>
                     }
                 />
+                <FormHelperText>{errors.password?.message}</FormHelperText>
             </FormControl>
         </>
     );

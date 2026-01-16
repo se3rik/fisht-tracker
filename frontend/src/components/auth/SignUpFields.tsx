@@ -1,6 +1,13 @@
 import type { UseFormReturn } from 'react-hook-form';
 
-import { FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
+import {
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import type { SignUpForm } from '@/types/auth';
@@ -32,6 +39,7 @@ export const SignUpFields = ({
                     autoComplete="email"
                     {...register('email')}
                 />
+                <FormHelperText>{errors.email?.message}</FormHelperText>
             </FormControl>
             <FormControl variant="outlined" error={!!errors.firstName}>
                 <InputLabel htmlFor="firstName">Имя</InputLabel>
@@ -42,6 +50,7 @@ export const SignUpFields = ({
                     autoComplete="firstName"
                     {...register('firstName')}
                 />
+                <FormHelperText>{errors.firstName?.message}</FormHelperText>
             </FormControl>
             <FormControl variant="outlined" error={!!errors.secondName}>
                 <InputLabel htmlFor="secondName">Фамилия</InputLabel>
@@ -52,6 +61,7 @@ export const SignUpFields = ({
                     autoComplete="secondName"
                     {...register('secondName')}
                 />
+                <FormHelperText>{errors.secondName?.message}</FormHelperText>
             </FormControl>
             <FormControl variant="outlined" error={!!errors.password}>
                 <InputLabel htmlFor="password">Пароль</InputLabel>
@@ -75,6 +85,7 @@ export const SignUpFields = ({
                         </InputAdornment>
                     }
                 />
+                <FormHelperText>{errors.password?.message}</FormHelperText>
             </FormControl>
         </>
     );
