@@ -37,10 +37,19 @@
         display: flex;
         align-items: center;
         padding: 10px 0;
+
+        &:active {
+            background-color: $color-accent-active;
+        }
+
+        &:hover {
+            background-color: $color-accent-hover;
+        }
     }
 
     .navIcon {
         flex: 2;
+        color: $color-text-muted;
     }
 
     .navTitle {
@@ -51,7 +60,12 @@
 .profileSection {
     display: flex;
     align-items: center;
-    margin: auto 0 12px;
+    margin: auto 0 10px;
+    padding: 10px 0;
+
+    &:hover {
+        background-color: $color-accent-hover;
+    }
 
     .profileAvatar {
         display: flex;
