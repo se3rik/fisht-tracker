@@ -1,21 +1,26 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
+
+import { loginSuccess } from '@/stores/slices/authSlice';
 
 import styles from './AuthPage.module.scss';
 
 import Button from '@mui/material/Button';
+import { AuthTabs, SignUpFields, SignInFields } from '@/components/auth';
 
 import FishtLogo from '@/assets/icons/FishtLogo.svg';
 
-import { AuthTabs, SignUpFields, SignInFields } from '@/components/auth';
-
-import { signInValidationSchema, signUpValidationSchema } from '@/validation/authValidation';
-
 import type { AuthTab, SignInForm, SignUpForm } from '@/types/auth';
 import { signInFormDefaults, signUpFormDefaults } from '@/constants/authDefaultsForms';
+import { signInValidationSchema, signUpValidationSchema } from '@/validation/authValidation';
 
 export const AuthPage = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const [activeTab, setActiveTab] = useState<AuthTab>('signIn');
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const signInForm = useForm<SignInForm>({
@@ -30,11 +35,15 @@ export const AuthPage = () => {
     const onSignInSubmit = (data: SignInForm) => {
         console.log('SIGN IN', data);
         signInForm.reset();
+        dispatch(loginSuccess('mock-jwt-token'));
+        navigate('/', { replace: true });
     };
 
     const onSignUpSubmit = (data: SignUpForm) => {
         console.log('SIGN UP', data);
         signUpForm.reset();
+        dispatch(loginSuccess('mock-jwt-token'));
+        navigate('/', { replace: true });
     };
 
     const changePasswordVisibility = () => setShowPassword((show) => !show);
