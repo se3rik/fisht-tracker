@@ -1,3 +1,5 @@
+import styles from './HomePage.module.scss';
+
 export const HomePage = () => {
-    return <div>HOMEPAGE</div>;
+    return <section className={styles.pageSection}>HOMEPAGE</section>;
 };

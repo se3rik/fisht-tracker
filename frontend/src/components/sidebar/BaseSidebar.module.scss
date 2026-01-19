@@ -1,3 +1,66 @@
-.sidebarWrapper {
-    background-color: #5252526f;
+@use '@/styles/variables' as *;
+
+.sidebarSection {
+    display: flex;
+    flex-direction: column;
+    min-width: 236px;
+    background: linear-gradient(to bottom, #353d5d, $color-bg-main 40%);
+    backdrop-filter: blur(30%);
+    border-right: 1px solid $devider-color;
+}
+
+.heroSection {
+    border-bottom: 1px solid $devider-color;
+}
+
+.logoWrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+
+    .logoIcon {
+        flex: 2;
+    }
+
+    .logoTitle {
+        flex: 6;
+        font-weight: 500;
+    }
+}
+
+.navList {
+    list-style-type: none;
+    font-size: $font-size-sm;
+    padding: 0;
+
+    .navItem {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .navIcon {
+        flex: 2;
+    }
+
+    .navTitle {
+        flex: 6;
+    }
+}
+
+.profileSection {
+    display: flex;
+    align-items: center;
+    margin: auto 0 12px;
+
+    .profileAvatar {
+        display: flex;
+        justify-content: center;
+        flex: 2;
+    }
+
+    .profileTitle {
+        flex: 6;
+        font-size: $font-size-sm;
+    }
 }
