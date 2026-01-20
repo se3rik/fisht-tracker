@@ -6,6 +6,7 @@ import { MainLayout } from '@/layouts/main/MainLayout';
 import { HomePage } from '@/pages/HomePage/HomePage';
 import { AuthPage } from '@/pages/AuthPage/AuthPage';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
+import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 
 export const router = createBrowserRouter([
     { element: <AuthLayout />, children: [{ path: '/auth', element: <AuthPage /> }] },
@@ -19,6 +20,8 @@ export const router = createBrowserRouter([
             { path: '/administration', element: <InProgressPage /> },
             { path: '/employees', element: <InProgressPage /> },
             { path: '/profile', element: <InProgressPage /> },
+
+            { path: '*', element: <NotFoundPage /> },
         ],
     },
 ]);
