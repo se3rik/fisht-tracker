@@ -33,12 +33,14 @@
     font-size: $font-size-sm;
     padding: 0;
 
-    .navItem {
+    .navLink {
         display: flex;
         align-items: center;
         padding: 10px 0;
+        color: $color-text-primary;
+        text-decoration: none;
 
-        &:active {
+        &.active {
             background-color: $color-accent-active;
         }
 
@@ -57,11 +59,17 @@
     }
 }
 
-.profileSection {
+.profileLink {
     display: flex;
     align-items: center;
     margin: auto 0 10px;
     padding: 10px 0;
+    color: $color-text-primary;
+    text-decoration: none;
+
+    &.active {
+        background-color: $color-accent-active;
+    }
 
     &:hover {
         background-color: $color-accent-hover;

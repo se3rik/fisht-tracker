@@ -5,10 +5,11 @@ import AdsClickIcon from '@mui/icons-material/AdsClick';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 import { navigationList } from '@/constants/navigationList';
+import { NavLink } from 'react-router';
 
 export const BaseSidebar = () => {
     return (
-        <section className={styles.sidebarSection}>
+        <aside className={styles.sidebarSection}>
             <section className={styles.heroSection}>
                 <div className={styles.logoWrapper}>
                     <AdsClickIcon className={styles.logoIcon} color="primary" fontSize="large" />
@@ -18,14 +19,26 @@ export const BaseSidebar = () => {
             <section className={styles.navSection}>
                 <ul className={styles.navList}>
                     {navigationList.map((el) => (
-                        <li className={styles.navItem} key={el.id}>
-                            <el.icon className={styles.navIcon} fontSize="small" />
-                            <span className={styles.navTitle}>{el.title}</span>
+                        <li key={el.id}>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+                                }
+                                to={el.link}
+                            >
+                                <el.icon className={styles.navIcon} fontSize="small" />
+                                <span className={styles.navTitle}>{el.title}</span>
+                            </NavLink>
                         </li>
                     ))}
                 </ul>
             </section>
-            <section className={styles.profileSection}>
+            <NavLink
+                to={'/profile'}
+                className={({ isActive }) =>
+                    isActive ? `${styles.profileLink} ${styles.active}` : styles.profileLink
+                }
+            >
                 <div className={styles.profileAvatar}>
                     <Avatar
                         {...stringAvatar('Sergey Ryndin')}
@@ -33,7 +46,7 @@ export const BaseSidebar = () => {
                     />
                 </div>
                 <span className={styles.profileTitle}>Учетная запись</span>
-            </section>
-        </section>
+            </NavLink>
+        </aside>
     );
 };
