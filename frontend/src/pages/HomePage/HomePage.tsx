@@ -5,7 +5,42 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import styles from './HomePage.module.scss';
 
+import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
+
+import type { AccordionTask } from '@/types/accordion/AccordionTask';
+
 export const HomePage = () => {
+    const mockActiveTasks: AccordionTask[] = [
+        {
+            id: 1,
+            key: 'ОСО',
+            title: 'Кастомизировать стили для Аккордеона',
+            deadline: '22.01.2026',
+        },
+        {
+            id: 2,
+            key: 'ОСО',
+            title: 'Отрисовать блоки на главной странице',
+            deadline: '22.01.2026',
+        },
+        { id: 3, key: 'ОСО', title: 'Закончить главную страницу', deadline: '22.01.2026' },
+    ];
+
+    const mockPendingTasks: AccordionTask[] = [
+        {
+            id: 1,
+            key: 'ОСО',
+            title: 'Кастомизировать стили для Аккордеона',
+            deadline: '22.01.2026',
+        },
+        {
+            id: 2,
+            key: 'ОСО',
+            title: 'Отрисовать блоки на главной странице',
+            deadline: '22.01.2026',
+        },
+    ];
+
     return (
         <>
             <section className={styles.pageTitleWrapper}>
@@ -29,7 +64,7 @@ export const HomePage = () => {
                         <span>Активные задачи</span>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <span>Тут пока пусто</span>
+                        <AccordionTasksList tasksList={mockActiveTasks} />
                     </AccordionDetails>
                 </Accordion>
 
@@ -38,7 +73,7 @@ export const HomePage = () => {
                         <span>Ждут ответа</span>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <span>Тут пока пусто</span>
+                        <AccordionTasksList tasksList={mockPendingTasks} />
                     </AccordionDetails>
                 </Accordion>
             </section>

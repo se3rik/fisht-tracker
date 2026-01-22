@@ -1,0 +1,43 @@
+@use '@/styles/variables' as *;
+
+.contentWrapper {
+}
+
+.tasksList {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.taskItem {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 8px 12px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: $color-accent-hover;
+    }
+}
+
+.taskIcon,
+.taskKey {
+    flex: 0 0 auto;
+}
+
+.taskTitle {
+    flex: 3;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.taskDeadline {
+    flex: 1;
+    text-align: right;
+    white-space: nowrap;
+}
