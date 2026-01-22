@@ -1,3 +1,24 @@
-.pageSection {
-    padding: 12px;
+@use '@/styles/variables.scss' as *;
+
+.pageTitleWrapper {
+    border-bottom: 1px solid $devider-color;
+    padding: 6px 16px;
+}
+
+.pageTitle {
+    font-size: $font-size-sm;
+}
+
+.pageWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: min-content min-content;
+    align-items: start;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.heroAccordion {
+    grid-column: span 2;
 }
