@@ -1,0 +1,35 @@
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.filterSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+// Костыльный адаптив, плохо смотрится
+
+.filterTools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filterTools > :first-child {
+    flex: 2 1 250px;
+}
+
+.filterTools > :not(:first-child) {
+    flex: 1 1 160px;
+}
+
+.createTaskButton {
+    word-wrap: none;
+    flex-shrink: 0;
+}

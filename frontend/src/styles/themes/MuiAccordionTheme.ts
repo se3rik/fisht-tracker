@@ -23,9 +23,12 @@ export const MuiAccordionTheme: Components = {
             root: {
                 fontSize: '15px',
                 fontWeight: 500,
+                borderRadius: 16,
 
                 '&.Mui-expanded': {
                     borderBottom: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
                 },
             },
 

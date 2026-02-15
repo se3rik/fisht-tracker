@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import styles from './HomePage.module.scss';
 
 import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
+import { PageHeading } from '@/components/ui/PageHeading/PageHeading';
 
 import type { AccordionTask } from '@/types/accordion/AccordionTask';
 
@@ -43,9 +44,7 @@ export const HomePage = () => {
 
     return (
         <>
-            <section className={styles.pageTitleWrapper}>
-                <span className={styles.pageTitle}>Главная страница</span>
-            </section>
+            <PageHeading title="Главная страница" />
             <section className={styles.pageWrapper}>
                 <Accordion className={styles.heroAccordion} defaultExpanded>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>

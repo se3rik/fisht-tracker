@@ -5,6 +5,7 @@ import { MainLayout } from '@/layouts/main/MainLayout';
 
 import { HomePage } from '@/pages/HomePage/HomePage';
 import { AuthPage } from '@/pages/AuthPage/AuthPage';
+import { TasksPage } from '@/pages/TasksPage/TasksPage';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 
@@ -14,7 +15,7 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             { path: '/', element: <HomePage /> },
-            { path: '/tasks', element: <InProgressPage /> },
+            { path: '/tasks', element: <TasksPage /> },
             { path: '/boards', element: <InProgressPage /> },
             { path: '/goals', element: <InProgressPage /> },
             { path: '/administration', element: <InProgressPage /> },

@@ -1,14 +1,3 @@
-@use '@/styles/variables.scss' as *;
-
-.pageTitleWrapper {
-    border-bottom: 1px solid $devider-color;
-    padding: 6px 16px;
-}
-
-.pageTitle {
-    font-size: $font-size-sm;
-}
-
 .pageWrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
