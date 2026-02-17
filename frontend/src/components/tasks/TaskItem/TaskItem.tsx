@@ -1,13 +1,14 @@
+import { Link } from 'react-router';
 import { Avatar, Chip } from '@mui/material';
 
 import styles from './TaskItem.module.scss';
 
 import { TASK_STATUS_CONFIG } from '@/constants/taskStatuses';
+import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
-import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 
 type TaskItemProps = {
     task: TaskListItem;
@@ -15,7 +16,7 @@ type TaskItemProps = {
 
 export const TaskItem = ({ task }: TaskItemProps) => {
     return (
-        <div className={styles.taskItem}>
+        <Link to={`/tasks/${task.id}`} className={styles.taskItem}>
             <div className={styles.taskTitleBlock}>
                 <span className={styles.taskTitle}>{task.title}</span>
                 <span className={styles.taskDate}>{task.createdAt}</span>
@@ -56,6 +57,6 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                 />
                 <span>{task.executor}</span>
             </div>
-        </div>
+        </Link>
     );
 };

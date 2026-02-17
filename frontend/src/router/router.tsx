@@ -8,6 +8,8 @@ import { AuthPage } from '@/pages/AuthPage/AuthPage';
 import { TasksPage } from '@/pages/TasksPage/TasksPage';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
+import { TaskDetailsPage } from '@/pages/TaskDetailsPage/TaskDetailsPage';
+import { TasksLayout } from '@/layouts/tasks/TasksLayout';
 
 export const router = createBrowserRouter([
     { element: <AuthLayout />, children: [{ path: '/auth', element: <AuthPage /> }] },
@@ -15,7 +17,14 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             { path: '/', element: <HomePage /> },
-            { path: '/tasks', element: <TasksPage /> },
+            {
+                path: '/tasks',
+                element: <TasksLayout />,
+                children: [
+                    { index: true, element: <TasksPage /> },
+                    { path: ':taskId', element: <TaskDetailsPage /> },
+                ],
+            },
             { path: '/boards', element: <InProgressPage /> },
             { path: '/goals', element: <InProgressPage /> },
             { path: '/administration', element: <InProgressPage /> },
