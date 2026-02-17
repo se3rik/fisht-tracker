@@ -1,0 +1,72 @@
+@use '@/styles/variables' as *;
+
+.pageWrapper {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.heroBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.heroSection {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid $devider-color;
+    border-radius: 8px;
+}
+
+.taskTitle {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: $font-size-lg;
+    color: $color-text-primary;
+}
+
+.taskDescriprion {
+    font-size: $font-size-md;
+    color: $color-text-primary;
+}
+
+.commentSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+    border: 1px solid $devider-color;
+    border-radius: 8px;
+}
+
+.taskInfoBlock {
+    min-width: 400px;
+    height: fit-content;
+    border: 1px solid $devider-color;
+    border-radius: 8px;
+}
+
+.taskInfoList {
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.taskInfoItem {
+    display: flex;
+    padding: 12px 20px;
+    gap: 20px;
+}
+
+.taskInfoItemTitle {
+    flex: 2;
+    font-size: $font-size-sm;
+}
+
+.taskInfoItemValue {
+    flex: 3;
+    font-size: $font-size-sm;
+}
