@@ -8,6 +8,7 @@
     padding: 12px 18px;
     border-radius: 4px;
     font-size: $font-size-sm;
+    cursor: pointer;
 
     &:hover {
         background: #ffffff1a;
@@ -19,6 +20,10 @@
 
     & > *:not(:first-child) {
         flex: 1;
+    }
+
+    & > * {
+        user-select: none;
     }
 }
 
