@@ -1,0 +1,48 @@
+@use '@/styles/variables' as *;
+
+.taskItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-size: $font-size-sm;
+
+    &:hover {
+        background: #ffffff1a;
+    }
+
+    & > :first-child {
+        flex: 2;
+    }
+
+    & > *:not(:first-child) {
+        flex: 1;
+    }
+}
+
+.taskTitleBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.taskTitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: $color-text-primary;
+}
+
+.taskDate {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+}
+
+.taskExecutor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
