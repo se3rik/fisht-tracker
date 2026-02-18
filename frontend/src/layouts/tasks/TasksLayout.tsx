@@ -1,6 +1,6 @@
 import { Outlet, useParams } from 'react-router';
 
-import { PageHeading } from '@/components/ui/PageHeading/PageHeading';
+import { PageHeading } from '@/components/PageHeading/PageHeading';
 
 export const TasksLayout = () => {
     const { taskId } = useParams();
