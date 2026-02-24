@@ -1,0 +1,27 @@
+.textarea {
+    width: 100%;
+    padding: 8px;
+    resize: none;
+    background-color: transparent;
+    border: 1px solid #ffffff40;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+
+    &::placeholder {
+        font-weight: 500;
+    }
+
+    &:hover {
+        border-color: #ffffff4d;
+    }
+
+    &:focus {
+        border: 1px solid #1976d2;
+        outline: 1px solid #1976d2;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}

@@ -1,0 +1,24 @@
+@use '@/styles/variables' as *;
+
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.title {
+    margin: 0;
+}
+
+.text {
+    margin: 0;
+    font-size: $font-size-lg;
+}
+
+.fallbackLink {
+    margin-top: 20px;
+    text-decoration: none;
+    color: $color-accent;
+}

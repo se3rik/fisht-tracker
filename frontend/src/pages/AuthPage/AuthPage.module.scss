@@ -1,0 +1,48 @@
+.authPageWrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('@/assets/images/FishtImage.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.formSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50%;
+    min-height: 700px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.logo {
+    box-sizing: content-box;
+    padding: 20px;
+    margin-right: 25px;
+    margin-bottom: 20px;
+    width: 300px;
+    height: 60px;
+}
+
+.authTabsSection {
+    margin-bottom: 40px;
+    min-width: 80%;
+}
+
+.authForm {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .formSection {
+        min-width: 100vw;
+        min-height: 100vh;
+    }
+}

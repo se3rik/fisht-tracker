@@ -1,0 +1,23 @@
+.pageWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: min-content min-content;
+    align-items: start;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.heroAccordion {
+    grid-column: span 2;
+}
+
+@media (max-width: 1300px) {
+    .pageWrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .heroAccordion {
+        grid-column: span 1;
+    }
+}

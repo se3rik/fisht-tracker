@@ -1,0 +1,19 @@
+@use '@/styles/variables' as *;
+
+.commentInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.commentAuthor {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    font-weight: 500;
+    font-size: $font-size-md;
+    margin-bottom: 8px;
+}
+
+.commentText {
+    font-size: 15px;
+}

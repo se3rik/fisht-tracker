@@ -1,0 +1,19 @@
+@use '@/styles/variables' as *;
+
+.pageWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    height: 100%;
+}
+
+.inProgressIcon {
+    font-size: 50px;
+}
+
+.inProgressTitle {
+    font-size: $font-size-lg;
+}

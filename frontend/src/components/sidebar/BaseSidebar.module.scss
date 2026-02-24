@@ -1,0 +1,88 @@
+@use '@/styles/variables' as *;
+
+.sidebarSection {
+    display: flex;
+    flex-direction: column;
+    min-width: 236px;
+    background: linear-gradient(to bottom, #353d5d, $color-bg-main 40%);
+    backdrop-filter: blur(30%);
+    border-right: 1px solid $devider-color;
+}
+
+.heroSection {
+    border-bottom: 1px solid $devider-color;
+}
+
+.logoWrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+
+    .logoIcon {
+        flex: 2;
+    }
+
+    .logoTitle {
+        flex: 6;
+        font-weight: 500;
+    }
+}
+
+.navList {
+    list-style-type: none;
+    font-size: $font-size-sm;
+    padding: 0;
+
+    .navLink {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        color: $color-text-primary;
+        text-decoration: none;
+
+        &.active {
+            background-color: $color-accent-active;
+        }
+
+        &:hover {
+            background-color: $color-accent-hover;
+        }
+    }
+
+    .navIcon {
+        flex: 2;
+        color: $color-text-muted;
+    }
+
+    .navTitle {
+        flex: 6;
+    }
+}
+
+.profileLink {
+    display: flex;
+    align-items: center;
+    margin: auto 0 10px;
+    padding: 10px 0;
+    color: $color-text-primary;
+    text-decoration: none;
+
+    &.active {
+        background-color: $color-accent-active;
+    }
+
+    &:hover {
+        background-color: $color-accent-hover;
+    }
+
+    .profileAvatar {
+        display: flex;
+        justify-content: center;
+        flex: 2;
+    }
+
+    .profileTitle {
+        flex: 6;
+        font-size: $font-size-sm;
+    }
+}
