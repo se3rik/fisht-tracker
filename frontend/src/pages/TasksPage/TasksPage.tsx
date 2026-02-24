@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Button } from '@mui/material';
 
 import styles from './TasksPage.module.scss';
@@ -17,6 +18,8 @@ import { taskRoles } from '@/constants/taskRoles';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 
 export const TasksPage = () => {
+    const navigate = useNavigate();
+
     const [status, setStatus] = useState<TasksStatusValue>('');
     const [priority, setPriority] = useState<TaskPriorityValue>('');
     const [role, setRole] = useState<TaskRoleValue>('');
@@ -140,7 +143,12 @@ export const TasksPage = () => {
                     />
                 </div>
 
-                <Button variant="contained" size="small" className={styles.createTaskButton}>
+                <Button
+                    variant="contained"
+                    onClick={() => navigate('/tasks/new-task')}
+                    size="small"
+                    className={styles.createTaskButton}
+                >
                     Создать задачу
                 </Button>
             </section>

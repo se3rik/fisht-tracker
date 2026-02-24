@@ -8,6 +8,10 @@
     color: #ffffff;
     font-size: 14px;
 
+    &::placeholder {
+        font-weight: 500;
+    }
+
     &:hover {
         border-color: #ffffff4d;
     }

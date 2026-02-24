@@ -4,7 +4,7 @@ type BaseInputProps = OutlinedInputProps;
 
 export const BaseInput = (props: BaseInputProps) => {
     return (
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" fullWidth={props.fullWidth}>
             <OutlinedInput
                 id={props.id}
                 type={props.type}

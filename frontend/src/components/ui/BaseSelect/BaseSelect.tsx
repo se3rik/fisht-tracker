@@ -1,7 +1,10 @@
 import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 
+// TODO: доработать компонент, тут проблема с пропсами, они по сути захардкожены, а надо сделать через SelectProps
+
 type BaseSelectProps<T extends string | number> = {
-    label: string;
+    label?: string;
+    fullWidth?: boolean;
     value: T;
     menuItems: {
         id: number;
@@ -13,6 +16,7 @@ type BaseSelectProps<T extends string | number> = {
 
 export const BaseSelect = <T extends string | number>({
     label,
+    fullWidth,
     value,
     menuItems,
     onChange,
@@ -22,7 +26,7 @@ export const BaseSelect = <T extends string | number>({
     };
 
     return (
-        <FormControl size="small">
+        <FormControl size="small" fullWidth={fullWidth}>
             <InputLabel
                 id="demo-select-small-label"
                 sx={{
