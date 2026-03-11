@@ -12,6 +12,8 @@ export default defineConfig([
         extends: [js.configs.recommended, tseslint.configs.recommended, eslintConfigPrettier],
         rules: {
             '@typescript-eslint/no-explicit-any': ['warn'],
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': ['warn'],
         },
         languageOptions: { globals: globals.browser },
     },
