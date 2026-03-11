@@ -13,9 +13,6 @@ model User {
   email      	  String   @unique
   password		  String
 
-  isVerified	  Boolean  @default(false) @map("is_verified")
-  activationLink  String?  @map("activation_link")
-
   firstName  	  String   @map("first_name")
   secondName 	  String   @map("second_name")
   patronymic 	  String?
