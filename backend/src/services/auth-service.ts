@@ -6,6 +6,8 @@ import { UserDto } from '~/dtos/user-dto.js';
 
 import tokenService from '~/services/token-service.js';
 
+import ApiError from '~/exceptions/api-error.js';
+
 class AuthService {
     async registration(email: string, firstName: string, secondName: string, password: string) {
         const candidate = await prisma.user.findUnique({
@@ -15,7 +17,7 @@ class AuthService {
         });
 
         if (candidate) {
-            throw new Error(`Пользователь с почтовым адресом ${email} уже существует`);
+            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`);
         }
 
         const hashPassword = await bcrypt.hash(password, 3);
