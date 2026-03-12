@@ -41,7 +41,17 @@ class AuthController {
         }
     }
 
-    async logout(req: Request, res: Response) {}
+    async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.cookies;
+            await authService.logout(refreshToken);
+            res.clearCookie('refreshToken');
+
+            return res.status(200).json({ message: 'Выход из аккаунта совершен успешно' });
+        } catch (error) {
+            next(error);
+        }
+    }
 
     async refresh(req: Request, res: Response) {}
 }

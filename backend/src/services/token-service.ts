@@ -40,6 +40,15 @@ class TokenService {
             },
         });
     }
+
+    async removeToken(refreshToken: string) {
+        const tokenData = await prisma.refreshToken.delete({
+            where: {
+                token: refreshToken,
+            },
+        });
+        return tokenData;
+    }
 }
 
 export default new TokenService();
