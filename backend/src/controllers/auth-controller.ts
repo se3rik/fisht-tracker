@@ -43,8 +43,6 @@ class AuthController {
 
     async logout(req: Request, res: Response) {}
 
-    async activate(req: Request, res: Response) {}
-
     async refresh(req: Request, res: Response) {}
 }
 
