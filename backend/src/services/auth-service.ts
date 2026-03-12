@@ -39,6 +39,31 @@ class AuthService {
             user: userDto,
         };
     }
+
+    async login(email: string, password: string) {
+        const user = await prisma.user.findFirst({
+            where: {
+                email,
+            },
+        });
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь с таким email не найден');
+        }
+
+        const isPasswordEquals = await bcrypt.compare(password, user.password);
+        if (!isPasswordEquals) {
+            throw ApiError.BadRequest('Неверный пароль');
+        }
+
+        const userDto = new UserDto({ ...user });
+        const tokens = tokenService.generateToken({ ...userDto });
+        await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+        return {
+            ...tokens,
+            user: userDto,
+        };
+    }
 }
 
 export default new AuthService();
