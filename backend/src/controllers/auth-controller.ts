@@ -1,12 +1,19 @@
 import type { NextFunction, Request, Response } from 'express';
+import { validationResult } from 'express-validator';
 
 import authService from '~/services/auth-service.js';
+
+import ApiError from '~/exceptions/api-error.js';
 
 class AuthController {
     async login(req: Request, res: Response) {}
 
     async registration(req: Request, res: Response, next: NextFunction) {
         try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+            }
             const { email, firstName, secondName, password } = req.body;
             const userData = await authService.registration(email, firstName, secondName, password);
             res.cookie('refreshToken', userData.refreshToken, {
