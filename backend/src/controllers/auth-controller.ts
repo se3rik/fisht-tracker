@@ -53,7 +53,20 @@ class AuthController {
         }
     }
 
-    async refresh(req: Request, res: Response) {}
+    async refresh(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.cookies;
+            const userData = await authService.refresh(refreshToken);
+            res.cookie('refreshToken', userData.refreshToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            });
+
+            return res.json(userData);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new AuthController();

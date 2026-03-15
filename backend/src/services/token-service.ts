@@ -21,6 +21,32 @@ class TokenService {
         };
     }
 
+    validateAccessToken(token: string) {
+        try {
+            const secret = process.env.JWT_ACCESS_SECRET;
+            if (!secret) {
+                throw new Error('JWT_ACCESS_SECRET is not defined');
+            }
+            const userData = jwt.verify(token, secret) as JWTPayload;
+            return userData;
+        } catch {
+            return null;
+        }
+    }
+
+    validateRefreshToken(token: string) {
+        try {
+            const secret = process.env.JWT_REFRESH_SECRET;
+            if (!secret) {
+                throw new Error('JWT_REFRESH_SECRET is not defined');
+            }
+            const userData = jwt.verify(token, secret) as JWTPayload;
+            return userData;
+        } catch {
+            return null;
+        }
+    }
+
     async saveToken(userId: string, refreshToken: string) {
         const tokenData = await prisma.refreshToken.findFirst({
             where: { userId },
@@ -45,6 +71,15 @@ class TokenService {
         const tokenData = await prisma.refreshToken.delete({
             where: {
                 token: refreshToken,
+            },
+        });
+        return tokenData;
+    }
+
+    async findToken(token: string) {
+        const tokenData = await prisma.refreshToken.findFirst({
+            where: {
+                token,
             },
         });
         return tokenData;
