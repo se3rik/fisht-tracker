@@ -9,6 +9,7 @@ import { HomePage } from '@/pages/HomePage/HomePage';
 import { TasksPage } from '@/pages/TasksPage/TasksPage';
 import { TaskCreationPage } from '@/pages/TaskCreationPage/TaskCreationPage';
 import { TaskDetailsPage } from '@/pages/TaskDetailsPage/TaskDetailsPage';
+import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 
@@ -31,7 +32,7 @@ export const router = createBrowserRouter([
             { path: '/goals', element: <InProgressPage /> },
             { path: '/administration', element: <InProgressPage /> },
             { path: '/employees', element: <InProgressPage /> },
-            { path: '/profile', element: <InProgressPage /> },
+            { path: '/profile', element: <ProfilePage /> },
 
             { path: '*', element: <NotFoundPage /> },
         ],

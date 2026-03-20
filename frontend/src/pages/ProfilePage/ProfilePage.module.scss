@@ -1,0 +1,45 @@
+@use '@/styles/variables' as *;
+
+.pageWrapper {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    padding: 16px;
+}
+
+.profileInfoWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    height: fit-content;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.profileInfoBlock {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid $devider-color;
+    border-radius: 12px;
+}
+
+.profileInfoList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profileInfoItem {
+    display: flex;
+    flex-direction: column;
+    gap: 6 px;
+}
+
+.profileInfoItem > :first-child {
+    font-size: $font-size-sm;
+    color: #bdbdbd;
+}

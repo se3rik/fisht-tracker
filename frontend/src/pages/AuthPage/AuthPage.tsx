@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 
 import { loginSuccess } from '@/stores/slices/authSlice';
 
@@ -19,7 +19,7 @@ import { signInValidationSchema, signUpValidationSchema } from '@/validation/aut
 
 export const AuthPage = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const [activeTab, setActiveTab] = useState<AuthTab>('signIn');
     const [showPassword, setShowPassword] = useState<boolean>(false);
