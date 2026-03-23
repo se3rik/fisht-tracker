@@ -1,5 +1,5 @@
 export const signInFormDefaults = {
-    login: '',
+    email: '',
     password: '',
 };
 

@@ -3,7 +3,7 @@ import * as yup from 'yup';
 const regExpEmail = new RegExp(/^\S+@\S+\.\S+$/);
 
 export const signInValidationSchema = yup.object().shape({
-    login: yup.string().trim().required('Это обязательное поле'),
+    email: yup.string().trim().required('Это обязательное поле'),
     password: yup.string().trim().required('Это обязательное поле'),
 });
 

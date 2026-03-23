@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 
-import { loginSuccess, registration } from '@/stores/slices/authSlice';
+import { login, registration } from '@/stores/slices/authSlice';
 
 import styles from './AuthPage.module.scss';
 
@@ -34,9 +34,9 @@ export const AuthPage = () => {
         resolver: yupResolver(signUpValidationSchema),
     });
 
-    const onSignInSubmit = (data: SignInForm) => {
+    const onSignInSubmit = async (data: SignInForm) => {
         signInForm.reset();
-        dispatch(loginSuccess('mock-jwt-token'));
+        await dispatch(login(data));
         navigate('/', { replace: true });
     };
 

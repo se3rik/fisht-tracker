@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { authApi } from '@/api';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { AuthResponse, RegistrationRequest } from '@/api/api-types/auth';
+import type { AuthResponse, LoginRequest, RegistrationRequest } from '@/api/api-types/auth';
 
 type AuthState = {
     isAuthenticated: boolean;
@@ -38,6 +38,19 @@ export const registration = createAsyncThunk<
     }
 });
 
+export const login = createAsyncThunk<AuthResponse, LoginRequest, { rejectValue: string }>(
+    'auth/login',
+    async function (data, { rejectWithValue }) {
+        try {
+            const response = await authApi.login(data.email, data.password);
+
+            return response;
+        } catch (error) {
+            return rejectWithValue((error as Error).message);
+        }
+    },
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -53,6 +66,7 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Registration
             .addCase(registration.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -63,6 +77,20 @@ const authSlice = createSlice({
                 state.token = action.payload.accessToken;
             })
             .addCase(registration.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload ?? 'Неизвестная ошибка';
+            })
+            // Login
+            .addCase(login.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(login.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.token = action.payload.accessToken;
+            })
+            .addCase(login.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload ?? 'Неизвестная ошибка';
             });
