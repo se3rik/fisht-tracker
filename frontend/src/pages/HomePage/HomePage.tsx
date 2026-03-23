@@ -6,7 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import styles from './HomePage.module.scss';
 
 import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
-import { PageHeading } from '@/components/PageHeading/PageHeading';
+import { PageHeading } from '@/components/pageHeading/PageHeading';
 
 import type { AccordionTask } from '@/types/accordion/AccordionTask';
 

@@ -3,7 +3,7 @@ import { Avatar } from '@mui/material';
 
 import styles from './ProfilePage.module.scss';
 
-import { PageHeading } from '@/components/PageHeading/PageHeading';
+import { PageHeading } from '@/components/pageHeading/PageHeading';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 

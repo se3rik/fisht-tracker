@@ -1,13 +1,27 @@
 import styles from './BaseSidebar.module.scss';
 
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+
+import { logout } from '@/stores/slices/authSlice';
+
 import { Avatar } from '@mui/material';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 import { navigationList } from '@/constants/navigationList';
 import { NavLink } from 'react-router';
 
+import type { MouseEvent } from 'react';
+
 export const BaseSidebar = () => {
+    const dispatch = useAppDispatch();
+
+    const onLogoutIconClick = async (event: MouseEvent<SVGSVGElement>) => {
+        event.preventDefault();
+        await dispatch(logout());
+    };
+
     return (
         <aside className={styles.sidebarSection}>
             <section className={styles.heroSection}>
@@ -46,6 +60,7 @@ export const BaseSidebar = () => {
                     />
                 </div>
                 <span className={styles.profileTitle}>Учетная запись</span>
+                <LogoutIcon className={styles.logoutIcon} onClick={onLogoutIconClick} />
             </NavLink>
         </aside>
     );

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { authApi } from '@/api';
 
-import type { PayloadAction } from '@reduxjs/toolkit';
+// import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AuthResponse, LoginRequest, RegistrationRequest } from '@/api/api-types/auth';
 
 type AuthState = {
@@ -51,19 +51,23 @@ export const login = createAsyncThunk<AuthResponse, LoginRequest, { rejectValue:
     },
 );
 
+export const logout = createAsyncThunk<{ message: string }, void, { rejectValue: string }>(
+    'auth/logout',
+    async function (_, { rejectWithValue }) {
+        try {
+            const response = await authApi.logout();
+
+            return response;
+        } catch (error) {
+            return rejectWithValue((error as Error).message);
+        }
+    },
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {
-        loginSuccess(state, action: PayloadAction<string>) {
-            state.isAuthenticated = true;
-            state.token = action.payload;
-        },
-        logout(state) {
-            state.isAuthenticated = false;
-            state.token = null;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             // Registration
@@ -93,9 +97,23 @@ const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload ?? 'Неизвестная ошибка';
+            })
+            // Logout
+            .addCase(logout.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(logout.fulfilled, (state) => {
+                state.isLoading = false;
+                state.isAuthenticated = false;
+                state.token = null;
+            })
+            .addCase(logout.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload ?? 'Неизвестная ошибка';
             });
     },
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+// export const {} = authSlice.actions;
 export default authSlice.reducer;
