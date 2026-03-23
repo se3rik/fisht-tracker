@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 
-import { loginSuccess } from '@/stores/slices/authSlice';
+import { loginSuccess, registration } from '@/stores/slices/authSlice';
 
 import styles from './AuthPage.module.scss';
 
@@ -23,26 +23,26 @@ export const AuthPage = () => {
 
     const [activeTab, setActiveTab] = useState<AuthTab>('signIn');
     const [showPassword, setShowPassword] = useState<boolean>(false);
+
     const signInForm = useForm<SignInForm>({
         defaultValues: signInFormDefaults,
         resolver: yupResolver(signInValidationSchema),
     });
+
     const signUpForm = useForm<SignUpForm>({
         defaultValues: signUpFormDefaults,
         resolver: yupResolver(signUpValidationSchema),
     });
 
     const onSignInSubmit = (data: SignInForm) => {
-        console.log('SIGN IN', data);
         signInForm.reset();
         dispatch(loginSuccess('mock-jwt-token'));
         navigate('/', { replace: true });
     };
 
-    const onSignUpSubmit = (data: SignUpForm) => {
-        console.log('SIGN UP', data);
+    const onSignUpSubmit = async (data: SignUpForm) => {
         signUpForm.reset();
-        dispatch(loginSuccess('mock-jwt-token'));
+        await dispatch(registration(data));
         navigate('/', { replace: true });
     };
 
@@ -50,12 +50,7 @@ export const AuthPage = () => {
 
     const changeActiveTab = (tabValue: AuthTab) => {
         setActiveTab(tabValue);
-
-        if (tabValue === 'signIn') {
-            signUpForm.reset();
-        } else {
-            signInForm.reset();
-        }
+        return tabValue === 'signIn' ? signUpForm.reset() : signInForm.reset();
     };
 
     return (

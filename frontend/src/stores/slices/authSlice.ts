@@ -1,16 +1,42 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+import { authApi } from '@/api';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
+import type { AuthResponse, RegistrationRequest } from '@/api/api-types/auth';
 
 type AuthState = {
     isAuthenticated: boolean;
     token: string | null;
+    isLoading: boolean;
+    error: string | null;
 };
 
 const initialState: AuthState = {
-    isAuthenticated: true,
+    isAuthenticated: false,
     token: null,
+    isLoading: false,
+    error: null,
 };
+
+export const registration = createAsyncThunk<
+    AuthResponse,
+    RegistrationRequest,
+    { rejectValue: string }
+>('auth/registration', async function (data, { rejectWithValue }) {
+    try {
+        const response = await authApi.registration(
+            data.email,
+            data.firstName,
+            data.secondName,
+            data.password,
+        );
+
+        return response;
+    } catch (error) {
+        return rejectWithValue((error as Error).message);
+    }
+});
 
 const authSlice = createSlice({
     name: 'auth',
@@ -24,6 +50,22 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.token = null;
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(registration.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(registration.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.token = action.payload.accessToken;
+            })
+            .addCase(registration.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload ?? 'Неизвестная ошибка';
+            });
     },
 });
 

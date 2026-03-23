@@ -10,3 +10,10 @@ export type AuthResponse = {
     refreshToken: string;
     user: UserDto;
 };
+
+export type RegistrationRequest = {
+    email: string;
+    firstName: string;
+    secondName: string;
+    password: string;
+};
