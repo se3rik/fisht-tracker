@@ -7,6 +7,7 @@ import type { AuthResponse, LoginRequest, RegistrationRequest } from '@/api/api-
 
 type AuthState = {
     isAuthenticated: boolean;
+    isInitialized: boolean;
     token: string | null;
     isLoading: boolean;
     error: string | null;
@@ -14,6 +15,7 @@ type AuthState = {
 
 const initialState: AuthState = {
     isAuthenticated: false,
+    isInitialized: false,
     token: null,
     isLoading: false,
     error: null,
@@ -58,6 +60,17 @@ export const logout = createAsyncThunk<{ message: string }, void, { rejectValue:
             const response = await authApi.logout();
 
             return response;
+        } catch (error) {
+            return rejectWithValue((error as Error).message);
+        }
+    },
+);
+
+export const refresh = createAsyncThunk<AuthResponse, void, { rejectValue: string }>(
+    'auth/refresh',
+    async function (_, { rejectWithValue }) {
+        try {
+            return await authApi.refresh();
         } catch (error) {
             return rejectWithValue((error as Error).message);
         }
@@ -111,6 +124,23 @@ const authSlice = createSlice({
             .addCase(logout.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload ?? 'Неизвестная ошибка';
+            })
+            // Refresh
+            .addCase(refresh.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(refresh.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.isInitialized = true;
+                state.token = action.payload.accessToken;
+            })
+            .addCase(refresh.rejected, (state) => {
+                state.isLoading = false;
+                state.isAuthenticated = false;
+                state.isInitialized = true;
+                state.token = null;
             });
     },
 });

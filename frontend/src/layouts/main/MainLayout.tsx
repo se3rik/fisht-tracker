@@ -1,18 +1,28 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { useSelector } from 'react-redux';
+
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { useAppSelector } from '@/hooks/useAppSelector';
+
+import { refresh } from '@/stores/slices/authSlice';
 
 import { BaseSidebar } from '@/components/sidebar/BaseSidebar';
 
 import styles from './MainLayout.module.scss';
 
-import type { RootState } from '@/stores/store';
-
 export const MainLayout = () => {
-    const isAuth = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const dispatch = useAppDispatch();
+    const { isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
 
-    if (!isAuth) {
-        return <Navigate to="/auth" replace />;
-    }
+    useEffect(() => {
+        if (!isInitialized) {
+            dispatch(refresh());
+        }
+    }, [dispatch, isInitialized]);
+
+    if (!isInitialized) return <div>Загрузка...</div>;
+
+    if (!isAuthenticated) return <Navigate to="/auth" replace />;
 
     return (
         <div className={styles.appWrapper}>
