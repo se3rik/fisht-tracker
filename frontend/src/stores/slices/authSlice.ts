@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { authApi } from '@/api';
 
-// import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AuthResponse, LoginRequest, RegistrationRequest } from '@/api/api-types/auth';
 
 type AuthState = {
@@ -80,7 +79,15 @@ export const refresh = createAsyncThunk<AuthResponse, void, { rejectValue: strin
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {},
+    reducers: {
+        forceLogout: (state) => {
+            state.isAuthenticated = false;
+            state.isInitialized = true;
+            state.token = null;
+            state.error = null;
+            state.isLoading = false;
+        },
+    },
     extraReducers: (builder) => {
         builder
             // Registration
@@ -145,5 +152,5 @@ const authSlice = createSlice({
     },
 });
 
-// export const {} = authSlice.actions;
+export const { forceLogout } = authSlice.actions;
 export default authSlice.reducer;

@@ -2,6 +2,7 @@ import { request } from '@/api/base';
 import { endpoints } from '@/api/endpoints';
 
 import type { AuthResponse } from '@/api/api-types/auth';
+import type { RequestOptions } from '@/api/api-types/request-options';
 
 export const authApi = {
     registration: (email: string, firstName: string, secondName: string, password: string) => {
@@ -21,9 +22,10 @@ export const authApi = {
             method: 'POST',
         });
     },
-    refresh: () => {
+    refresh: (options?: RequestOptions) => {
         return request<AuthResponse>(endpoints.auth.refresh, {
             method: 'GET',
+            ...options,
         });
     },
 };

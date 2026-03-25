@@ -1,11 +1,11 @@
 import { authApi } from '@/api/auth.api';
 
-const BASE_API = 'http://localhost:3000/api';
+import { store } from '../stores/store';
+import { forceLogout } from '@/stores/slices/authSlice';
 
-type RequestOptions = Omit<RequestInit, 'body'> & {
-    body?: unknown;
-    _retry?: boolean;
-};
+import type { RequestOptions } from '@/api/api-types/request-options';
+
+const BASE_API = 'http://localhost:3000/api';
 
 export async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const { body, headers, _retry, ...rest } = options;
@@ -19,16 +19,15 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
 
     if (response.status === 401 && !_retry) {
         try {
-            await authApi.refresh();
+            await authApi.refresh({ _retry: true });
 
             return request<T>(url, {
                 ...options,
                 _retry: true,
             });
         } catch (error) {
-            // Тут должна быть логика logout пользователя
-            console.error('Refresh token failed');
-            throw error;
+            store.dispatch(forceLogout());
+            throw new Error('Сессия истекла');
         }
     }
 
