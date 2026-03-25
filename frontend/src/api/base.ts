@@ -10,9 +10,15 @@ const BASE_API = 'http://localhost:3000/api';
 export async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const { body, headers, _retry, ...rest } = options;
 
+    const token = store.getState().auth.token;
+
     const response = await fetch(`${BASE_API}${url}`, {
         ...rest,
-        headers: { 'Content-Type': 'application/json', ...headers },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...headers,
+        },
         credentials: 'include',
         body: body ? JSON.stringify(body) : undefined,
     });

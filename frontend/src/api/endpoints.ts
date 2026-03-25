@@ -5,4 +5,7 @@ export const endpoints = {
         logout: '/logout',
         refresh: '/refresh',
     },
+    profile: {
+        getInfo: '/profile',
+    },
 };
