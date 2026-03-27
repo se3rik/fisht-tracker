@@ -7,3 +7,5 @@ export type ProfileDataResponse = {
     department: string | null;
     speciality: string | null;
 };
+
+export type UpdateProfileRequest = Partial<Omit<ProfileDataResponse, 'id'>>;

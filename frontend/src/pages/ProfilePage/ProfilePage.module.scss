@@ -7,11 +7,14 @@
     padding: 16px;
 }
 
+.avatarComponent {
+    margin-bottom: 20px;
+}
+
 .profileInfoWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
     height: fit-content;
     width: 100%;
     max-width: 1000px;
@@ -20,8 +23,15 @@
 .profileInfoBlock {
     width: 100%;
     padding: 20px;
+    margin-bottom: 10px;
     border: 1px solid $devider-color;
     border-radius: 12px;
+}
+
+.profileInfoForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .profileInfoList {
@@ -42,4 +52,10 @@
 .profileInfoItem > :first-child {
     font-size: $font-size-sm;
     color: #bdbdbd;
+}
+
+.buttonBlock {
+    display: flex;
+    gap: 8px;
+    align-self: flex-end;
 }
