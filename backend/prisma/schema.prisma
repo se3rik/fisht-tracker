@@ -7,42 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id         	  String   @id @default(uuid())
-
-  email      	  String   @unique
-  password		  String
-
-  firstName  	  String   @map("first_name")
-  secondName 	  String   @map("second_name")
-  patronymic 	  String?
-
-  department 	  Department?
-  speciality 	  Specialty?
-
-  roles           UserRole @default(USER)
-
-  refreshTokens RefreshToken[]
-
-  createdAt  	  DateTime @default(now()) @map("created_at")
-  updatedAt  	  DateTime @updatedAt @map("updated_at")
-
-  @@map("users")
-}
-
-model RefreshToken {
-	id 		  String   @id @default(uuid())
-
-	token 	  String   @unique
-
-	userId 	  String @map("user_id")
-	user 	  User 	   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	createdAt DateTime @default(now()) @map("created_at")
-
-	@@map("refresh_tokens")
-}
-
 enum UserRole {
 	USER
 	ADMIN
@@ -103,4 +67,109 @@ enum Specialty {
   CLEANER                       // Уборщик производственных и служебных помещений
   AUXILIARY_WORKER              // Подсобный рабочий
   GREEN_WORKER                  // Рабочий зеленого хозяйства
+}
+
+enum TaskStatus {
+  DRAFT       // Черновик
+  REVISION    // На уточнении
+  IN_PROGRESS // В работе
+  SUSPENDED   // Приостановлена
+  COMPLETED   // Выполнена
+  REWORK      // На доработке
+  FINISHED    // Завершена
+  CANCELED    // Отменена
+  ARCHIVE     // Архив
+}
+
+enum TaskPriority {
+  P1  // Критичный
+  P2  // Высокий
+  P3  // Средний
+  P4  // Низкий
+}
+
+model User {
+  id         	  String   @id @default(uuid())
+
+  email      	  String   @unique
+  password		  String
+
+  firstName  	  String   @map("first_name")
+  secondName 	  String   @map("second_name")
+  patronymic 	  String?
+
+  department 	  Department?
+  speciality 	  Specialty?
+
+  roles           UserRole @default(USER)
+
+  tasksAsExecutor    Task[] @relation("TaskExecutor")
+  tasksAsAnswerable  Task[] @relation("TaskAnswerable")
+  tasksAsInitiator   Task[] @relation("TaskInitiator")
+  comments  Comment[] @relation("CommentAuthor")
+
+  refreshTokens RefreshToken[]
+
+  createdAt  	  DateTime @default(now()) @map("created_at")
+  updatedAt  	  DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model RefreshToken {
+	id 		  String   @id @default(uuid())
+
+	token 	  String   @unique
+
+	userId 	  String @map("user_id")
+	user 	  User 	   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	createdAt DateTime @default(now()) @map("created_at")
+
+	@@map("refresh_tokens")
+}
+
+model Task {
+  id          String       @id @default(uuid())
+
+  name        String
+  description String
+
+  status      TaskStatus   @default(DRAFT)
+  priority    TaskPriority
+
+  executorId    String     @map("executor_id")
+  executor      User       @relation("TaskExecutor", fields: [executorId], references: [id])
+
+  answerableId  String     @map("answerable_id")
+  answerable    User       @relation("TaskAnswerable", fields: [answerableId], references: [id])
+
+  initiatorId   String     @map("initiator_id")
+  initiator     User       @relation("TaskInitiator", fields: [initiatorId], references: [id])
+
+  deadline    DateTime?
+
+  comments  Comment[]
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@map("tasks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+
+  text      String
+
+  taskId    String   @map("task_id")
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId  String   @map("author_id")
+  author    User     @relation("CommentAuthor", fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("comments")
 }

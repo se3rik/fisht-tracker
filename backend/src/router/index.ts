@@ -7,6 +7,7 @@ import profileController from '~/controllers/profile-controller.js';
 import authMiddleware from '~/middlewares/auth-middleware.js';
 
 import { Department, Specialty } from '../../generated/prisma/enums.js';
+import taskController from '~/controllers/task-controller.js';
 
 const router = express.Router();
 
@@ -36,5 +37,12 @@ router.put(
     body('specialty').optional({ nullable: true }).isIn(Object.values(Specialty)),
     profileController.updateProfile,
 );
+
+// Tasks
+router.get('/tasks', authMiddleware, taskController.getAllTasks);
+router.get('/tasks/:id', authMiddleware, taskController.getTaskById);
+router.post('/tasks', authMiddleware, taskController.createTask);
+router.patch('/tasks/:id', authMiddleware, taskController.updateTask);
+router.delete('/tasks/:id', authMiddleware, taskController.deleteTask);
 
 export default router;

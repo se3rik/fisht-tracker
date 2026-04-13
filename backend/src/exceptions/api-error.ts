@@ -16,8 +16,12 @@ class ApiError extends Error {
         return new ApiError(400, message, errors);
     }
 
-    static Forbidden() {
-        return new ApiError(403, 'Нет доступа');
+    static Forbidden(message: string = 'Нет доступа') {
+        return new ApiError(403, message);
+    }
+
+    static NotFound(message: string = 'Не найдено') {
+        return new ApiError(404, message);
     }
 }
 
