@@ -3,11 +3,12 @@ import { body } from 'express-validator';
 
 import authController from '~/controllers/auth-controller.js';
 import profileController from '~/controllers/profile-controller.js';
+import taskController from '~/controllers/task-controller.js';
+import commentController from '~/controllers/comment-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
 
 import { Department, Specialty } from '../../generated/prisma/enums.js';
-import taskController from '~/controllers/task-controller.js';
 
 const router = express.Router();
 
@@ -44,5 +45,12 @@ router.get('/tasks/:id', authMiddleware, taskController.getTaskById);
 router.post('/tasks', authMiddleware, taskController.createTask);
 router.patch('/tasks/:id', authMiddleware, taskController.updateTask);
 router.delete('/tasks/:id', authMiddleware, taskController.deleteTask);
+// Tasks-Comments
+router.post('/tasks/:id/comments', authMiddleware, commentController.createComment);
+router.delete(
+    '/tasks/:taskId/comments/:commentId',
+    authMiddleware,
+    commentController.deleteComment,
+);
 
 export default router;

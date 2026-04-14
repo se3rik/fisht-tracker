@@ -1,40 +1,9 @@
 import { prisma } from '../lib/prisma.js';
 
-import { TaskStatus, TaskPriority } from '../../generated/prisma/enums.js';
-
 import ApiError from '~/exceptions/api-error.js';
 
-type TaskRole = 'all' | 'executor' | 'answerable' | 'initiator';
-type SortOrder = 'asc' | 'desc';
-
-interface GetAllTasksParams {
-    userId: string;
-    name?: string;
-    role?: TaskRole;
-    status?: TaskStatus;
-    priority?: TaskPriority;
-    sortByDate?: SortOrder;
-}
-
-interface CreateTaskParams {
-    name: string;
-    description: string;
-    priority: TaskPriority;
-    executorId: string;
-    answerableId: string;
-    initiatorId: string;
-    deadline?: string;
-}
-
-interface UpdateTaskParams {
-    name?: string;
-    description?: string;
-    status?: TaskStatus;
-    priority?: TaskPriority;
-    executorId?: string;
-    answerableId?: string;
-    deadline?: string;
-}
+import { TaskStatus } from '../../generated/prisma/enums.js';
+import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
 
 class TaskService {
     async getAllTasks({ userId, name, role, status, priority, sortByDate }: GetAllTasksParams) {
