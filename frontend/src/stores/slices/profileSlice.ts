@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { profileApi } from '@/api/profile.api';
+import { profileApi } from '@/api';
 
 import type { ProfileDataResponse, UpdateProfileRequest } from '@/api/api-types/profile';
 

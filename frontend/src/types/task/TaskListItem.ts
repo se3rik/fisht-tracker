@@ -3,9 +3,12 @@ import type { TasksStatusValue } from '@/types/task/TaskStatus';
 
 export type TaskListItem = {
     id: number;
-    title: string;
+    name: string;
     createdAt: string;
     status: TasksStatusValue;
     priority: TaskPriorityValue;
-    executor: string;
+    executor: {
+        firstName: string;
+        secondName: string;
+    };
 };

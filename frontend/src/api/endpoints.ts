@@ -9,4 +9,7 @@ export const endpoints = {
         getInfo: '/profile',
         updateData: '/updateProfile',
     },
+    tasks: {
+        getAllTasks: '/tasks',
+    },
 };
