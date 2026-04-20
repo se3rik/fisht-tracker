@@ -26,10 +26,18 @@ class TaskService {
             orderBy: {
                 createdAt: sortByDate ?? 'desc',
             },
-            include: {
-                executor: { select: { id: true, firstName: true, secondName: true } },
-                answerable: { select: { id: true, firstName: true, secondName: true } },
-                initiator: { select: { id: true, firstName: true, secondName: true } },
+            select: {
+                id: true,
+                name: true,
+                status: true,
+                priority: true,
+                createdAt: true,
+                executor: {
+                    select: {
+                        firstName: true,
+                        secondName: true,
+                    },
+                },
             },
         });
     }

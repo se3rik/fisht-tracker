@@ -7,6 +7,7 @@ import { TASK_STATUS_CONFIG } from '@/constants/taskStatuses';
 import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
+import { formatDate } from '@/helpers/formatDate';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -22,7 +23,7 @@ export const TaskItem = ({ task }: TaskItemProps) => {
         <Link to={`/tasks/${task.id}`} className={styles.taskItem}>
             <div className={styles.taskTitleBlock}>
                 <span className={styles.taskTitle}>{task.name}</span>
-                <span className={styles.taskDate}>{task.createdAt}</span>
+                <span className={styles.taskDate}>{formatDate(task.createdAt)}</span>
             </div>
 
             {status && (
