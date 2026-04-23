@@ -5,6 +5,7 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { refresh } from '@/stores/slices/authSlice';
+import { getProfileData } from '@/stores/slices/profileSlice';
 
 import { BaseSidebar } from '@/components/sidebar/BaseSidebar';
 
@@ -19,6 +20,12 @@ export const MainLayout = () => {
             dispatch(refresh());
         }
     }, [dispatch, isInitialized]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(getProfileData());
+        }
+    }, [isAuthenticated, dispatch]);
 
     if (!isInitialized) return <div>Загрузка...</div>;
 

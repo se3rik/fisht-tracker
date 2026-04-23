@@ -5,10 +5,13 @@ import SendIcon from '@mui/icons-material/Send';
 
 import styles from './TaskDetailsPage.module.scss';
 
+import { tasksApi } from '@/api';
+
 import { BaseTextarea } from '@/components/ui/BaseTextarea/BaseTextarea';
 import { CommentaryList } from '@/components/comment/CommentaryList/CommentaryList';
 
 import { useTasksItem } from '@/hooks/useTaskItem';
+import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 import { TASK_STATUS_CONFIG } from '@/constants/taskStatuses';
@@ -21,10 +24,36 @@ import { formatDate } from '@/helpers/formatDate';
 
 export const TaskDetailsPage = () => {
     const urlParams = useParams();
-
-    const { taskData } = useTasksItem(urlParams.id ?? '');
-
+    const { taskData, setTaskData } = useTasksItem(urlParams.id ?? '');
+    const { profileData } = useAppSelector((state) => state.profile);
     const [commentValue, setCommentValue] = useState('');
+
+    const handleSendComment = async () => {
+        if (!commentValue.trim()) return;
+
+        try {
+            const newComment = await tasksApi.createComment(urlParams.id ?? '', commentValue);
+            setCommentValue('');
+            setTaskData((prev) =>
+                prev ? { ...prev, comments: [...prev.comments, newComment] } : prev,
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDeleteComment = async (commentId: string) => {
+        try {
+            await tasksApi.deleteComment(urlParams.id ?? '', commentId);
+            setTaskData((prev) =>
+                prev
+                    ? { ...prev, comments: prev.comments.filter((c) => c.id !== commentId) }
+                    : prev,
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <section className={styles.pageWrapper}>
@@ -38,7 +67,12 @@ export const TaskDetailsPage = () => {
 
                         <section className={styles.commentSection}>
                             <span>Комментарии</span>
-                            <CommentaryList commentaryList={taskData.comments} />
+                            <CommentaryList
+                                commentaryList={taskData.comments}
+                                currentUserId={profileData?.id ?? ''}
+                                isAdmin={profileData?.roles === 'ADMIN'}
+                                onDeleteComment={handleDeleteComment}
+                            />
                             <div className={styles.commentAreaWrapper}>
                                 <BaseTextarea
                                     minRows={4}
@@ -51,6 +85,7 @@ export const TaskDetailsPage = () => {
                                     <Button
                                         variant="contained"
                                         size="small"
+                                        onClick={handleSendComment}
                                         startIcon={<SendIcon />}
                                         sx={{
                                             position: 'absolute',

@@ -6,6 +6,7 @@ export type ProfileDataResponse = {
     patronymic: string | null;
     department: string | null;
     speciality: string | null;
+    roles: 'USER' | 'ADMIN';
 };
 
 export type UpdateProfileRequest = Partial<Omit<ProfileDataResponse, 'id'>>;

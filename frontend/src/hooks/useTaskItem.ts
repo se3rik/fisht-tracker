@@ -30,5 +30,5 @@ export const useTasksItem = (id: string) => {
         fetchTaskData();
     }, [id]);
 
-    return { taskData, isLoading, error };
+    return { taskData, setTaskData, isLoading, error };
 };
