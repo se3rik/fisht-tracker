@@ -13,7 +13,10 @@ export const CommentaryList = ({ commentaryList }: CommentaryListProps) => {
         <ul className={styles.commentList}>
             {commentaryList.map((comment) => (
                 <li key={comment.id} className={styles.commentItem}>
-                    <CommentaryItem author={comment.author} text={comment.text} />
+                    <CommentaryItem
+                        author={`${comment.author.firstName} ${comment.author.secondName}`}
+                        text={comment.text}
+                    />
                 </li>
             ))}
         </ul>

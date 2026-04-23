@@ -1,4 +1,4 @@
-import { TaskStatus, TaskPriority } from '../../generated/prisma/enums.js';
+import { TaskStatus, TaskPriority, Department } from '../../generated/prisma/enums.js';
 
 export type TaskRole = 'all' | 'executor' | 'answerable' | 'initiator';
 
@@ -20,6 +20,7 @@ export type CreateTaskParams = {
     executorId: string;
     answerableId: string;
     initiatorId: string;
+    department: Department;
     deadline?: string;
 };
 
@@ -30,5 +31,6 @@ export type UpdateTaskParams = {
     priority?: TaskPriority;
     executorId?: string;
     answerableId?: string;
+    department?: Department;
     deadline?: string;
 };

@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
                 element: <TasksLayout />,
                 children: [
                     { index: true, element: <TasksPage /> },
-                    { path: ':taskId', element: <TaskDetailsPage /> },
+                    { path: ':id', element: <TaskDetailsPage /> },
                     { path: 'new-task', element: <TaskCreationPage /> },
                 ],
             },

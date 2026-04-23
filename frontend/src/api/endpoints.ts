@@ -11,5 +11,6 @@ export const endpoints = {
     },
     tasks: {
         getAllTasks: '/tasks',
+        getTaskById: '/tasks',
     },
 };

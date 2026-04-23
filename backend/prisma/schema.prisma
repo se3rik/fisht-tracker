@@ -149,6 +149,8 @@ model Task {
 
   deadline    DateTime?
 
+  department Department
+
   comments  Comment[]
 
   createdAt   DateTime     @default(now()) @map("created_at")
