@@ -47,3 +47,15 @@ export type TaskData = {
     };
     comments: Comment[] | [];
 };
+
+export type CreateTaskDto = {
+    name: string;
+    description: string;
+    priority: string;
+    executorId: string;
+    answerableId: string;
+    initiatorId: string;
+    department: string;
+    startDate?: string;
+    deadline?: string;
+};

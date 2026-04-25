@@ -5,7 +5,7 @@ import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TaskRoleValue } from '@/types/task/TaskRole';
-import type { TaskData, Comment } from '@/api/api-types/tasks';
+import type { TaskData, Comment, CreateTaskDto } from '@/api/api-types/tasks';
 
 type GetAllTasksParams = {
     name?: string;
@@ -36,6 +36,13 @@ export const tasksApi = {
         const url = `${endpoints.tasks.getTaskById}/${id}`;
         return request<TaskData>(url, {
             method: 'GET',
+        });
+    },
+
+    createTask: async (data: CreateTaskDto) => {
+        return request<TaskData>('/tasks', {
+            method: 'POST',
+            body: data,
         });
     },
 
