@@ -5,6 +5,7 @@ import authController from '~/controllers/auth-controller.js';
 import profileController from '~/controllers/profile-controller.js';
 import taskController from '~/controllers/task-controller.js';
 import commentController from '~/controllers/comment-controller.js';
+import userController from '~/controllers/user-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
 
@@ -38,6 +39,9 @@ router.put(
     body('specialty').optional({ nullable: true }).isIn(Object.values(Specialty)),
     profileController.updateProfile,
 );
+
+// Users
+router.get('/users/search', authMiddleware, userController.searchUsers);
 
 // Tasks
 router.get('/tasks', authMiddleware, taskController.getAllTasks);
