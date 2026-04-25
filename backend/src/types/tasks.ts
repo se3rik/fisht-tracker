@@ -21,6 +21,7 @@ export type CreateTaskParams = {
     answerableId: string;
     initiatorId: string;
     department: Department;
+    startDate?: string;
     deadline?: string;
 };
 

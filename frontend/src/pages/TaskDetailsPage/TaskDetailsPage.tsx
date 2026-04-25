@@ -132,7 +132,9 @@ export const TaskDetailsPage = () => {
                             <li className={styles.taskInfoItem}>
                                 <div className={styles.taskInfoItemTitle}>Дата начала</div>
                                 <div className={styles.taskInfoItemValue}>
-                                    {formatDate(taskData.createdAt)}
+                                    {taskData.startDate
+                                        ? formatDate(taskData.startDate)
+                                        : 'Не назначен'}
                                 </div>
                             </li>
                             <li className={styles.taskInfoItem}>

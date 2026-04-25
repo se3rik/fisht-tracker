@@ -67,7 +67,23 @@ class TaskService {
         return prisma.task.create({
             data: {
                 ...params,
+                startDate: params.startDate ? new Date(params.startDate) : undefined,
                 deadline: params.deadline ? new Date(params.deadline) : undefined,
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                status: true,
+                priority: true,
+                department: true,
+                startDate: true,
+                deadline: true,
+                executorId: true,
+                answerableId: true,
+                initiatorId: true,
+                createdAt: true,
+                updatedAt: true,
             },
         });
     }

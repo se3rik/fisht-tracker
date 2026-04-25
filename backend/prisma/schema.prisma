@@ -147,6 +147,7 @@ model Task {
   initiatorId   String     @map("initiator_id")
   initiator     User       @relation("TaskInitiator", fields: [initiatorId], references: [id])
 
+  startDate   DateTime?	   @default(now()) @map("start_date")
   deadline    DateTime?
 
   department Department

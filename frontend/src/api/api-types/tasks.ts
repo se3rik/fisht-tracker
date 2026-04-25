@@ -28,6 +28,7 @@ export type TaskData = {
     department: TaskDepartmentValues;
     createdAt: string;
     updatedAt: string;
+    startDate?: string;
     deadline?: string;
     executor: {
         id: string;
