@@ -98,7 +98,7 @@ export const ProfilePage = () => {
                 <section className={styles.profileInfoWrapper}>
                     <Avatar
                         className={styles.avatarComponent}
-                        {...stringAvatar('Sergey Ryndin')}
+                        {...stringAvatar(`${profileData?.firstName} ${profileData?.secondName}`)}
                         sx={{ width: 64, height: 64, fontSize: 24 }}
                     />
                     <div className={styles.profileInfoBlock}>
