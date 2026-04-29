@@ -66,17 +66,17 @@ export const TaskCreationPage = () => {
         {
             id: 4,
             label: 'Инициатор',
-            component: <UserAutocomplete onChange={setInitiatorId} />,
+            component: <UserAutocomplete onChange={(id) => setInitiatorId(id)} />,
         },
         {
             id: 5,
             label: 'Ответственный',
-            component: <UserAutocomplete onChange={setAnswerableId} />,
+            component: <UserAutocomplete onChange={(id) => setAnswerableId(id)} />,
         },
         {
             id: 6,
             label: 'Исполнитель',
-            component: <UserAutocomplete onChange={setExecutorId} />,
+            component: <UserAutocomplete onChange={(id) => setExecutorId(id)} />,
         },
         {
             id: 7,

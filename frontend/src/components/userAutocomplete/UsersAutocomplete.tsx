@@ -17,6 +17,9 @@ export const UserAutocomplete = ({
     value,
 }: UserAutocompleteProps) => {
     const [options, setOptions] = useState<UserSearchResult[]>([]);
+    const [internalValue, setInternalValue] = useState<UserSearchResult | null>(value ?? null);
+
+    const currentValue = value !== undefined ? value : internalValue;
 
     const handleInputChange = async (_: unknown, inputValue: string) => {
         if (!inputValue) {
@@ -35,11 +38,12 @@ export const UserAutocomplete = ({
     return (
         <Autocomplete
             options={options}
-            value={value ?? null}
+            value={currentValue}
             disabled={disabled}
             getOptionLabel={(option) => `${option.firstName} ${option.secondName}`}
             onInputChange={handleInputChange}
             onChange={(_, val) => {
+                setInternalValue(val);
                 if (val) {
                     onChange(val.id);
                     onChangeUser?.(val);
