@@ -20,7 +20,8 @@
 }
 
 .subFormWrapper {
-    flex: 1;
+    min-width: 450px;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     height: fit-content;
@@ -28,6 +29,7 @@
     padding: 20px;
     border: 1px solid $devider-color;
     border-radius: 8px;
+    overflow: hidden;
 }
 
 .subFormList {

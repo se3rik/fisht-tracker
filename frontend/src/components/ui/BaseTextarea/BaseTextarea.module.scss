@@ -23,5 +23,8 @@
 
     &:disabled {
         cursor: not-allowed;
+        color: #ffffffcf;
+        background-color: #ffffff08;
+        border: 0;
     }
 }

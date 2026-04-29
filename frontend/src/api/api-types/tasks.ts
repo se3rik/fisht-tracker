@@ -59,3 +59,16 @@ export type CreateTaskDto = {
     startDate?: string;
     deadline?: string;
 };
+
+export type UpdateTaskDto = {
+    name?: string;
+    description?: string;
+    priority?: string;
+    status?: string;
+    startDate?: string;
+    deadline?: string;
+    executorId?: string;
+    answerableId?: string;
+    initiatorId?: string;
+    department?: string;
+};

@@ -3,7 +3,7 @@ import type { TasksStatusValue, TaskStatus, TaskStatusTitle } from '@/types/task
 export const taskStatuses: TaskStatus[] = [
     { id: 1, value: 'draft', title: 'Черновик' },
     { id: 2, value: 'revision', title: 'На уточнении' },
-    { id: 3, value: 'in-progress', title: 'В работе' },
+    { id: 3, value: 'in_progress', title: 'В работе' },
     { id: 4, value: 'suspended', title: 'Приостановлена' },
     { id: 5, value: 'completed', title: 'Выполнена' },
     { id: 6, value: 'rework', title: 'На доработке' },
@@ -26,7 +26,7 @@ export const TASK_STATUS_CONFIG: Record<
         color: '#374151',
     },
 
-    'in-progress': {
+    in_progress: {
         label: 'В работе',
         bgcolor: '#e0f2fe',
         color: '#075985',

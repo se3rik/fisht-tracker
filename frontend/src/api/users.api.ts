@@ -4,8 +4,8 @@ export type UserSearchResult = {
     id: string;
     firstName: string;
     secondName: string;
-    department: string | null;
-    speciality: string | null;
+    department?: string | null;
+    speciality?: string | null;
 };
 
 export const usersApi = {

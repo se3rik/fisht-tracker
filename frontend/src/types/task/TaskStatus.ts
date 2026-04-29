@@ -12,7 +12,7 @@ export type TaskStatusTitle =
 export type TasksStatusValue =
     | 'draft'
     | 'revision'
-    | 'in-progress'
+    | 'in_progress'
     | 'suspended'
     | 'completed'
     | 'rework'

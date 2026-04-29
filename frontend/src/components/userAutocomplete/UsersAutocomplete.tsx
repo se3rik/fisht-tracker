@@ -5,19 +5,27 @@ import { usersApi, type UserSearchResult } from '@/api/users.api';
 
 type UserAutocompleteProps = {
     onChange: (userId: string) => void;
+    onChangeUser?: (user: UserSearchResult) => void;
+    disabled?: boolean;
+    value?: UserSearchResult | null;
 };
 
-export const UserAutocomplete = ({ onChange }: UserAutocompleteProps) => {
+export const UserAutocomplete = ({
+    onChange,
+    onChangeUser,
+    disabled,
+    value,
+}: UserAutocompleteProps) => {
     const [options, setOptions] = useState<UserSearchResult[]>([]);
 
-    const handleInputChange = async (_: unknown, value: string) => {
-        if (!value) {
+    const handleInputChange = async (_: unknown, inputValue: string) => {
+        if (!inputValue) {
             setOptions([]);
             return;
         }
 
         try {
-            const users = await usersApi.searchUsers(value);
+            const users = await usersApi.searchUsers(inputValue);
             setOptions(users);
         } catch {
             setOptions([]);
@@ -27,11 +35,17 @@ export const UserAutocomplete = ({ onChange }: UserAutocompleteProps) => {
     return (
         <Autocomplete
             options={options}
+            value={value ?? null}
+            disabled={disabled}
             getOptionLabel={(option) => `${option.firstName} ${option.secondName}`}
             onInputChange={handleInputChange}
-            onChange={(_, value) => {
-                if (value) onChange(value.id);
+            onChange={(_, val) => {
+                if (val) {
+                    onChange(val.id);
+                    onChangeUser?.(val);
+                }
             }}
+            isOptionEqualToValue={(option, val) => option.id === val.id}
             noOptionsText="Пользователи не найдены"
             slotProps={{
                 popper: {
@@ -73,7 +87,7 @@ export const UserAutocomplete = ({ onChange }: UserAutocompleteProps) => {
                 <TextField
                     {...params}
                     size="small"
-                    placeholder="Введите текст для поиска"
+                    placeholder={disabled ? '' : 'Введите текст для поиска'}
                     variant="outlined"
                     autoComplete="off"
                     slotProps={{
@@ -103,6 +117,25 @@ export const UserAutocomplete = ({ onChange }: UserAutocompleteProps) => {
                         },
                         '& .MuiAutocomplete-endAdornment .MuiIconButton-root': {
                             color: '#ffffff80',
+                        },
+                        '& .MuiOutlinedInput-root.Mui-disabled:hover .MuiOutlinedInput-notchedOutline':
+                            {
+                                borderColor: 'transparent',
+                            },
+                        '& .MuiOutlinedInput-root.Mui-disabled': {
+                            backgroundColor: '#ffffff08',
+                            borderRadius: '4px',
+                            cursor: 'not-allowed',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'transparent',
+                            },
+                            '& input': {
+                                WebkitTextFillColor: '#ffffffcf',
+                                cursor: 'not-allowed',
+                            },
+                        },
+                        '& .MuiAutocomplete-endAdornment .MuiIconButton-root.Mui-disabled': {
+                            color: '#ffffff20',
                         },
                     }}
                 />
