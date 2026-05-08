@@ -25,6 +25,22 @@ import type { TasksStatusValue } from '@/types/task/TaskStatus';
 import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 import type { UserSearchResult } from '@/api/users.api';
 import { taskStatuses } from '@/constants/taskStatuses';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { updateTaskValidationSchema } from '@/validation/taskValidation';
+
+type TaskUpdateForm = {
+    name: string;
+    description: string;
+    priority: string;
+    status: string;
+    executorId: string;
+    answerableId: string;
+    initiatorId: string;
+    department: string;
+    startDate: string | null;
+    deadline: string | null;
+};
 
 export const TaskDetailsPage = () => {
     const urlParams = useParams();
@@ -38,6 +54,28 @@ export const TaskDetailsPage = () => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [commentValue, setCommentValue] = useState('');
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        formState: { errors },
+    } = useForm<TaskUpdateForm>({
+        defaultValues: {
+            name: '',
+            description: '',
+            priority: '',
+            status: '',
+            executorId: '',
+            answerableId: '',
+            initiatorId: '',
+            department: '',
+            startDate: null,
+            deadline: null,
+        },
+        resolver: yupResolver(updateTaskValidationSchema),
+    });
 
     const [taskName, setTaskName] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
@@ -63,56 +101,72 @@ export const TaskDetailsPage = () => {
 
     const handleStartEditing = () => {
         if (!taskData) return;
-        setTaskName(taskData.name);
-        setTaskDescription(taskData.description);
-        setPriority(taskData.priority as TaskPriorityValue);
-        setStatus(taskData.status.toLowerCase() as TasksStatusValue);
-        setStartDate(taskData.startDate ? dayjs(taskData.startDate) : null);
-        setDeadline(taskData.deadline ? dayjs(taskData.deadline) : null);
-        setExecutorId(taskData.executorId);
-        setAnswerableId(taskData.answerableId);
-        setInitiatorId(taskData.initiatorId);
+        reset({
+            name: taskData.name,
+            description: taskData.description,
+            priority: taskData.priority,
+            status: taskData.status.toLowerCase(),
+            executorId: taskData.executorId,
+            answerableId: taskData.answerableId,
+            initiatorId: taskData.initiatorId,
+            department: taskData.department,
+            startDate: taskData.startDate ?? null,
+            deadline: taskData.deadline ?? null,
+        });
         setExecutor(taskData.executor);
         setAnswerable(taskData.answerable);
         setInitiator(taskData.initiator);
-        setDepartment(taskData.department);
+        setStartDate(taskData.startDate ? dayjs(taskData.startDate) : null);
+        setDeadline(taskData.deadline ? dayjs(taskData.deadline) : null);
         setIsEditing(true);
     };
 
     const handleCancelEditing = () => {
+        reset({
+            name: taskData?.name ?? '',
+            description: taskData?.description ?? '',
+            priority: taskData?.priority ?? '',
+            status: taskData?.status.toLowerCase() ?? '',
+            executorId: taskData?.executorId ?? '',
+            answerableId: taskData?.answerableId ?? '',
+            initiatorId: taskData?.initiatorId ?? '',
+            department: taskData?.department ?? '',
+            startDate: taskData?.startDate ?? null,
+            deadline: taskData?.deadline ?? null,
+        });
         setIsEditing(false);
     };
 
-    const handleSave = async () => {
+    const handleSave = handleSubmit(async (formData) => {
         if (!taskData) return;
         try {
             await tasksApi.updateTask(taskData.id, {
-                name: taskName,
-                description: taskDescription,
-                priority,
-                status: status.toUpperCase(),
+                name: formData.name,
+                description: formData.description,
+                priority: formData.priority,
+                status: formData.status.toUpperCase(),
                 startDate: startDate ? startDate.toISOString() : undefined,
                 deadline: deadline ? deadline.toISOString() : undefined,
-                executorId,
-                answerableId,
-                initiatorId: initiatorId || taskData.initiatorId,
-                department,
+                executorId: formData.executorId,
+                answerableId: formData.answerableId,
+                initiatorId: formData.initiatorId || taskData.initiatorId,
+                department: formData.department,
             });
 
             setTaskData((prev) =>
                 prev
                     ? {
                           ...prev,
-                          name: taskName,
-                          description: taskDescription,
-                          priority,
-                          status,
+                          name: formData.name,
+                          description: formData.description,
+                          priority: formData.priority as TaskPriorityValue,
+                          status: formData.status as TasksStatusValue,
                           startDate: startDate ? startDate.toISOString() : undefined,
                           deadline: deadline ? deadline.toISOString() : undefined,
-                          executorId,
-                          answerableId,
-                          initiatorId,
-                          department: department as TaskDepartmentValues,
+                          executorId: formData.executorId,
+                          answerableId: formData.answerableId,
+                          initiatorId: formData.initiatorId,
+                          department: formData.department as TaskDepartmentValues,
                           executor: executor ?? prev.executor,
                           answerable: answerable ?? prev.answerable,
                           initiator: initiator ?? prev.initiator,
@@ -124,7 +178,7 @@ export const TaskDetailsPage = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    });
 
     const handleSendComment = async () => {
         if (!commentValue.trim()) return;
@@ -157,12 +211,24 @@ export const TaskDetailsPage = () => {
             id: 1,
             label: 'Приоритет',
             component: (
-                <BaseSelect
-                    value={isEditing ? priority : taskData?.priority}
-                    menuItems={taskPriorities}
-                    disabled={!isEditing}
-                    onChange={setPriority}
-                    fullWidth
+                <Controller
+                    name="priority"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <BaseSelect
+                                value={isEditing ? field.value : (taskData?.priority ?? '')}
+                                menuItems={taskPriorities}
+                                disabled={!isEditing}
+                                error={!!errors.priority}
+                                onChange={field.onChange}
+                                fullWidth
+                            />
+                            {errors.priority && (
+                                <span className={styles.errorText}>{errors.priority.message}</span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -170,14 +236,28 @@ export const TaskDetailsPage = () => {
             id: 2,
             label: 'Статус',
             component: (
-                <BaseSelect
-                    value={
-                        isEditing ? status : (taskData?.status.toLowerCase() as TasksStatusValue)
-                    }
-                    menuItems={taskStatuses}
-                    disabled={!isEditing}
-                    onChange={setStatus}
-                    fullWidth
+                <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <BaseSelect
+                                value={
+                                    isEditing
+                                        ? field.value
+                                        : (taskData?.status.toLowerCase() as TasksStatusValue)
+                                }
+                                menuItems={taskStatuses}
+                                disabled={!isEditing}
+                                error={!!errors.status}
+                                onChange={field.onChange}
+                                fullWidth
+                            />
+                            {errors.status && (
+                                <span className={styles.errorText}>{errors.status.message}</span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -185,16 +265,25 @@ export const TaskDetailsPage = () => {
             id: 3,
             label: 'Дата начала',
             component: (
-                <BaseDatePicker
-                    value={
-                        isEditing
-                            ? startDate
-                            : taskData?.startDate
-                              ? dayjs(taskData.startDate)
-                              : null
-                    }
-                    disabled={!isEditing}
-                    onChange={(newValue) => setStartDate(newValue)}
+                <Controller
+                    name="startDate"
+                    control={control}
+                    render={({ field }) => (
+                        <BaseDatePicker
+                            value={
+                                isEditing
+                                    ? startDate
+                                    : taskData?.startDate
+                                      ? dayjs(taskData.startDate)
+                                      : null
+                            }
+                            disabled={!isEditing}
+                            onChange={(newValue) => {
+                                setStartDate(newValue);
+                                field.onChange(newValue ? newValue.toISOString() : null);
+                            }}
+                        />
+                    )}
                 />
             ),
         },
@@ -202,12 +291,25 @@ export const TaskDetailsPage = () => {
             id: 4,
             label: 'Дедлайн',
             component: (
-                <BaseDatePicker
-                    value={
-                        isEditing ? deadline : taskData?.deadline ? dayjs(taskData.deadline) : null
-                    }
-                    disabled={!isEditing}
-                    onChange={(newValue) => setDeadline(newValue)}
+                <Controller
+                    name="deadline"
+                    control={control}
+                    render={({ field }) => (
+                        <BaseDatePicker
+                            value={
+                                isEditing
+                                    ? deadline
+                                    : taskData?.deadline
+                                      ? dayjs(taskData.deadline)
+                                      : null
+                            }
+                            disabled={!isEditing}
+                            onChange={(newValue) => {
+                                setDeadline(newValue);
+                                field.onChange(newValue ? newValue.toISOString() : null);
+                            }}
+                        />
+                    )}
                 />
             ),
         },
@@ -215,11 +317,28 @@ export const TaskDetailsPage = () => {
             id: 5,
             label: 'Инициатор',
             component: (
-                <UserAutocomplete
-                    disabled={!isEditing}
-                    value={isEditing ? initiator : (taskData?.initiator ?? null)}
-                    onChange={(id) => setInitiatorId(id)}
-                    onChangeUser={(user) => setInitiator(user)}
+                <Controller
+                    name="initiatorId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                disabled={!isEditing}
+                                value={isEditing ? initiator : (taskData?.initiator ?? null)}
+                                error={!!errors.initiatorId}
+                                onChange={(id) => {
+                                    setInitiatorId(id);
+                                    field.onChange(id);
+                                }}
+                                onChangeUser={(user) => setInitiator(user)}
+                            />
+                            {errors.initiatorId && (
+                                <span className={styles.errorText}>
+                                    {errors.initiatorId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -227,11 +346,28 @@ export const TaskDetailsPage = () => {
             id: 6,
             label: 'Ответственный',
             component: (
-                <UserAutocomplete
-                    disabled={!isEditing}
-                    value={isEditing ? answerable : (taskData?.answerable ?? null)}
-                    onChange={(id) => setAnswerableId(id)}
-                    onChangeUser={(user) => setAnswerable(user)}
+                <Controller
+                    name="answerableId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                disabled={!isEditing}
+                                value={isEditing ? answerable : (taskData?.answerable ?? null)}
+                                error={!!errors.answerableId}
+                                onChange={(id) => {
+                                    setAnswerableId(id);
+                                    field.onChange(id);
+                                }}
+                                onChangeUser={(user) => setAnswerable(user)}
+                            />
+                            {errors.answerableId && (
+                                <span className={styles.errorText}>
+                                    {errors.answerableId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -239,11 +375,28 @@ export const TaskDetailsPage = () => {
             id: 7,
             label: 'Исполнитель',
             component: (
-                <UserAutocomplete
-                    disabled={!isEditing}
-                    value={isEditing ? executor : (taskData?.executor ?? null)}
-                    onChange={(id) => setExecutorId(id)}
-                    onChangeUser={(user) => setExecutor(user)}
+                <Controller
+                    name="executorId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                disabled={!isEditing}
+                                value={isEditing ? executor : (taskData?.executor ?? null)}
+                                error={!!errors.executorId}
+                                onChange={(id) => {
+                                    setExecutorId(id);
+                                    field.onChange(id);
+                                }}
+                                onChangeUser={(user) => setExecutor(user)}
+                            />
+                            {errors.executorId && (
+                                <span className={styles.errorText}>
+                                    {errors.executorId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -251,23 +404,37 @@ export const TaskDetailsPage = () => {
             id: 8,
             label: 'Подразделение',
             component: (
-                <BaseSelect
-                    value={isEditing ? department : taskData?.department}
-                    disabled={!isEditing}
-                    displayEmpty
-                    menuItems={[
-                        { id: 0, value: '', title: 'Выберите подразделение' },
-                        ...departmentItems,
-                    ]}
-                    sx={{
-                        '& .MuiSelect-select': {
-                            color: department ? 'white' : '#ffffff80',
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                        },
-                    }}
-                    onChange={(value: string) => setDepartment(value as TaskDepartmentValues | '')}
-                    fullWidth
+                <Controller
+                    name="department"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <BaseSelect
+                                value={isEditing ? field.value : (taskData?.department ?? '')}
+                                disabled={!isEditing}
+                                displayEmpty
+                                error={!!errors.department}
+                                menuItems={[
+                                    { id: 0, value: '', title: 'Выберите подразделение' },
+                                    ...departmentItems,
+                                ]}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        color: field.value ? 'white' : '#ffffff80',
+                                        whiteSpace: 'normal',
+                                        wordBreak: 'break-word',
+                                    },
+                                }}
+                                onChange={field.onChange}
+                                fullWidth
+                            />
+                            {errors.department && (
+                                <span className={styles.errorText}>
+                                    {errors.department.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -279,22 +446,48 @@ export const TaskDetailsPage = () => {
                 <>
                     <div className={styles.heroBlock}>
                         <section className={styles.heroSection}>
-                            {/* <h1 className={styles.taskTitle}>{taskData.name}</h1>
-                            <span className={styles.taskDescription}>{taskData.description}</span> */}
-                            <BaseTextarea
-                                placeholder="Введите название задачи"
-                                value={isEditing ? taskName : taskData?.name}
-                                onChange={(e) => setTaskName(e.target.value)}
-                                disabled={!isEditing}
-                                style={{ fontSize: '18px', fontWeight: 500 }}
+                            <Controller
+                                name="name"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className={styles.textareaWrapper}>
+                                        <BaseTextarea
+                                            placeholder="Введите название задачи"
+                                            value={isEditing ? field.value : taskData?.name}
+                                            onChange={field.onChange}
+                                            disabled={!isEditing}
+                                            error={!!errors.name}
+                                            style={{ fontSize: '18px', fontWeight: 500 }}
+                                        />
+                                        {errors.name && (
+                                            <span className={styles.errorText}>
+                                                {errors.name.message}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             />
-                            <BaseTextarea
-                                minRows={6}
-                                value={isEditing ? taskDescription : taskData?.description}
-                                onChange={(e) => setTaskDescription(e.target.value)}
-                                placeholder="Введите описание задачи"
-                                disabled={!isEditing}
-                                style={{ fontSize: '15px' }}
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className={styles.textareaWrapper}>
+                                        <BaseTextarea
+                                            minRows={6}
+                                            placeholder="Введите описание задачи"
+                                            value={isEditing ? field.value : taskData?.description}
+                                            onChange={field.onChange}
+                                            disabled={!isEditing}
+                                            error={!!errors.description}
+                                            style={{ fontSize: '15px' }}
+                                        />
+                                        {errors.description && (
+                                            <span className={styles.errorText}>
+                                                {errors.description.message}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             />
                         </section>
 

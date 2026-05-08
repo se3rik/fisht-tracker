@@ -5,7 +5,7 @@ import { usersApi, type UserSearchResult } from '@/api/users.api';
 
 type UserAutocompleteProps = {
     onChange: (userId: string) => void;
-    onChangeUser?: (user: UserSearchResult) => void;
+    onChangeUser?: (user: UserSearchResult | null) => void;
     disabled?: boolean;
     value?: UserSearchResult | null;
     error?: boolean;
@@ -49,6 +49,9 @@ export const UserAutocomplete = ({
                 if (val) {
                     onChange(val.id);
                     onChangeUser?.(val);
+                } else {
+                    onChange('');
+                    onChangeUser?.(null as any);
                 }
             }}
             isOptionEqualToValue={(option, val) => option.id === val.id}
