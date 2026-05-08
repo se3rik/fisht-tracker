@@ -48,3 +48,14 @@
     list-style-type: none;
     font-size: $font-size-sm;
 }
+
+.textareaWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.errorText {
+    font-size: $font-size-xs;
+    color: #dc2626;
+}

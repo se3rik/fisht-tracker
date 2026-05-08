@@ -8,6 +8,7 @@ type UserAutocompleteProps = {
     onChangeUser?: (user: UserSearchResult) => void;
     disabled?: boolean;
     value?: UserSearchResult | null;
+    error?: boolean;
 };
 
 export const UserAutocomplete = ({
@@ -15,6 +16,7 @@ export const UserAutocomplete = ({
     onChangeUser,
     disabled,
     value,
+    error,
 }: UserAutocompleteProps) => {
     const [options, setOptions] = useState<UserSearchResult[]>([]);
     const [internalValue, setInternalValue] = useState<UserSearchResult | null>(value ?? null);
@@ -94,6 +96,7 @@ export const UserAutocomplete = ({
                     placeholder={disabled ? '' : 'Введите текст для поиска'}
                     variant="outlined"
                     autoComplete="off"
+                    error={error}
                     slotProps={{
                         inputLabel: { shrink: true },
                     }}

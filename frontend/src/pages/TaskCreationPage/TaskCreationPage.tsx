@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import dayjs from 'dayjs';
 import { Button } from '@mui/material';
 
 import styles from './TaskCreationPage.module.scss';
@@ -14,21 +16,44 @@ import { UserAutocomplete } from '@/components/userAutocomplete/UsersAutocomplet
 import { taskPriorities } from '@/constants/taskPriorities';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
 
+import { createTaskValidationSchema } from '@/validation/taskValidation';
+
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
-import type { Dayjs } from 'dayjs';
+
+type TaskCreationForm = {
+    name: string;
+    description: string;
+    priority: string;
+    executorId: string;
+    answerableId: string;
+    initiatorId: string;
+    department: string;
+    startDate: string | null;
+    deadline: string | null;
+};
 
 export const TaskCreationPage = () => {
     const navigate = useNavigate();
 
-    const [taskName, setTaskName] = useState('');
-    const [taskDescription, setTaskDescription] = useState('');
-    const [priority, setPriority] = useState<TaskPriorityValue>('P3');
-    const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    const [deadline, setDeadline] = useState<Dayjs | null>(null);
-    const [executorId, setExecutorId] = useState('');
-    const [answerableId, setAnswerableId] = useState('');
-    const [initiatorId, setInitiatorId] = useState('');
-    const [department, setDepartment] = useState('');
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm<TaskCreationForm>({
+        defaultValues: {
+            name: '',
+            description: '',
+            priority: 'P3',
+            executorId: '',
+            answerableId: '',
+            initiatorId: '',
+            department: '',
+            startDate: null,
+            deadline: null,
+        },
+        resolver: yupResolver(createTaskValidationSchema),
+    });
 
     const departmentItems = Object.entries(DEPARTMENT_LABELS).map(([value, title], id) => ({
         id,
@@ -41,11 +66,23 @@ export const TaskCreationPage = () => {
             id: 1,
             label: 'Приоритет',
             component: (
-                <BaseSelect
-                    value={priority}
-                    menuItems={taskPriorities}
-                    onChange={setPriority}
-                    fullWidth
+                <Controller
+                    name="priority"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <BaseSelect
+                                value={field.value}
+                                menuItems={taskPriorities}
+                                onChange={field.onChange}
+                                error={!!errors.priority}
+                                fullWidth
+                            />
+                            {errors.priority && (
+                                <span className={styles.errorText}>{errors.priority.message}</span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
@@ -53,92 +90,190 @@ export const TaskCreationPage = () => {
             id: 2,
             label: 'Дата начала',
             component: (
-                <BaseDatePicker value={startDate} onChange={(newValue) => setStartDate(newValue)} />
+                <Controller
+                    name="startDate"
+                    control={control}
+                    render={({ field }) => (
+                        <BaseDatePicker
+                            value={field.value ? dayjs(field.value) : null}
+                            onChange={(newValue) =>
+                                field.onChange(newValue ? newValue.toISOString() : null)
+                            }
+                        />
+                    )}
+                />
             ),
         },
         {
             id: 3,
             label: 'Дедлайн',
             component: (
-                <BaseDatePicker value={deadline} onChange={(newValue) => setDeadline(newValue)} />
+                <Controller
+                    name="deadline"
+                    control={control}
+                    render={({ field }) => (
+                        <BaseDatePicker
+                            value={field.value ? dayjs(field.value) : null}
+                            onChange={(newValue) =>
+                                field.onChange(newValue ? newValue.toISOString() : null)
+                            }
+                        />
+                    )}
+                />
             ),
         },
         {
             id: 4,
             label: 'Инициатор',
-            component: <UserAutocomplete onChange={(id) => setInitiatorId(id)} />,
+            component: (
+                <Controller
+                    name="initiatorId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                onChange={field.onChange}
+                                error={!!errors.initiatorId}
+                            />
+                            {errors.initiatorId && (
+                                <span className={styles.errorText}>
+                                    {errors.initiatorId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                />
+            ),
         },
         {
             id: 5,
             label: 'Ответственный',
-            component: <UserAutocomplete onChange={(id) => setAnswerableId(id)} />,
+            component: (
+                <Controller
+                    name="answerableId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                onChange={field.onChange}
+                                error={!!errors.answerableId}
+                            />
+                            {errors.answerableId && (
+                                <span className={styles.errorText}>
+                                    {errors.answerableId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                />
+            ),
         },
         {
             id: 6,
             label: 'Исполнитель',
-            component: <UserAutocomplete onChange={(id) => setExecutorId(id)} />,
+            component: (
+                <Controller
+                    name="executorId"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <UserAutocomplete
+                                onChange={field.onChange}
+                                error={!!errors.executorId}
+                            />
+                            {errors.executorId && (
+                                <span className={styles.errorText}>
+                                    {errors.executorId.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                />
+            ),
         },
         {
             id: 7,
             label: 'Подразделение',
             component: (
-                <BaseSelect
-                    value={department}
-                    displayEmpty
-                    menuItems={[
-                        { id: 0, value: '', title: 'Выберите подразделение' },
-                        ...departmentItems,
-                    ]}
-                    sx={{
-                        '& .MuiSelect-select': {
-                            color: department ? 'white' : '#ffffff80',
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                        },
-                    }}
-                    onChange={setDepartment}
-                    fullWidth
+                <Controller
+                    name="department"
+                    control={control}
+                    render={({ field }) => (
+                        <div>
+                            <BaseSelect
+                                value={field.value}
+                                displayEmpty
+                                menuItems={[
+                                    { id: 0, value: '', title: 'Выберите подразделение' },
+                                    ...departmentItems,
+                                ]}
+                                sx={{
+                                    '& .MuiSelect-select': {
+                                        color: field.value ? 'white' : '#ffffff80',
+                                        whiteSpace: 'normal',
+                                        wordBreak: 'break-word',
+                                    },
+                                }}
+                                onChange={field.onChange}
+                                error={!!errors.department}
+                                fullWidth
+                            />
+                            {errors.department && (
+                                <span className={styles.errorText}>
+                                    {errors.department.message}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 />
             ),
         },
     ];
 
-    const onTaskCreate = async () => {
+    const onTaskCreate = handleSubmit(async (data) => {
         try {
             await tasksApi.createTask({
-                name: taskName,
-                description: taskDescription,
-                priority,
-                executorId,
-                answerableId,
-                initiatorId,
-                department,
-                startDate: startDate ? startDate.toISOString() : undefined,
-                deadline: deadline ? deadline.toISOString() : undefined,
+                name: data.name,
+                description: data.description,
+                priority: data.priority as TaskPriorityValue,
+                executorId: data.executorId,
+                answerableId: data.answerableId,
+                initiatorId: data.initiatorId,
+                department: data.department,
+                startDate: data.startDate ?? undefined,
+                deadline: data.deadline ?? undefined,
             });
 
             navigate('/tasks');
         } catch (err) {
             console.error(err);
         }
-    };
+    });
 
     return (
         <section className={styles.pageWrapper}>
             <div className={styles.heroForm}>
-                <BaseTextarea
-                    placeholder="Введите название задачи"
-                    value={taskName}
-                    onChange={(e) => setTaskName(e.target.value)}
-                    style={{ fontSize: '18px', fontWeight: 500 }}
-                />
-                <BaseTextarea
-                    minRows={6}
-                    value={taskDescription}
-                    onChange={(e) => setTaskDescription(e.target.value)}
-                    placeholder="Введите описание задачи"
-                    style={{ fontSize: '15px' }}
-                />
+                <div className={styles.textareaWrapper}>
+                    <BaseTextarea
+                        placeholder="Введите название задачи"
+                        style={{ fontSize: '18px', fontWeight: 500 }}
+                        error={!!errors.name}
+                        {...register('name')}
+                    />
+                    {errors.name && <span className={styles.errorText}>{errors.name.message}</span>}
+                </div>
+                <div className={styles.textareaWrapper}>
+                    <BaseTextarea
+                        minRows={6}
+                        placeholder="Введите описание задачи"
+                        style={{ fontSize: '15px' }}
+                        error={!!errors.description}
+                        {...register('description')}
+                    />
+                    {errors.description && (
+                        <span className={styles.errorText}>{errors.description.message}</span>
+                    )}
+                </div>
                 <div className={styles.heroFormButtonsSection}>
                     <Button variant="contained" size="small" onClick={onTaskCreate}>
                         Создать задачу
