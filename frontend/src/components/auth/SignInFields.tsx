@@ -30,16 +30,16 @@ export const SignInFields = ({
 
     return (
         <>
-            <FormControl variant="outlined" error={!!errors.login}>
+            <FormControl variant="outlined" error={!!errors.email}>
                 <InputLabel htmlFor="login">Логин</InputLabel>
                 <OutlinedInput
                     id="login"
                     type="text"
                     label="Логин"
                     autoComplete="user"
-                    {...register('login')}
+                    {...register('email')}
                 />
-                <FormHelperText>{errors.login?.message}</FormHelperText>
+                <FormHelperText>{errors.email?.message}</FormHelperText>
             </FormControl>
             <FormControl variant="outlined" error={!!errors.password}>
                 <InputLabel htmlFor="password">Пароль</InputLabel>

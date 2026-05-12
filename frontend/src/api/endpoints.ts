@@ -1,0 +1,16 @@
+export const endpoints = {
+    auth: {
+        registration: '/registration',
+        login: '/login',
+        logout: '/logout',
+        refresh: '/refresh',
+    },
+    profile: {
+        getInfo: '/profile',
+        updateData: '/updateProfile',
+    },
+    tasks: {
+        getAllTasks: '/tasks',
+        getTaskById: '/tasks',
+    },
+};

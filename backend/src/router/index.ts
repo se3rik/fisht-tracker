@@ -1,0 +1,60 @@
+import express from 'express';
+import { body } from 'express-validator';
+
+import authController from '~/controllers/auth-controller.js';
+import profileController from '~/controllers/profile-controller.js';
+import taskController from '~/controllers/task-controller.js';
+import commentController from '~/controllers/comment-controller.js';
+import userController from '~/controllers/user-controller.js';
+
+import authMiddleware from '~/middlewares/auth-middleware.js';
+
+import { Department, Specialty } from '../../generated/prisma/enums.js';
+
+const router = express.Router();
+
+// Auth
+router.post('/login', authController.login);
+router.post(
+    '/registration',
+    body('email').isEmail(),
+    body('password').isLength({
+        min: 3,
+        max: 32,
+    }),
+    authController.registration,
+);
+router.post('/logout', authController.logout);
+router.get('/refresh', authController.refresh);
+
+// Profile
+router.get('/profile', authMiddleware, profileController.getProfile);
+router.put(
+    '/updateProfile',
+    authMiddleware,
+    body('firstName').optional().isString().isLength({ min: 1, max: 64 }),
+    body('secondName').optional().isString().isLength({ min: 1, max: 64 }),
+    body('patronymic').optional({ nullable: true }).isString().isLength({ max: 64 }),
+    body('department').optional({ nullable: true }).isIn(Object.values(Department)),
+    body('specialty').optional({ nullable: true }).isIn(Object.values(Specialty)),
+    profileController.updateProfile,
+);
+
+// Users
+router.get('/users/search', authMiddleware, userController.searchUsers);
+
+// Tasks
+router.get('/tasks', authMiddleware, taskController.getAllTasks);
+router.get('/tasks/:id', authMiddleware, taskController.getTaskById);
+router.post('/tasks', authMiddleware, taskController.createTask);
+router.patch('/tasks/:id', authMiddleware, taskController.updateTask);
+router.delete('/tasks/:id', authMiddleware, taskController.deleteTask);
+// Tasks-Comments
+router.post('/tasks/:id/comments', authMiddleware, commentController.createComment);
+router.delete(
+    '/tasks/:taskId/comments/:commentId',
+    authMiddleware,
+    commentController.deleteComment,
+);
+
+export default router;

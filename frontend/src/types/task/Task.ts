@@ -1,3 +1,4 @@
+import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
 
@@ -13,6 +14,7 @@ export type TaskMeta = {
     executorId: string;
     answerableId: string;
     initiatorId: string;
+    department: TaskDepartmentValues;
 };
 
 export type TaskDates = {

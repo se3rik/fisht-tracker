@@ -23,5 +23,21 @@
 
     &:disabled {
         cursor: not-allowed;
+        color: #ffffffcf;
+        background-color: #ffffff08;
+        border: 0;
+    }
+}
+
+.textareaError {
+    border-color: #dc2626 !important;
+
+    &:hover {
+        border-color: #dc2626 !important;
+    }
+
+    &:focus {
+        border-color: #dc2626 !important;
+        outline-color: #dc2626 !important;
     }
 }

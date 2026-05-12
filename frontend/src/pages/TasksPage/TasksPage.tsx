@@ -10,7 +10,8 @@ import { TaskItem } from '@/components/tasks/TaskItem/TaskItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TaskRoleValue } from '@/types/task/TaskRole';
-import type { TaskListItem } from '@/types/task/TaskListItem';
+
+import { useTasksList } from '@/hooks/useTasksList';
 
 import { taskStatuses } from '@/constants/taskStatuses';
 import { taskPriorities } from '@/constants/taskPriorities';
@@ -20,85 +21,19 @@ import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 export const TasksPage = () => {
     const navigate = useNavigate();
 
+    const [name, setName] = useState('');
     const [status, setStatus] = useState<TasksStatusValue>('');
     const [priority, setPriority] = useState<TaskPriorityValue>('');
     const [role, setRole] = useState<TaskRoleValue>('');
-    const [dateFilter, setDateFilter] = useState<'increase' | 'decrease' | ''>('');
+    const [dateFilter, setDateFilter] = useState<'asc' | 'desc' | ''>('');
 
-    const mockTasksList: TaskListItem[] = [
-        {
-            id: 1,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'draft',
-            priority: 'P1',
-            executor: 'Sergey Ryndin',
-        },
-        {
-            id: 2,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'revision',
-            priority: 'P2',
-            executor: 'Daniil Lunev',
-        },
-        {
-            id: 3,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'in-progress',
-            priority: 'P3',
-            executor: 'Alexey Chekhov',
-        },
-        {
-            id: 4,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'suspended',
-            priority: 'P4',
-            executor: 'Nikita Karaput',
-        },
-        {
-            id: 5,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'completed',
-            priority: 'P4',
-            executor: 'Nikita Isaev',
-        },
-        {
-            id: 6,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'rework',
-            priority: 'P1',
-            executor: 'Sergey Ryndin',
-        },
-        {
-            id: 7,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'finished',
-            priority: 'P1',
-            executor: 'Sergey Ryndin',
-        },
-        {
-            id: 8,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'canceled',
-            priority: 'P1',
-            executor: 'Sergey Ryndin',
-        },
-        {
-            id: 9,
-            title: 'Основной контент на главной странице',
-            createdAt: '15.02.2026',
-            status: 'archive',
-            priority: 'P1',
-            executor: 'Sergey Ryndin',
-        },
-    ];
+    const { tasks } = useTasksList({
+        name,
+        role: role || undefined,
+        status: status || undefined,
+        priority: priority || undefined,
+        sortByDate: dateFilter || undefined,
+    });
 
     return (
         <section className={styles.pageWrapper}>
@@ -108,6 +43,8 @@ export const TasksPage = () => {
                         id="taskName"
                         type="text"
                         size="small"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         placeholder="Поиск по названию задачи"
                     />
 
@@ -136,8 +73,8 @@ export const TasksPage = () => {
                         label="Дата"
                         value={dateFilter}
                         menuItems={[
-                            { id: 1, value: 'increase', title: 'По возрастанию' },
-                            { id: 2, value: 'decrease', title: 'По убыванию' },
+                            { id: 1, value: 'asc', title: 'По возрастанию' },
+                            { id: 2, value: 'desc', title: 'По убыванию' },
                         ]}
                         onChange={setDateFilter}
                     />
@@ -154,7 +91,7 @@ export const TasksPage = () => {
             </section>
 
             <section className={styles.mainContent}>
-                {mockTasksList.map((task) => (
+                {tasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
                 ))}
             </section>

@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+	USER
+	ADMIN
+}
+
+enum Department {
+  AUP          // АДМИНИСТРАТИВНО-УПРАВЛЕНЧЕСКИЙ ПЕРСОНАЛ
+  OUOKR        // ОТДЕЛ УПРАВЛЕНЧЕСКОЙ ОТЧЕТНОСТИ И КАДРОВОЙ РАБОТЫ
+  OKS          // ОТДЕЛ КОНТРАКТНОЙ СЛУЖБЫ
+  YO           // ЮРИДИЧЕСКИЙ ОТДЕЛ
+  OSIOOR       // ОТДЕЛ СПОРТИВНОЙ ИНФРАСТРУКТУРЫ И ОРГАНИЗАЦИОННОЙ РАБОТЫ
+  OOEFP        // ОТДЕЛ ОБСЛУЖИВАНИЯ И ЭКСПЛУАТАЦИИ ФУТБОЛЬНОГО ПОЛЯ
+  PTO          // ПЛАНОВО-ТЕХНИЧЕСКИЙ ОТДЕЛ
+  OERO         // ОТДЕЛ ЭЛЕКТРОРЕМОНТНОГО ОБСЛУЖИВАНИЯ
+  OSO         // ОТДЕЛ ОБСЛУЖИВАНИЯ СЛАБОТОЧНОГО ОБОРУДОВАНИЯ
+  OOOVVO       // ОТДЕЛ ОБСЛУЖИВАНИЯ ОБОРУДОВАНИЯ ВОДОСНАБЖЕНИЯ, ВОДООТВЕДЕНИЯ И ОТОПЛЕНИЯ
+  OOOKHVK      // ОТДЕЛ ОБСЛУЖИВАНИЯ ОБОРУДОВАНИЯ ХОЛОДОСНАБЖЕНИЯ, ВЕНТИЛЯЦИИ И КОНДИЦИОНИРОВАНИЯ
+  MP           // МЕДИЦИНСКИЙ ПУНКТ
+  OOSPB        // ОТДЕЛ ОБСЛУЖИВАНИЯ СИСТЕМ ПОЖАРНОЙ БЕЗОПАСНОСТИ
+  OOOR         // ОТДЕЛ ОБЕСПЕЧЕНИЯ ОХРАНЫ И РЕЖИМА
+  OHO          // ОТДЕЛ ХОЗЯЙСТВЕННОГО ОБЕСПЕЧЕНИЯ
+}
+
+enum Specialty {
+  HEAD                          // Руководитель
+  SERVICE_CHIEF                 // Начальник службы
+  DEPUTY_HEAD                   // Заместитель руководителя
+  DEPARTMENT_CHIEF              // Начальник отдела
+  DEPUTY_DEPARTMENT_CHIEF       // Заместитель начальника отдела
+  CHIEF_SPECIALIST              // Главный специалист
+  CHIEF_SPECIALIST_ENGINEER     // Главный специалист, инженер
+  CHIEF_SPECIALIST_AGRONOMIST   // Начальник отдела, главный агроном
+  CHIEF_SPECIALIST_LABOR        // Главный специалист, специалист по охране труда
+  CHIEF_SPECIALIST_MASTER       // Главный специалист, мастер
+  LEAD_SPECIALIST               // Ведущий специалист
+  LEAD_SPECIALIST_ENGINEER      // Ведущий специалист, инженер
+  LEAD_SPECIALIST_MASTER        // Ведущий специалист, мастер
+  LEAD_SPECIALIST_MECHANIC      // Ведущий специалист, механизатор
+  LEAD_SPECIALIST_OPERATOR      // Ведущий специалист, оператор ПУ
+  LEAD_SPECIALIST_LABOR         // Ведущий специалист, специалист по охране труда
+  LEAD_SPECIALIST_HVAC          // Ведущий специалист, машинист ХУ
+  SPECIALIST_1                  // Специалист 1 категории
+  SPECIALIST_1_OPERATOR         // Специалист 1 категории, оператор пульта ПС
+  SPECIALIST_1_DUTY             // Специалист 1 категории, дежурный
+  SPECIALIST_1_PARAMEDIC        // Специалист 1 категории (фельдшер)
+  CHIEF_SPECIALIST_HALF_RATE    // Главный специалист на 0,5 ставки
+  ELECTRICIAN                   // Электромонтёр по ремонту и обслуживанию электрооборудования
+  PLUMBER                       // Слесарь-сантехник
+  LOCKSMITH_REPAIRMAN           // Слесарь-ремонтник
+  LOCKSMITH_REPAIRMAN_KIPIA     // Слесарь-ремонтник, слесарь КИПиА
+  LOCKSMITH_VENTILATION         // Слесарь по ремонту и обслуживанию систем вентиляции, кондиционирования
+  WELDER                        // Электрогазосварщик
+  DRIVER                        // Водитель автомобиля
+  DOCTOR                        // Врач
+  WAREHOUSE_KEEPER              // Кладовщик
+  ADMINISTRATOR                 // Администратор
+  PAINTER                       // Маляр
+  CLEANER                       // Уборщик производственных и служебных помещений
+  AUXILIARY_WORKER              // Подсобный рабочий
+  GREEN_WORKER                  // Рабочий зеленого хозяйства
+}
+
+enum TaskStatus {
+  DRAFT       // Черновик
+  REVISION    // На уточнении
+  IN_PROGRESS // В работе
+  SUSPENDED   // Приостановлена
+  COMPLETED   // Выполнена
+  REWORK      // На доработке
+  FINISHED    // Завершена
+  CANCELED    // Отменена
+  ARCHIVE     // Архив
+}
+
+enum TaskPriority {
+  P1  // Критичный
+  P2  // Высокий
+  P3  // Средний
+  P4  // Низкий
+}
+
+model User {
+  id         	  String   @id @default(uuid())
+
+  email      	  String   @unique
+  password		  String
+
+  firstName  	  String   @map("first_name")
+  secondName 	  String   @map("second_name")
+  patronymic 	  String?
+
+  department 	  Department?
+  speciality 	  Specialty?
+
+  roles           UserRole @default(USER)
+
+  tasksAsExecutor    Task[] @relation("TaskExecutor")
+  tasksAsAnswerable  Task[] @relation("TaskAnswerable")
+  tasksAsInitiator   Task[] @relation("TaskInitiator")
+  comments  Comment[] @relation("CommentAuthor")
+
+  refreshTokens RefreshToken[]
+
+  createdAt  	  DateTime @default(now()) @map("created_at")
+  updatedAt  	  DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model RefreshToken {
+	id 		  String   @id @default(uuid())
+
+	token 	  String   @unique
+
+	userId 	  String @map("user_id")
+	user 	  User 	   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	createdAt DateTime @default(now()) @map("created_at")
+
+	@@map("refresh_tokens")
+}
+
+model Task {
+  id          String       @id @default(uuid())
+
+  name        String
+  description String
+
+  status      TaskStatus   @default(DRAFT)
+  priority    TaskPriority
+
+  executorId    String     @map("executor_id")
+  executor      User       @relation("TaskExecutor", fields: [executorId], references: [id])
+
+  answerableId  String     @map("answerable_id")
+  answerable    User       @relation("TaskAnswerable", fields: [answerableId], references: [id])
+
+  initiatorId   String     @map("initiator_id")
+  initiator     User       @relation("TaskInitiator", fields: [initiatorId], references: [id])
+
+  startDate   DateTime?	   @default(now()) @map("start_date")
+  deadline    DateTime?
+
+  department Department
+
+  comments  Comment[]
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@map("tasks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+
+  text      String
+
+  taskId    String   @map("task_id")
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId  String   @map("author_id")
+  author    User     @relation("CommentAuthor", fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("comments")
+}

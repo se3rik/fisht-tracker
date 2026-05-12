@@ -1,13 +1,29 @@
+import type { MouseEvent } from 'react';
+import { NavLink } from 'react-router';
+
 import styles from './BaseSidebar.module.scss';
+
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { useAppSelector } from '@/hooks/useAppSelector';
+
+import { logout } from '@/stores/slices/authSlice';
 
 import { Avatar } from '@mui/material';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 import { navigationList } from '@/constants/navigationList';
-import { NavLink } from 'react-router';
 
 export const BaseSidebar = () => {
+    const dispatch = useAppDispatch();
+    const { profileData } = useAppSelector((state) => state.profile);
+
+    const onLogoutIconClick = async (event: MouseEvent<SVGSVGElement>) => {
+        event.preventDefault();
+        await dispatch(logout());
+    };
+
     return (
         <aside className={styles.sidebarSection}>
             <section className={styles.heroSection}>
@@ -41,11 +57,12 @@ export const BaseSidebar = () => {
             >
                 <div className={styles.profileAvatar}>
                     <Avatar
-                        {...stringAvatar('Sergey Ryndin')}
+                        {...stringAvatar(`${profileData?.firstName} ${profileData?.secondName}`)}
                         sx={{ width: 32, height: 32, fontSize: 16 }}
                     />
                 </div>
                 <span className={styles.profileTitle}>Учетная запись</span>
+                <LogoutIcon className={styles.logoutIcon} onClick={onLogoutIconClick} />
             </NavLink>
         </aside>
     );

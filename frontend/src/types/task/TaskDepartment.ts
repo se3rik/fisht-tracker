@@ -1,0 +1,16 @@
+export type TaskDepartmentValues =
+    | 'AUP'
+    | 'OUOKR'
+    | 'OKS'
+    | 'YO'
+    | 'OSIOOR'
+    | 'OOEFP'
+    | 'PTO'
+    | 'OERO'
+    | 'OSO'
+    | 'OOOVVO'
+    | 'OOOKHVK'
+    | 'MP'
+    | 'OOSPB'
+    | 'OOOR'
+    | 'OHO';

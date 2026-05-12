@@ -20,7 +20,8 @@
 }
 
 .subFormWrapper {
-    flex: 1;
+    min-width: 450px;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     height: fit-content;
@@ -28,6 +29,7 @@
     padding: 20px;
     border: 1px solid $devider-color;
     border-radius: 8px;
+    overflow: hidden;
 }
 
 .subFormList {
@@ -45,4 +47,15 @@
     gap: 8px;
     list-style-type: none;
     font-size: $font-size-sm;
+}
+
+.textareaWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.errorText {
+    font-size: $font-size-xs;
+    color: #dc2626;
 }

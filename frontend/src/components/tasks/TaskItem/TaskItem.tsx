@@ -7,28 +7,32 @@ import { TASK_STATUS_CONFIG } from '@/constants/taskStatuses';
 import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
+import { formatDate } from '@/helpers/formatDate';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
+import type { TasksStatusValue } from '@/types/task/TaskStatus';
 
 type TaskItemProps = {
     task: TaskListItem;
 };
 
 export const TaskItem = ({ task }: TaskItemProps) => {
+    const status = task.status.toLowerCase() as TasksStatusValue;
+
     return (
         <Link to={`/tasks/${task.id}`} className={styles.taskItem}>
             <div className={styles.taskTitleBlock}>
-                <span className={styles.taskTitle}>{task.title}</span>
-                <span className={styles.taskDate}>{task.createdAt}</span>
+                <span className={styles.taskTitle}>{task.name}</span>
+                <span className={styles.taskDate}>{formatDate(task.createdAt)}</span>
             </div>
 
-            {task.status && (
+            {status && (
                 <div>
                     <Chip
-                        label={TASK_STATUS_CONFIG[task.status].label}
+                        label={TASK_STATUS_CONFIG[status].label}
                         sx={{
-                            backgroundColor: TASK_STATUS_CONFIG[task.status].bgcolor,
-                            color: TASK_STATUS_CONFIG[task.status].color,
+                            backgroundColor: TASK_STATUS_CONFIG[status].bgcolor,
+                            color: TASK_STATUS_CONFIG[status].color,
                         }}
                     />
                 </div>
@@ -52,10 +56,12 @@ export const TaskItem = ({ task }: TaskItemProps) => {
 
             <div className={styles.taskExecutor}>
                 <Avatar
-                    {...stringAvatar(task.executor)}
+                    {...stringAvatar(task.executor.firstName + ' ' + task.executor.secondName)}
                     sx={{ width: 32, height: 32, fontSize: 16 }}
                 />
-                <span>{task.executor}</span>
+                <span>
+                    {task.executor.firstName} {task.executor.secondName}
+                </span>
             </div>
         </Link>
     );
