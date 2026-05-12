@@ -9,7 +9,7 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { getProfileData, updateProfileData } from '@/stores/slices/profileSlice';
 
-import { PageHeading } from '@/components/pageHeading/PageHeading';
+import { PageHeading } from '@/components/PageHeading/PageHeading';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 

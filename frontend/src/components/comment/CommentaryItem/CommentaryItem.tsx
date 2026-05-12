@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Avatar, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 

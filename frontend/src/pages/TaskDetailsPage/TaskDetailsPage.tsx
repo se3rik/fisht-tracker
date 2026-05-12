@@ -56,7 +56,6 @@ export const TaskDetailsPage = () => {
     const [commentValue, setCommentValue] = useState('');
 
     const {
-        register,
         handleSubmit,
         control,
         reset,
@@ -77,19 +76,11 @@ export const TaskDetailsPage = () => {
         resolver: yupResolver(updateTaskValidationSchema),
     });
 
-    const [taskName, setTaskName] = useState('');
-    const [taskDescription, setTaskDescription] = useState('');
-    const [priority, setPriority] = useState<TaskPriorityValue>('');
-    const [status, setStatus] = useState<TasksStatusValue>('');
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [deadline, setDeadline] = useState<Dayjs | null>(null);
-    const [executorId, setExecutorId] = useState('');
-    const [answerableId, setAnswerableId] = useState('');
-    const [initiatorId, setInitiatorId] = useState('');
     const [executor, setExecutor] = useState<UserSearchResult | null>(null);
     const [answerable, setAnswerable] = useState<UserSearchResult | null>(null);
     const [initiator, setInitiator] = useState<UserSearchResult | null>(null);
-    const [department, setDepartment] = useState<TaskDepartmentValues | ''>('');
 
     const departmentItems = Object.entries(DEPARTMENT_LABELS).map(([value, title], id) => ({
         id,
@@ -327,7 +318,6 @@ export const TaskDetailsPage = () => {
                                 value={isEditing ? initiator : (taskData?.initiator ?? null)}
                                 error={!!errors.initiatorId}
                                 onChange={(id) => {
-                                    setInitiatorId(id);
                                     field.onChange(id);
                                 }}
                                 onChangeUser={(user) => setInitiator(user)}
@@ -356,7 +346,6 @@ export const TaskDetailsPage = () => {
                                 value={isEditing ? answerable : (taskData?.answerable ?? null)}
                                 error={!!errors.answerableId}
                                 onChange={(id) => {
-                                    setAnswerableId(id);
                                     field.onChange(id);
                                 }}
                                 onChangeUser={(user) => setAnswerable(user)}
@@ -385,7 +374,6 @@ export const TaskDetailsPage = () => {
                                 value={isEditing ? executor : (taskData?.executor ?? null)}
                                 error={!!errors.executorId}
                                 onChange={(id) => {
-                                    setExecutorId(id);
                                     field.onChange(id);
                                 }}
                                 onChangeUser={(user) => setExecutor(user)}
