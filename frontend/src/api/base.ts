@@ -5,7 +5,7 @@ import { forceLogout } from '@/stores/slices/authSlice';
 
 import type { RequestOptions } from '@/api/api-types/request-options';
 
-const BASE_API = 'http://localhost:3000/api';
+const BASE_API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const { body, headers, _retry, ...rest } = options;
