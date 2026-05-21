@@ -53,6 +53,7 @@ export const TaskDetailsPage = () => {
     }
 
     const [isEditing, setIsEditing] = useState(false);
+    const [editMode, setEditMode] = useState<'full' | 'status' | null>(null);
     const [commentValue, setCommentValue] = useState('');
 
     const {
@@ -88,7 +89,12 @@ export const TaskDetailsPage = () => {
         title,
     }));
 
-    const canEdit = profileData?.roles === 'ADMIN' || profileData?.id === originalInitiatorId;
+    const canFullEdit = profileData?.roles === 'ADMIN' || profileData?.id === originalInitiatorId;
+
+    const canEditStatus =
+        canFullEdit ||
+        profileData?.id === taskData?.executorId ||
+        profileData?.id === taskData?.answerableId;
 
     const handleStartEditing = () => {
         if (!taskData) return;
@@ -109,7 +115,12 @@ export const TaskDetailsPage = () => {
         setInitiator(taskData.initiator);
         setStartDate(taskData.startDate ? dayjs(taskData.startDate) : null);
         setDeadline(taskData.deadline ? dayjs(taskData.deadline) : null);
-        setIsEditing(true);
+
+        if (canFullEdit) {
+            setEditMode('full');
+        } else if (canEditStatus) {
+            setEditMode('status');
+        }
     };
 
     const handleCancelEditing = () => {
@@ -125,7 +136,7 @@ export const TaskDetailsPage = () => {
             startDate: taskData?.startDate ?? null,
             deadline: taskData?.deadline ?? null,
         });
-        setIsEditing(false);
+        setEditMode(null);
     };
 
     const handleSave = handleSubmit(async (formData) => {
@@ -165,7 +176,7 @@ export const TaskDetailsPage = () => {
                     : prev,
             );
 
-            setIsEditing(false);
+            setEditMode(null);
         } catch (err) {
             console.error(err);
         }
@@ -208,9 +219,9 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <BaseSelect
-                                value={isEditing ? field.value : (taskData?.priority ?? '')}
+                                value={editMode !== null ? field.value : (taskData?.priority ?? '')}
                                 menuItems={taskPriorities}
-                                disabled={!isEditing}
+                                disabled={editMode !== 'full'}
                                 error={!!errors.priority}
                                 onChange={field.onChange}
                                 fullWidth
@@ -234,12 +245,12 @@ export const TaskDetailsPage = () => {
                         <div>
                             <BaseSelect
                                 value={
-                                    isEditing
+                                    editMode !== null
                                         ? field.value
                                         : (taskData?.status.toLowerCase() as TasksStatusValue)
                                 }
                                 menuItems={taskStatuses}
-                                disabled={!isEditing}
+                                disabled={!(editMode === 'full' || editMode === 'status')}
                                 error={!!errors.status}
                                 onChange={field.onChange}
                                 fullWidth
@@ -262,13 +273,13 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <BaseDatePicker
                             value={
-                                isEditing
+                                editMode !== null
                                     ? startDate
                                     : taskData?.startDate
                                       ? dayjs(taskData.startDate)
                                       : null
                             }
-                            disabled={!isEditing}
+                            disabled={editMode !== 'full'}
                             onChange={(newValue) => {
                                 setStartDate(newValue);
                                 field.onChange(newValue ? newValue.toISOString() : null);
@@ -288,13 +299,13 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <BaseDatePicker
                             value={
-                                isEditing
+                                editMode !== null
                                     ? deadline
                                     : taskData?.deadline
                                       ? dayjs(taskData.deadline)
                                       : null
                             }
-                            disabled={!isEditing}
+                            disabled={editMode !== 'full'}
                             onChange={(newValue) => {
                                 setDeadline(newValue);
                                 field.onChange(newValue ? newValue.toISOString() : null);
@@ -314,8 +325,10 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
-                                disabled={!isEditing}
-                                value={isEditing ? initiator : (taskData?.initiator ?? null)}
+                                disabled={editMode !== 'full'}
+                                value={
+                                    editMode !== null ? initiator : (taskData?.initiator ?? null)
+                                }
                                 error={!!errors.initiatorId}
                                 onChange={(id) => {
                                     field.onChange(id);
@@ -342,8 +355,10 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
-                                disabled={!isEditing}
-                                value={isEditing ? answerable : (taskData?.answerable ?? null)}
+                                disabled={editMode !== 'full'}
+                                value={
+                                    editMode !== null ? answerable : (taskData?.answerable ?? null)
+                                }
                                 error={!!errors.answerableId}
                                 onChange={(id) => {
                                     field.onChange(id);
@@ -370,8 +385,8 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
-                                disabled={!isEditing}
-                                value={isEditing ? executor : (taskData?.executor ?? null)}
+                                disabled={editMode !== 'full'}
+                                value={editMode !== null ? executor : (taskData?.executor ?? null)}
                                 error={!!errors.executorId}
                                 onChange={(id) => {
                                     field.onChange(id);
@@ -398,8 +413,10 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <BaseSelect
-                                value={isEditing ? field.value : (taskData?.department ?? '')}
-                                disabled={!isEditing}
+                                value={
+                                    editMode !== null ? field.value : (taskData?.department ?? '')
+                                }
+                                disabled={editMode !== 'full'}
                                 displayEmpty
                                 error={!!errors.department}
                                 menuItems={[
@@ -441,9 +458,9 @@ export const TaskDetailsPage = () => {
                                     <div className={styles.textareaWrapper}>
                                         <BaseTextarea
                                             placeholder="Введите название задачи"
-                                            value={isEditing ? field.value : taskData?.name}
+                                            value={editMode !== null ? field.value : taskData?.name}
                                             onChange={field.onChange}
-                                            disabled={!isEditing}
+                                            disabled={editMode !== 'full'}
                                             error={!!errors.name}
                                             style={{ fontSize: '18px', fontWeight: 500 }}
                                         />
@@ -463,9 +480,13 @@ export const TaskDetailsPage = () => {
                                         <BaseTextarea
                                             minRows={6}
                                             placeholder="Введите описание задачи"
-                                            value={isEditing ? field.value : taskData?.description}
+                                            value={
+                                                editMode !== null
+                                                    ? field.value
+                                                    : taskData?.description
+                                            }
                                             onChange={field.onChange}
-                                            disabled={!isEditing}
+                                            disabled={editMode !== 'full'}
                                             error={!!errors.description}
                                             style={{ fontSize: '15px' }}
                                         />
@@ -513,9 +534,9 @@ export const TaskDetailsPage = () => {
                             </div>
                         </section>
 
-                        {canEdit && (
+                        {(canFullEdit || canEditStatus) && (
                             <div className={styles.taskInfoButtons}>
-                                {isEditing ? (
+                                {editMode !== null ? (
                                     <>
                                         <Button
                                             variant="contained"
