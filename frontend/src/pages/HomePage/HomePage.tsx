@@ -1,51 +1,53 @@
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import Accordion from '@mui/material/Accordion';
+// import AccordionSummary from '@mui/material/AccordionSummary';
+// import AccordionDetails from '@mui/material/AccordionDetails';
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import styles from './HomePage.module.scss';
+// import styles from './HomePage.module.scss';
 
-import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
-import { PageHeading } from '@/components/PageHeading/PageHeading';
+// import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
+// import { PageHeading } from '@/components/PageHeading/PageHeading';
 
-import type { AccordionTask } from '@/types/accordion/AccordionTask';
+// import type { AccordionTask } from '@/types/accordion/AccordionTask';
+import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 
 export const HomePage = () => {
-    const mockActiveTasks: AccordionTask[] = [
-        {
-            id: 1,
-            key: 'ОСО',
-            title: 'Кастомизировать стили для Аккордеона',
-            deadline: '22.01.2026',
-        },
-        {
-            id: 2,
-            key: 'ОСО',
-            title: 'Отрисовать блоки на главной странице',
-            deadline: '22.01.2026',
-        },
-        { id: 3, key: 'ОСО', title: 'Закончить главную страницу', deadline: '22.01.2026' },
-    ];
+    // const mockActiveTasks: AccordionTask[] = [
+    //     {
+    //         id: 1,
+    //         key: 'ОСО',
+    //         title: 'Кастомизировать стили для Аккордеона',
+    //         deadline: '22.01.2026',
+    //     },
+    //     {
+    //         id: 2,
+    //         key: 'ОСО',
+    //         title: 'Отрисовать блоки на главной странице',
+    //         deadline: '22.01.2026',
+    //     },
+    //     { id: 3, key: 'ОСО', title: 'Закончить главную страницу', deadline: '22.01.2026' },
+    // ];
 
-    const mockPendingTasks: AccordionTask[] = [
-        {
-            id: 1,
-            key: 'ОСО',
-            title: 'Кастомизировать стили для Аккордеона',
-            deadline: '22.01.2026',
-        },
-        {
-            id: 2,
-            key: 'ОСО',
-            title: 'Отрисовать блоки на главной странице',
-            deadline: '22.01.2026',
-        },
-    ];
+    // const mockPendingTasks: AccordionTask[] = [
+    //     {
+    //         id: 1,
+    //         key: 'ОСО',
+    //         title: 'Кастомизировать стили для Аккордеона',
+    //         deadline: '22.01.2026',
+    //     },
+    //     {
+    //         id: 2,
+    //         key: 'ОСО',
+    //         title: 'Отрисовать блоки на главной странице',
+    //         deadline: '22.01.2026',
+    //     },
+    // ];
 
     return (
         <>
-            <PageHeading title="Главная страница" />
-            <section className={styles.pageWrapper}>
+            {/* <PageHeading title="Главная страница" /> */}
+            <InProgressPage />
+            {/* <section className={styles.pageWrapper}>
                 <Accordion className={styles.heroAccordion} defaultExpanded>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <span>Добро пожаловать в Fisht Tracker!</span>
@@ -75,7 +77,7 @@ export const HomePage = () => {
                         <AccordionTasksList tasksList={mockPendingTasks} />
                     </AccordionDetails>
                 </Accordion>
-            </section>
+            </section> */}
         </>
     );
 };
