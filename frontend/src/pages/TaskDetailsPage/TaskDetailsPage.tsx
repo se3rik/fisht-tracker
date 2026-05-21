@@ -52,7 +52,6 @@ export const TaskDetailsPage = () => {
         setOriginalInitiatorId(taskData.initiatorId);
     }
 
-    const [isEditing, setIsEditing] = useState(false);
     const [editMode, setEditMode] = useState<'full' | 'status' | null>(null);
     const [commentValue, setCommentValue] = useState('');
 
