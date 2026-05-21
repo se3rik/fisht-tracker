@@ -27,6 +27,8 @@ export const TasksPage = () => {
     const [role, setRole] = useState<TaskRoleValue>('');
     const [dateFilter, setDateFilter] = useState<'asc' | 'desc' | ''>('');
 
+    const isFiltersEmpty = !name && !status && !priority && !role && !dateFilter;
+
     const { tasks } = useTasksList({
         name,
         role: role || undefined,
@@ -35,49 +37,69 @@ export const TasksPage = () => {
         sortByDate: dateFilter || undefined,
     });
 
+    const resetFilters = () => {
+        setName('');
+        setStatus('');
+        setPriority('');
+        setRole('');
+        setDateFilter('');
+    };
+
     return (
         <section className={styles.pageWrapper}>
             <section className={styles.filterSection}>
-                <div className={styles.filterTools}>
-                    <BaseInput
-                        id="taskName"
-                        type="text"
-                        size="small"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Поиск по названию задачи"
-                    />
+                <div className={styles.filterToolsWrapper}>
+                    <div className={styles.filterTools}>
+                        <BaseInput
+                            id="taskName"
+                            type="text"
+                            size="small"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Поиск по названию задачи"
+                        />
 
-                    <BaseSelect
-                        label="Роль"
-                        value={role}
-                        menuItems={taskRoles}
-                        onChange={setRole}
-                    />
+                        <BaseSelect
+                            label="Роль"
+                            value={role}
+                            menuItems={taskRoles}
+                            onChange={setRole}
+                        />
 
-                    <BaseSelect
-                        label="Статус"
-                        value={status}
-                        menuItems={taskStatuses}
-                        onChange={setStatus}
-                    />
+                        <BaseSelect
+                            label="Статус"
+                            value={status}
+                            menuItems={taskStatuses}
+                            onChange={setStatus}
+                        />
 
-                    <BaseSelect
-                        label="Приоритет"
-                        value={priority}
-                        menuItems={taskPriorities}
-                        onChange={setPriority}
-                    />
+                        <BaseSelect
+                            label="Приоритет"
+                            value={priority}
+                            menuItems={taskPriorities}
+                            onChange={setPriority}
+                        />
 
-                    <BaseSelect
-                        label="Дата"
-                        value={dateFilter}
-                        menuItems={[
-                            { id: 1, value: 'asc', title: 'По возрастанию' },
-                            { id: 2, value: 'desc', title: 'По убыванию' },
-                        ]}
-                        onChange={setDateFilter}
-                    />
+                        <BaseSelect
+                            label="Дата"
+                            value={dateFilter}
+                            menuItems={[
+                                { id: 1, value: 'asc', title: 'По возрастанию' },
+                                { id: 2, value: 'desc', title: 'По убыванию' },
+                            ]}
+                            onChange={setDateFilter}
+                        />
+                    </div>
+                    <div className={styles.filterActions}>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            disabled={isFiltersEmpty}
+                            onClick={resetFilters}
+                        >
+                            Сбросить фильтры
+                        </Button>
+                    </div>
                 </div>
 
                 <Button

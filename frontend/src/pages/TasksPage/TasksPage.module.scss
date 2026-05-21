@@ -17,6 +17,12 @@
 
 // Костыльный адаптив, плохо смотрится
 
+.filterToolsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .filterTools {
     display: flex;
     flex-wrap: wrap;
