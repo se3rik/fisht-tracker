@@ -70,15 +70,16 @@ enum Specialty {
 }
 
 enum TaskStatus {
-  DRAFT       // Черновик
-  REVISION    // На уточнении
-  IN_PROGRESS // В работе
-  SUSPENDED   // Приостановлена
-  COMPLETED   // Выполнена
-  REWORK      // На доработке
-  FINISHED    // Завершена
-  CANCELED    // Отменена
-  ARCHIVE     // Архив
+  DRAFT         // Черновик
+  FOR_EXECUTION // Для исполнения
+  REVISION      // На уточнении
+  IN_PROGRESS   // В работе
+  SUSPENDED     // Приостановлена
+  COMPLETED     // Выполнена
+  REWORK        // На доработке
+  FINISHED      // Завершена
+  CANCELED      // Отменена
+  ARCHIVE       // Архив
 }
 
 enum TaskPriority {

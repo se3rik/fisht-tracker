@@ -2,14 +2,15 @@ import type { TasksStatusValue, TaskStatus, TaskStatusTitle } from '@/types/task
 
 export const taskStatuses: TaskStatus[] = [
     { id: 1, value: 'draft', title: 'Черновик' },
-    { id: 2, value: 'revision', title: 'На уточнении' },
-    { id: 3, value: 'in_progress', title: 'В работе' },
-    { id: 4, value: 'suspended', title: 'Приостановлена' },
-    { id: 5, value: 'completed', title: 'Выполнена' },
-    { id: 6, value: 'rework', title: 'На доработке' },
-    { id: 7, value: 'finished', title: 'Завершена' },
-    { id: 8, value: 'canceled', title: 'Отменена' },
-    { id: 9, value: 'archive', title: 'Архив' },
+    { id: 2, value: 'for_execution', title: 'Для исполнения' },
+    { id: 3, value: 'revision', title: 'На уточнении' },
+    { id: 4, value: 'in_progress', title: 'В работе' },
+    { id: 5, value: 'suspended', title: 'Приостановлена' },
+    { id: 6, value: 'completed', title: 'Выполнена' },
+    { id: 7, value: 'rework', title: 'На доработке' },
+    { id: 8, value: 'finished', title: 'Завершена' },
+    { id: 9, value: 'canceled', title: 'Отменена' },
+    { id: 10, value: 'archive', title: 'Архив' },
 ];
 
 export const TASK_STATUS_CONFIG: Record<
@@ -24,6 +25,12 @@ export const TASK_STATUS_CONFIG: Record<
         label: 'Черновик',
         bgcolor: '#f3f4f6',
         color: '#374151',
+    },
+
+    for_execution: {
+        label: 'Для исполнения',
+        bgcolor: '#3c75e6',
+        color: '#fdfeff',
     },
 
     in_progress: {

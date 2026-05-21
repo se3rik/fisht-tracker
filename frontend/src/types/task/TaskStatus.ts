@@ -1,5 +1,6 @@
 export type TaskStatusTitle =
     | 'Черновик'
+    | 'Для исполнения'
     | 'На уточнении'
     | 'В работе'
     | 'Приостановлена'
@@ -11,6 +12,7 @@ export type TaskStatusTitle =
 
 export type TasksStatusValue =
     | 'draft'
+    | 'for_execution'
     | 'revision'
     | 'in_progress'
     | 'suspended'
