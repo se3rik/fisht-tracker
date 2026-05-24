@@ -11,6 +11,7 @@ import { formatDate } from '@/helpers/formatDate';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
+import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
 
 type TaskItemProps = {
     task: TaskListItem;
@@ -52,6 +53,10 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                         }}
                     />
                 </div>
+            )}
+
+            {task.department && (
+                <div className={styles.taskDepartment}>{DEPARTMENT_LABELS[task.department]}</div>
             )}
 
             <div className={styles.taskExecutor}>

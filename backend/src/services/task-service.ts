@@ -31,6 +31,7 @@ class TaskService {
                 name: true,
                 status: true,
                 priority: true,
+                department: true,
                 createdAt: true,
                 executor: {
                     select: {

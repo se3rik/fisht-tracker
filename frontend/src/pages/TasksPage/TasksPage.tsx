@@ -113,6 +113,13 @@ export const TasksPage = () => {
             </section>
 
             <section className={styles.mainContent}>
+                <div className={styles.tasksHeader}>
+                    <div>Название</div>
+                    <div>Статус</div>
+                    <div>Приоритет</div>
+                    <div>Отдел</div>
+                    <div>Исполнитель</div>
+                </div>
                 {tasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
                 ))}
