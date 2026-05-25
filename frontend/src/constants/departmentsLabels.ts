@@ -22,7 +22,7 @@
 /* 
 	Более укороченное название отделов
 */
-export const DEPARTMENT_LABELS: Record<string, string> = {
+export const DEPARTMENT_LABELS = {
     AUP: 'Администрация',
     OUOKR: 'Отчетность и кадры',
     OKS: 'Контрактная служба',

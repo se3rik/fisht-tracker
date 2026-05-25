@@ -6,7 +6,15 @@ import { TaskStatus } from '../../generated/prisma/enums.js';
 import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
 
 class TaskService {
-    async getAllTasks({ userId, name, role, status, priority, sortByDate }: GetAllTasksParams) {
+    async getAllTasks({
+        userId,
+        name,
+        role,
+        status,
+        department,
+        priority,
+        sortByDate,
+    }: GetAllTasksParams) {
         const roleFilter =
             role === 'executor'
                 ? { executorId: userId }
@@ -21,6 +29,7 @@ class TaskService {
                 ...roleFilter,
                 ...(name && { name: { contains: name, mode: 'insensitive' } }),
                 ...(status && { status }),
+                ...(department && { department }),
                 ...(priority && { priority }),
             },
             orderBy: {

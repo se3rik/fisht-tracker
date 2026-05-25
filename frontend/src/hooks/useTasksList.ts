@@ -6,11 +6,13 @@ import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TaskRoleValue } from '@/types/task/TaskRole';
+import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 
 type Filters = {
     name?: string;
     role?: TaskRoleValue;
     status?: TasksStatusValue;
+    department?: TaskDepartmentValues;
     priority?: TaskPriorityValue;
     sortByDate?: 'asc' | 'desc';
 };
@@ -35,7 +37,14 @@ export const useTasksList = (filters: Filters) => {
         };
 
         fetchTasks();
-    }, [filters.name, filters.role, filters.status, filters.priority, filters.sortByDate]);
+    }, [
+        filters.name,
+        filters.role,
+        filters.status,
+        filters.department,
+        filters.priority,
+        filters.sortByDate,
+    ]);
 
     return { tasks, isLoading, error };
 };

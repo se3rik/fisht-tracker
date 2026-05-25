@@ -9,6 +9,7 @@ export type GetAllTasksParams = {
     name?: string;
     role?: TaskRole;
     status?: TaskStatus;
+    department?: Department;
     priority?: TaskPriority;
     sortByDate?: SortOrder;
 };

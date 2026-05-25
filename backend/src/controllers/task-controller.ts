@@ -4,19 +4,20 @@ import taskService from '~/services/task-service.js';
 
 import ApiError from '~/exceptions/api-error.js';
 
-import { TaskStatus, TaskPriority } from '../../generated/prisma/enums.js';
+import { TaskStatus, TaskPriority, Department } from '../../generated/prisma/enums.js';
 
 class TaskController {
     async getAllTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const { id: userId } = res.locals.user;
-            const { name, role, status, priority, sortByDate } = req.query;
+            const { name, role, status, department, priority, sortByDate } = req.query;
 
             const tasks = await taskService.getAllTasks({
                 userId,
                 name: name as string | undefined,
                 role: role as any | undefined,
                 status: status as TaskStatus | undefined,
+                department: department as Department | undefined,
                 priority: priority as TaskPriority | undefined,
                 sortByDate: sortByDate as 'asc' | 'desc' | undefined,
             });

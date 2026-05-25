@@ -34,7 +34,7 @@
 }
 
 .filterTools > :not(:first-child) {
-    flex: 1 1 160px;
+    flex: 0 1 200px;
 }
 
 .createTaskButton {
@@ -69,6 +69,6 @@
     }
 
     & > :nth-child(5) {
-        flex: 1;
+        flex: 2;
     }
 }
