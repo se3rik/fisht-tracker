@@ -19,18 +19,29 @@ import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
 import { SPECIALTY_LABELS } from '@/constants/specialityLabels';
 import { DEPARTMENT_SPECIALTY_MAP } from '@/constants/departmentSpecialityMap';
 
+import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
+
 const departmentItems = Object.entries(DEPARTMENT_LABELS).map(([value, title], id) => ({
     id,
     value,
     title,
 }));
 
+type ProfileFormValues = {
+    secondName: string;
+    firstName: string;
+    patronymic: string;
+    email: string;
+    department: TaskDepartmentValues | '';
+    speciality: string;
+};
+
 export const ProfilePage = () => {
     const dispatch = useAppDispatch();
     const { profileData } = useAppSelector((state) => state.profile);
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const { register, reset, handleSubmit, control, watch } = useForm({
+    const { register, reset, handleSubmit, control, watch } = useForm<ProfileFormValues>({
         defaultValues: {
             secondName: '',
             firstName: '',
@@ -73,7 +84,14 @@ export const ProfilePage = () => {
     }, [profileData, reset]);
 
     const onSubmit = handleSubmit((data) => {
-        dispatch(updateProfileData(data));
+        dispatch(
+            updateProfileData({
+                ...data,
+                department: data.department || null,
+                speciality: data.speciality || null,
+            }),
+        );
+
         setIsEditing(false);
     });
 
