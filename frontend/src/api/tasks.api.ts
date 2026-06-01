@@ -15,6 +15,8 @@ type GetAllTasksParams = {
     department?: TaskDepartmentValues;
     priority?: TaskPriorityValue;
     sortByDate?: 'asc' | 'desc';
+    limit?: number;
+    skip?: number;
 };
 
 export const tasksApi = {
@@ -27,12 +29,14 @@ export const tasksApi = {
         if (params.department) query.append('department', params.department);
         if (params.priority) query.append('priority', params.priority);
         if (params.sortByDate) query.append('sortByDate', params.sortByDate);
+        if (params.limit) query.append('limit', params.limit.toString());
+        if (params.skip) query.append('skip', params.skip.toString());
 
         const url = query.toString()
             ? `${endpoints.tasks.getAllTasks}?${query.toString()}`
             : endpoints.tasks.getAllTasks;
 
-        return request<TaskListItem[]>(url, { method: 'GET' });
+        return request<{ tasks: TaskListItem[]; total: number }>(url, { method: 'GET' });
     },
 
     getTaskById: async (id: string) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Button } from '@mui/material';
+import { Button, Pagination } from '@mui/material';
 
 import styles from './TasksPage.module.scss';
 
@@ -25,6 +25,8 @@ export const TasksPage = () => {
     const navigate = useNavigate();
     const { profileData } = useAppSelector((state) => state.profile);
 
+    const LIMIT = 9;
+    const [page, setPage] = useState(1);
     const [name, setName] = useState('');
     const [status, setStatus] = useState<TasksStatusValue>('');
     const [priority, setPriority] = useState<TaskPriorityValue>('');
@@ -34,13 +36,15 @@ export const TasksPage = () => {
 
     const isFiltersEmpty = !name && !status && !priority && !role && !dateFilter && !department;
 
-    const { tasks } = useTasksList({
+    const { tasks, total } = useTasksList({
         name,
         role: role || undefined,
         status: status || undefined,
         department: department || undefined,
         priority: priority || undefined,
         sortByDate: dateFilter || undefined,
+        limit: LIMIT,
+        skip: (page - 1) * LIMIT,
     });
 
     const resetFilters = () => {
@@ -50,6 +54,7 @@ export const TasksPage = () => {
         setDepartment('');
         setRole('');
         setDateFilter('');
+        setPage(1);
     };
 
     useEffect(() => {
@@ -58,6 +63,11 @@ export const TasksPage = () => {
             setDepartment(profileData.department);
         }
     }, [profileData?.department]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPage(1);
+    }, [name, status, priority, department, role, dateFilter]);
 
     return (
         <section className={styles.pageWrapper}>
@@ -145,6 +155,21 @@ export const TasksPage = () => {
                     <TaskItem key={task.id} task={task} />
                 ))}
             </section>
+
+            <Pagination
+                count={Math.ceil(total / LIMIT)}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                variant="outlined"
+                color="primary"
+                sx={{
+                    margin: '0 auto',
+                    '& .MuiPaginationItem-root': {
+                        color: 'white',
+                        borderColor: '#bdbdbd',
+                    },
+                }}
+            />
         </section>
     );
 };

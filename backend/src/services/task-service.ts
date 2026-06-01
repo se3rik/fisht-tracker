@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import ApiError from '~/exceptions/api-error.js';
 
 import { TaskStatus } from '../../generated/prisma/enums.js';
+import type { Prisma } from '../../generated/prisma/client.js';
 import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
 
 class TaskService {
@@ -26,34 +27,39 @@ class TaskService {
                     ? { initiatorId: userId }
                     : {};
 
-        return prisma.task.findMany({
-            where: {
-                ...roleFilter,
-                ...(name && { name: { contains: name, mode: 'insensitive' } }),
-                ...(status && { status }),
-                ...(department && { department }),
-                ...(priority && { priority }),
-            },
-            orderBy: {
-                createdAt: sortByDate ?? 'desc',
-            },
-            take: limit,
-            skip: skip,
-            select: {
-                id: true,
-                name: true,
-                status: true,
-                priority: true,
-                department: true,
-                createdAt: true,
-                executor: {
-                    select: {
-                        firstName: true,
-                        secondName: true,
+        const where: Prisma.TaskWhereInput = {
+            ...roleFilter,
+            ...(name && { name: { contains: name, mode: 'insensitive' } }),
+            ...(status && { status }),
+            ...(department && { department }),
+            ...(priority && { priority }),
+        };
+
+        const [tasks, total] = await prisma.$transaction([
+            prisma.task.findMany({
+                where,
+                orderBy: { createdAt: sortByDate ?? 'desc' },
+                take: limit,
+                skip,
+                select: {
+                    id: true,
+                    name: true,
+                    status: true,
+                    priority: true,
+                    department: true,
+                    createdAt: true,
+                    executor: {
+                        select: {
+                            firstName: true,
+                            secondName: true,
+                        },
                     },
                 },
-            },
-        });
+            }),
+            prisma.task.count({ where }),
+        ]);
+
+        return { tasks, total };
     }
 
     async getTaskById(id: string) {

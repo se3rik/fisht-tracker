@@ -15,10 +15,13 @@ type Filters = {
     department?: TaskDepartmentValues;
     priority?: TaskPriorityValue;
     sortByDate?: 'asc' | 'desc';
+    limit?: number;
+    skip?: number;
 };
 
 export const useTasksList = (filters: Filters) => {
     const [tasks, setTasks] = useState<TaskListItem[]>([]);
+    const [total, setTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +31,8 @@ export const useTasksList = (filters: Filters) => {
             setError(null);
             try {
                 const data = await tasksApi.getAllTasks(filters);
-                setTasks(data);
+                setTasks(data.tasks);
+                setTotal(data.total);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Ошибка загрузки задач');
             } finally {
@@ -44,7 +48,9 @@ export const useTasksList = (filters: Filters) => {
         filters.department,
         filters.priority,
         filters.sortByDate,
+        filters.limit,
+        filters.skip,
     ]);
 
-    return { tasks, isLoading, error };
+    return { tasks, total, isLoading, error };
 };
