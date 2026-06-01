@@ -14,6 +14,8 @@ class TaskService {
         department,
         priority,
         sortByDate,
+        limit,
+        skip,
     }: GetAllTasksParams) {
         const roleFilter =
             role === 'executor'
@@ -35,6 +37,8 @@ class TaskService {
             orderBy: {
                 createdAt: sortByDate ?? 'desc',
             },
+            take: limit,
+            skip: skip,
             select: {
                 id: true,
                 name: true,

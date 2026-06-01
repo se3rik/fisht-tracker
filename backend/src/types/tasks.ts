@@ -12,6 +12,8 @@ export type GetAllTasksParams = {
     department?: Department;
     priority?: TaskPriority;
     sortByDate?: SortOrder;
+    limit?: number;
+    skip?: number;
 };
 
 export type CreateTaskParams = {

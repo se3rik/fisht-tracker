@@ -10,7 +10,7 @@ class TaskController {
     async getAllTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const { id: userId } = res.locals.user;
-            const { name, role, status, department, priority, sortByDate } = req.query;
+            const { name, role, status, department, priority, sortByDate, limit, skip } = req.query;
 
             const tasks = await taskService.getAllTasks({
                 userId,
@@ -20,6 +20,8 @@ class TaskController {
                 department: department as Department | undefined,
                 priority: priority as TaskPriority | undefined,
                 sortByDate: sortByDate as 'asc' | 'desc' | undefined,
+                limit: limit ? Number(limit) : undefined,
+                skip: skip ? Number(skip) : undefined,
             });
 
             res.json(tasks);
