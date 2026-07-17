@@ -24,7 +24,7 @@ type TaskCreationForm = {
     name: string;
     description: string;
     priority: string;
-    executorId: string;
+    executorIds: string[];
     answerableId: string;
     initiatorId: string;
     department: string;
@@ -45,7 +45,7 @@ export const TaskCreationPage = () => {
             name: '',
             description: '',
             priority: 'P3',
-            executorId: '',
+            executorIds: [],
             answerableId: '',
             initiatorId: '',
             department: '',
@@ -173,17 +173,18 @@ export const TaskCreationPage = () => {
             label: 'Исполнитель',
             component: (
                 <Controller
-                    name="executorId"
+                    name="executorIds"
                     control={control}
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
+                                multiple
                                 onChange={field.onChange}
-                                error={!!errors.executorId}
+                                error={!!errors.executorIds}
                             />
-                            {errors.executorId && (
+                            {errors.executorIds && (
                                 <span className={styles.errorText}>
-                                    {errors.executorId.message}
+                                    {errors.executorIds.message}
                                 </span>
                             )}
                         </div>
@@ -236,7 +237,7 @@ export const TaskCreationPage = () => {
                 name: data.name,
                 description: data.description,
                 priority: data.priority as TaskPriorityValue,
-                executorId: data.executorId,
+                executorIds: data.executorIds,
                 answerableId: data.answerableId,
                 initiatorId: data.initiatorId,
                 department: data.department,

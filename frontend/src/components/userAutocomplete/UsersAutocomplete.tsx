@@ -3,25 +3,36 @@ import { Autocomplete, TextField } from '@mui/material';
 
 import { usersApi, type UserSearchResult } from '@/api/users.api';
 
-type UserAutocompleteProps = {
+type SingleProps = {
+    multiple?: false;
+    value?: UserSearchResult | null;
     onChange: (userId: string) => void;
     onChangeUser?: (user: UserSearchResult | null) => void;
+};
+
+type MultiProps = {
+    multiple: true;
+    value?: UserSearchResult[];
+    onChange: (userIds: string[]) => void;
+    onChangeUser?: (users: UserSearchResult[]) => void;
+};
+
+type UserAutocompleteProps = (SingleProps | MultiProps) & {
     disabled?: boolean;
-    value?: UserSearchResult | null;
     error?: boolean;
 };
 
-export const UserAutocomplete = ({
-    onChange,
-    onChangeUser,
-    disabled,
-    value,
-    error,
-}: UserAutocompleteProps) => {
-    const [options, setOptions] = useState<UserSearchResult[]>([]);
-    const [internalValue, setInternalValue] = useState<UserSearchResult | null>(value ?? null);
+export const UserAutocomplete = (props: UserAutocompleteProps) => {
+    const { disabled, error, multiple } = props;
 
-    const currentValue = value !== undefined ? value : internalValue;
+    const [options, setOptions] = useState<UserSearchResult[]>([]);
+
+    const [internalSingle, setInternalSingle] = useState<UserSearchResult | null>(null);
+    const [internalMulti, setInternalMulti] = useState<UserSearchResult[]>([]);
+
+    const currentValue = multiple
+        ? ((props as MultiProps).value ?? internalMulti)
+        : ((props as SingleProps).value ?? internalSingle);
 
     const handleInputChange = async (_: unknown, inputValue: string) => {
         if (!inputValue) {
@@ -37,23 +48,29 @@ export const UserAutocomplete = ({
         }
     };
 
+    const handleChange = (_: unknown, val: UserSearchResult | UserSearchResult[] | null) => {
+        if (multiple) {
+            const arr = (val as UserSearchResult[]) ?? [];
+            setInternalMulti(arr);
+            (props as MultiProps).onChange(arr.map((u) => u.id));
+            (props as MultiProps).onChangeUser?.(arr);
+        } else {
+            const single = val as UserSearchResult | null;
+            setInternalSingle(single);
+            (props as SingleProps).onChange(single ? single.id : '');
+            (props as SingleProps).onChangeUser?.(single);
+        }
+    };
+
     return (
         <Autocomplete
+            multiple={multiple}
             options={options}
             value={currentValue}
             disabled={disabled}
             getOptionLabel={(option) => `${option.firstName} ${option.secondName}`}
             onInputChange={handleInputChange}
-            onChange={(_, val) => {
-                setInternalValue(val);
-                if (val) {
-                    onChange(val.id);
-                    onChangeUser?.(val);
-                } else {
-                    onChange('');
-                    onChangeUser?.(null as any);
-                }
-            }}
+            onChange={handleChange}
             isOptionEqualToValue={(option, val) => option.id === val.id}
             noOptionsText="Пользователи не найдены"
             slotProps={{
@@ -146,6 +163,12 @@ export const UserAutocomplete = ({
                         },
                         '& .MuiAutocomplete-endAdornment .MuiIconButton-root.Mui-disabled': {
                             color: '#ffffff20',
+                        },
+                        '& .MuiChip-root': {
+                            backgroundColor: '#3a3942',
+                            color: 'white',
+                            width: '100%',
+                            textAlign: 'start',
                         },
                     }}
                 />

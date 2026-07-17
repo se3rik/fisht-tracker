@@ -20,7 +20,7 @@ class TaskService {
     }: GetAllTasksParams) {
         const roleFilter =
             role === 'executor'
-                ? { executorId: userId }
+                ? { executors: { some: { id: userId } } }
                 : role === 'answerable'
                   ? { answerableId: userId }
                   : role === 'initiator'
@@ -48,7 +48,7 @@ class TaskService {
                     priority: true,
                     department: true,
                     createdAt: true,
-                    executor: {
+                    executors: {
                         select: {
                             firstName: true,
                             secondName: true,
@@ -66,7 +66,7 @@ class TaskService {
         const task = await prisma.task.findUnique({
             where: { id },
             include: {
-                executor: { select: { id: true, firstName: true, secondName: true } },
+                executors: { select: { id: true, firstName: true, secondName: true } },
                 answerable: { select: { id: true, firstName: true, secondName: true } },
                 initiator: { select: { id: true, firstName: true, secondName: true } },
                 comments: {
@@ -84,11 +84,14 @@ class TaskService {
     }
 
     async createTask(params: CreateTaskParams) {
+        const { executorIds, startDate, deadline, ...rest } = params;
+
         return prisma.task.create({
             data: {
-                ...params,
-                startDate: params.startDate ? new Date(params.startDate) : undefined,
-                deadline: params.deadline ? new Date(params.deadline) : undefined,
+                ...rest,
+                executors: { connect: executorIds.map((id) => ({ id })) },
+                startDate: startDate ? new Date(startDate) : undefined,
+                deadline: deadline ? new Date(deadline) : undefined,
             },
             select: {
                 id: true,
@@ -99,7 +102,9 @@ class TaskService {
                 department: true,
                 startDate: true,
                 deadline: true,
-                executorId: true,
+                executors: {
+                    select: { id: true, firstName: true, secondName: true },
+                },
                 answerableId: true,
                 initiatorId: true,
                 createdAt: true,
@@ -113,11 +118,16 @@ class TaskService {
 
         if (!task) throw ApiError.NotFound('Задача не найдена');
 
+        const { executorIds, deadline, ...rest } = data;
+
         return prisma.task.update({
             where: { id },
             data: {
-                ...data,
-                deadline: data.deadline ? new Date(data.deadline) : undefined,
+                ...rest,
+                ...(executorIds && {
+                    executors: { set: executorIds.map((id) => ({ id })) },
+                }),
+                deadline: deadline ? new Date(deadline) : undefined,
             },
         });
     }

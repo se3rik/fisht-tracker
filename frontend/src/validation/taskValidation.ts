@@ -12,7 +12,11 @@ export const createTaskValidationSchema = yup.object().shape({
         .required('Это обязательное поле')
         .min(10, 'Необходимо минимум 10 символов'),
     priority: yup.string().required('Это обязательное поле'),
-    executorId: yup.string().required('Это обязательное поле'),
+    executorIds: yup
+        .array()
+        .of(yup.string().required())
+        .min(1, 'Выберите хотя бы одного исполнителя')
+        .required('Это обязательное поле'),
     answerableId: yup.string().required('Это обязательное поле'),
     initiatorId: yup.string().required('Это обязательное поле'),
     department: yup.string().required('Это обязательное поле'),
@@ -33,7 +37,11 @@ export const updateTaskValidationSchema = yup.object().shape({
         .min(10, 'Необходимо минимум 10 символов'),
     priority: yup.string().required('Это обязательное поле'),
     status: yup.string().required('Это обязательное поле'),
-    executorId: yup.string().required('Это обязательное поле'),
+    executorIds: yup
+        .array()
+        .of(yup.string().required())
+        .min(1, 'Выберите хотя бы одного исполнителя')
+        .required('Это обязательное поле'),
     answerableId: yup.string().required('Это обязательное поле'),
     initiatorId: yup.string().required('Это обязательное поле'),
     department: yup.string().required('Это обязательное поле'),

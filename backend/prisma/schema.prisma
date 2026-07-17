@@ -139,8 +139,7 @@ model Task {
   status      TaskStatus   @default(DRAFT)
   priority    TaskPriority
 
-  executorId    String     @map("executor_id")
-  executor      User       @relation("TaskExecutor", fields: [executorId], references: [id])
+  executors     User[]     @relation("TaskExecutor")
 
   answerableId  String     @map("answerable_id")
   answerable    User       @relation("TaskAnswerable", fields: [answerableId], references: [id])
@@ -159,7 +158,7 @@ model Task {
   updatedAt   DateTime     @updatedAt @map("updated_at")
 
   @@map("tasks")
-}
+}	
 
 model Comment {
   id        String   @id @default(uuid())

@@ -20,7 +20,7 @@ export type CreateTaskParams = {
     name: string;
     description: string;
     priority: TaskPriority;
-    executorId: string;
+    executorIds: string[];
     answerableId: string;
     initiatorId: string;
     department: Department;
@@ -33,7 +33,7 @@ export type UpdateTaskParams = {
     description?: string;
     status?: TaskStatus;
     priority?: TaskPriority;
-    executorId?: string;
+    executorIds?: string[];
     answerableId?: string;
     department?: Department;
     deadline?: string;

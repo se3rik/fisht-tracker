@@ -34,7 +34,7 @@ type TaskUpdateForm = {
     description: string;
     priority: string;
     status: string;
-    executorId: string;
+    executorIds: string[];
     answerableId: string;
     initiatorId: string;
     department: string;
@@ -66,7 +66,7 @@ export const TaskDetailsPage = () => {
             description: '',
             priority: '',
             status: '',
-            executorId: '',
+            executorIds: [],
             answerableId: '',
             initiatorId: '',
             department: '',
@@ -78,7 +78,7 @@ export const TaskDetailsPage = () => {
 
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [deadline, setDeadline] = useState<Dayjs | null>(null);
-    const [executor, setExecutor] = useState<UserSearchResult | null>(null);
+    const [executors, setExecutors] = useState<UserSearchResult[]>([]);
     const [answerable, setAnswerable] = useState<UserSearchResult | null>(null);
     const [initiator, setInitiator] = useState<UserSearchResult | null>(null);
 
@@ -92,7 +92,7 @@ export const TaskDetailsPage = () => {
 
     const canEditStatus =
         canFullEdit ||
-        profileData?.id === taskData?.executorId ||
+        taskData?.executors.some((e) => e.id === profileData?.id) ||
         profileData?.id === taskData?.answerableId;
 
     const handleStartEditing = () => {
@@ -102,14 +102,14 @@ export const TaskDetailsPage = () => {
             description: taskData.description,
             priority: taskData.priority,
             status: taskData.status.toLowerCase(),
-            executorId: taskData.executorId,
+            executorIds: taskData.executors.map((e) => e.id),
             answerableId: taskData.answerableId,
             initiatorId: taskData.initiatorId,
             department: taskData.department,
             startDate: taskData.startDate ?? null,
             deadline: taskData.deadline ?? null,
         });
-        setExecutor(taskData.executor);
+        setExecutors(taskData.executors);
         setAnswerable(taskData.answerable);
         setInitiator(taskData.initiator);
         setStartDate(taskData.startDate ? dayjs(taskData.startDate) : null);
@@ -128,7 +128,7 @@ export const TaskDetailsPage = () => {
             description: taskData?.description ?? '',
             priority: taskData?.priority ?? '',
             status: taskData?.status.toLowerCase() ?? '',
-            executorId: taskData?.executorId ?? '',
+            executorIds: taskData?.executors.map((e) => e.id) ?? [],
             answerableId: taskData?.answerableId ?? '',
             initiatorId: taskData?.initiatorId ?? '',
             department: taskData?.department ?? '',
@@ -148,7 +148,7 @@ export const TaskDetailsPage = () => {
                 status: formData.status.toUpperCase(),
                 startDate: startDate ? startDate.toISOString() : undefined,
                 deadline: deadline ? deadline.toISOString() : undefined,
-                executorId: formData.executorId,
+                executorIds: formData.executorIds,
                 answerableId: formData.answerableId,
                 initiatorId: formData.initiatorId || taskData.initiatorId,
                 department: formData.department,
@@ -164,11 +164,10 @@ export const TaskDetailsPage = () => {
                           status: formData.status as TasksStatusValue,
                           startDate: startDate ? startDate.toISOString() : undefined,
                           deadline: deadline ? deadline.toISOString() : undefined,
-                          executorId: formData.executorId,
                           answerableId: formData.answerableId,
                           initiatorId: formData.initiatorId,
                           department: formData.department as TaskDepartmentValues,
-                          executor: executor ?? prev.executor,
+                          executors: executors.length ? executors : prev.executors,
                           answerable: answerable ?? prev.answerable,
                           initiator: initiator ?? prev.initiator,
                       }
@@ -379,22 +378,23 @@ export const TaskDetailsPage = () => {
             label: 'Исполнитель',
             component: (
                 <Controller
-                    name="executorId"
+                    name="executorIds"
                     control={control}
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
+                                multiple
                                 disabled={editMode !== 'full'}
-                                value={editMode !== null ? executor : (taskData?.executor ?? null)}
-                                error={!!errors.executorId}
-                                onChange={(id) => {
-                                    field.onChange(id);
+                                value={editMode !== null ? executors : (taskData?.executors ?? [])}
+                                error={!!errors.executorIds}
+                                onChange={(ids) => {
+                                    field.onChange(ids);
                                 }}
-                                onChangeUser={(user) => setExecutor(user)}
+                                onChangeUser={(users) => setExecutors(users)}
                             />
-                            {errors.executorId && (
+                            {errors.executorIds && (
                                 <span className={styles.errorText}>
-                                    {errors.executorId.message}
+                                    {errors.executorIds.message}
                                 </span>
                             )}
                         </div>

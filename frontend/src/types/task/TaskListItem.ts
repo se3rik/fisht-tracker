@@ -9,8 +9,8 @@ export type TaskListItem = {
     status: TasksStatusValue;
     priority: TaskPriorityValue;
     department: TaskDepartmentValues;
-    executor: {
+    executors: {
         firstName: string;
         secondName: string;
-    };
+    }[];
 };

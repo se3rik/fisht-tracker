@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Avatar, Chip } from '@mui/material';
+import { Avatar, AvatarGroup, Chip } from '@mui/material';
 
 import styles from './TaskItem.module.scss';
 
@@ -19,6 +19,10 @@ type TaskItemProps = {
 
 export const TaskItem = ({ task }: TaskItemProps) => {
     const status = task.status.toLowerCase() as TasksStatusValue;
+
+    const executorsFullNames = task.executors
+        .map((e) => `${e.firstName} ${e.secondName}`)
+        .join(', ');
 
     return (
         <Link to={`/tasks/${task.id}`} className={styles.taskItem}>
@@ -59,7 +63,7 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                 <div className={styles.taskDepartment}>{DEPARTMENT_LABELS[task.department]}</div>
             )}
 
-            <div className={styles.taskExecutor}>
+            {/* <div className={styles.taskExecutor}>
                 <Avatar
                     {...stringAvatar(task.executor.firstName + ' ' + task.executor.secondName)}
                     sx={{ width: 32, height: 32, fontSize: 16 }}
@@ -67,6 +71,20 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                 <span>
                     {task.executor.firstName} {task.executor.secondName}
                 </span>
+            </div> */}
+            <div className={styles.taskExecutor} title={executorsFullNames}>
+                <AvatarGroup
+                    max={3}
+                    sx={{ '& .MuiAvatar-root': { width: 32, height: 32, fontSize: 14 } }}
+                >
+                    {task.executors.map((executor) => (
+                        <Avatar
+                            key={executor.firstName + executor.secondName}
+                            {...stringAvatar(`${executor.firstName} ${executor.secondName}`)}
+                        />
+                    ))}
+                </AvatarGroup>
+                <span>{executorsFullNames}</span>
             </div>
         </Link>
     );

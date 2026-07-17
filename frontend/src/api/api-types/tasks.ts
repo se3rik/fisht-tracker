@@ -22,7 +22,6 @@ export type TaskData = {
     description: string;
     status: TasksStatusValue;
     priority: TaskPriorityValue;
-    executorId: string;
     answerableId: string;
     initiatorId: string;
     department: TaskDepartmentValues;
@@ -30,11 +29,11 @@ export type TaskData = {
     updatedAt: string;
     startDate?: string;
     deadline?: string;
-    executor: {
+    executors: {
         id: string;
         firstName: string;
         secondName: string;
-    };
+    }[];
     answerable: {
         id: string;
         firstName: string;
@@ -52,7 +51,7 @@ export type CreateTaskDto = {
     name: string;
     description: string;
     priority: string;
-    executorId: string;
+    executorIds: string[];
     answerableId: string;
     initiatorId: string;
     department: string;
@@ -67,7 +66,7 @@ export type UpdateTaskDto = {
     status?: string;
     startDate?: string;
     deadline?: string;
-    executorId?: string;
+    executorIds?: string[];
     answerableId?: string;
     initiatorId?: string;
     department?: string;
