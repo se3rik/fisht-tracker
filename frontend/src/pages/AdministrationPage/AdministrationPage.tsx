@@ -30,13 +30,16 @@ import {
     TextField,
     Tooltip,
     Typography,
-    Tabs,
-    Tab,
 } from '@mui/material';
 
 import styles from './AdministrationPage.module.scss';
 
 import { PageHeading } from '@/components/pageHeading/PageHeading';
+import { BaseTabs } from '@/components/tabs/BaseTabs';
+
+import type { TabValue } from '@/types/tabs/TabValue';
+
+import { TABS } from '@/constants/administrationTabs';
 
 // ==== моковые данные ====
 
@@ -128,7 +131,7 @@ const getAvatarColor = (id) => {
 };
 
 export const AdministrationPage = () => {
-    const [activeTab, setActiveTab] = useState('users');
+    const [activeTab, setActiveTab] = useState<TabValue>('users');
     const [users, setUsers] = useState(initialUsers);
     const [search, setSearch] = useState('');
     const [departmentFilter, setDepartmentFilter] = useState('');
@@ -221,16 +224,12 @@ export const AdministrationPage = () => {
             <PageHeading title={'Администрирование'} />
             <section className={styles.pageWrapper}>
                 {/* ==== табы ==== */}
-                <Tabs
+                <BaseTabs<TabValue>
                     value={activeTab}
-                    onChange={(_, value) => setActiveTab(value)}
+                    onChange={setActiveTab}
+                    items={TABS}
                     className={styles.tabs}
-                >
-                    <Tab value="users" label="Пользователи" />
-                    <Tab value="departments" label="Отделы" />
-                    <Tab value="roles" label="Роли и доступы" />
-                    <Tab value="log" label="Журнал действий" />
-                </Tabs>
+                />
 
                 {activeTab !== 'users' && (
                     <Typography variant="body2" color="text.secondary">
