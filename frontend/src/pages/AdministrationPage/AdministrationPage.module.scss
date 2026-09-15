@@ -1,0 +1,81 @@
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.tabs {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    min-height: 40px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.filter {
+    min-width: 160px;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.tableWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tableContainer {
+    border-radius: 10px;
+}
+
+.userCell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.emptyCell {
+    padding: 32px 0;
+}
+
+.dialogContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px !important;
+}
+
+.formRow {
+    display: flex;
+    gap: 14px;
+}
+
+.hint {
+    display: block;
+    margin-top: 6px;
+}
+
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
