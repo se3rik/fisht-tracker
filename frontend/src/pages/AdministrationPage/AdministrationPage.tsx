@@ -36,10 +36,13 @@ import styles from './AdministrationPage.module.scss';
 
 import { PageHeading } from '@/components/pageHeading/PageHeading';
 import { BaseTabs } from '@/components/tabs/BaseTabs';
+import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
+import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 
 import type { TabValue } from '@/types/tabs/TabValue';
 
 import { TABS } from '@/constants/administrationTabs';
+import { taskDepartments } from '@/constants/taskDepartments';
 
 // ==== моковые данные ====
 
@@ -223,7 +226,6 @@ export const AdministrationPage = () => {
         <>
             <PageHeading title={'Администрирование'} />
             <section className={styles.pageWrapper}>
-                {/* ==== табы ==== */}
                 <BaseTabs<TabValue>
                     value={activeTab}
                     onChange={setActiveTab}
@@ -232,7 +234,7 @@ export const AdministrationPage = () => {
                 />
 
                 {activeTab !== 'users' && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="white">
                         Раздел в разработке
                     </Typography>
                 )}
@@ -240,245 +242,209 @@ export const AdministrationPage = () => {
                 {activeTab === 'users' && (
                     <>
                         <div className={styles.toolbar}>
-                            {/* ==== тулбар ==== */}
-                            <div className={styles.toolbar}>
-                                <TextField
-                                    className={styles.search}
-                                    size="small"
-                                    placeholder="Поиск по имени или почте"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    slotProps={{
-                                        input: {
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <SearchIcon fontSize="small" />
-                                                </InputAdornment>
-                                            ),
-                                        },
-                                    }}
-                                />
+                            <BaseInput
+                                id="searchUser"
+                                type="text"
+                                size="small"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Поиск по имени или почте"
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon
+                                                    fontSize="small"
+                                                    sx={{ color: 'rgba(255, 255, 255, 0.25)' }}
+                                                />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                            />
 
-                                <TextField
-                                    className={styles.filter}
-                                    size="small"
-                                    select
-                                    label="Отдел"
-                                    value={departmentFilter}
-                                    onChange={(e) => setDepartmentFilter(e.target.value)}
-                                >
-                                    <MenuItem value="">Все отделы</MenuItem>
-                                    {departments.map((department) => (
-                                        <MenuItem key={department} value={department}>
-                                            {department}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                            <BaseSelect
+                                label="Отдел"
+                                value={departmentFilter}
+                                menuItems={taskDepartments}
+                                onChange={setDepartmentFilter}
+                            />
 
-                                <TextField
-                                    className={styles.filter}
-                                    size="small"
-                                    select
-                                    label="Роль"
-                                    value={roleFilter}
-                                    onChange={(e) => setRoleFilter(e.target.value)}
-                                >
-                                    <MenuItem value="">Все роли</MenuItem>
-                                    {Object.keys(roleLabels).map((role) => (
-                                        <MenuItem key={role} value={role}>
-                                            {roleLabels[role]}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-
-                                <TextField
-                                    className={styles.filter}
-                                    size="small"
-                                    select
-                                    label="Статус"
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                >
-                                    <MenuItem value="">Все статусы</MenuItem>
-                                    <MenuItem value="active">Активен</MenuItem>
-                                    <MenuItem value="blocked">Заблокирован</MenuItem>
-                                </TextField>
-
-                                {hasActiveFilters && (
-                                    <Button variant="outlined" onClick={resetFilters}>
-                                        Сбросить фильтры
-                                    </Button>
-                                )}
-
-                                <div className={styles.spacer} />
-
-                                <Button
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={openCreateDialog}
-                                >
-                                    Зарегистрировать пользователя
+                            {hasActiveFilters && (
+                                <Button variant="outlined" onClick={resetFilters}>
+                                    Сбросить фильтры
                                 </Button>
-                            </div>
+                            )}
+
+                            <Button
+                                variant="contained"
+                                startIcon={<AddIcon />}
+                                onClick={openCreateDialog}
+                                sx={{ marginLeft: 'auto' }}
+                            >
+                                Зарегистрировать пользователя
+                            </Button>
                         </div>
 
                         <div className={styles.tableWrapper}>
-                            {/* ==== таблица ==== */}
-                            <div className={styles.tableWrapper}>
-                                <TableContainer
-                                    component={Paper}
-                                    variant="outlined"
-                                    className={styles.tableContainer}
-                                >
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Сотрудник</TableCell>
-                                                <TableCell>Отдел</TableCell>
-                                                <TableCell>Должность</TableCell>
-                                                <TableCell>Роль</TableCell>
-                                                <TableCell>Статус</TableCell>
-                                                <TableCell align="right">Действия</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {filteredUsers.map((user) => (
-                                                <TableRow key={user.id} hover>
-                                                    <TableCell>
-                                                        <div className={styles.userCell}>
-                                                            <Avatar
+                            <TableContainer
+                                component={Paper}
+                                variant="outlined"
+                                className={styles.tableContainer}
+                            >
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Сотрудник</TableCell>
+                                            <TableCell>Отдел</TableCell>
+                                            <TableCell>Должность</TableCell>
+                                            <TableCell>Роль</TableCell>
+                                            <TableCell>Статус</TableCell>
+                                            <TableCell align="right">Действия</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {filteredUsers.map((user) => (
+                                            <TableRow key={user.id} hover>
+                                                <TableCell>
+                                                    <div className={styles.userCell}>
+                                                        <Avatar
+                                                            sx={{
+                                                                bgcolor: getAvatarColor(user.id),
+                                                            }}
+                                                        >
+                                                            {getInitials(user)}
+                                                        </Avatar>
+                                                        <div>
+                                                            <Typography
+                                                                variant="body2"
                                                                 sx={{
-                                                                    bgcolor: getAvatarColor(
-                                                                        user.id,
-                                                                    ),
+                                                                    fontWeight: 500,
+                                                                    color: '#ffffff',
                                                                 }}
                                                             >
-                                                                {getInitials(user)}
-                                                            </Avatar>
-                                                            <div>
-                                                                <Typography
-                                                                    variant="body2"
-                                                                    fontWeight={500}
-                                                                >
-                                                                    {user.lastName} {user.firstName}{' '}
-                                                                    {user.middleName}
-                                                                </Typography>
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    color="text.secondary"
-                                                                >
-                                                                    {user.email}
-                                                                </Typography>
-                                                            </div>
+                                                                {user.lastName} {user.firstName}{' '}
+                                                                {user.middleName}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="caption"
+                                                                sx={{ color: '#ffffff99' }}
+                                                            >
+                                                                {user.email}
+                                                            </Typography>
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            {user.department}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            {user.position}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Chip
-                                                            size="small"
-                                                            variant="outlined"
-                                                            color={roleChipColor[user.role]}
-                                                            label={roleLabels[user.role]}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Chip
-                                                            size="small"
-                                                            variant={
-                                                                user.status === 'active'
-                                                                    ? 'filled'
-                                                                    : 'outlined'
-                                                            }
-                                                            color={
-                                                                user.status === 'active'
-                                                                    ? 'success'
-                                                                    : 'default'
-                                                            }
-                                                            label={
-                                                                user.status === 'active'
-                                                                    ? 'Активен'
-                                                                    : 'Заблокирован'
-                                                            }
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        <div className={styles.actions}>
-                                                            <Tooltip title="Редактировать">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() =>
-                                                                        openEditDialog(user)
-                                                                    }
-                                                                >
-                                                                    <EditOutlinedIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title="Сменить пароль">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() =>
-                                                                        openPasswordDialog(user)
-                                                                    }
-                                                                >
-                                                                    <LockResetIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title="Удалить">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color="error"
-                                                                    onClick={() =>
-                                                                        openDeleteDialog(user)
-                                                                    }
-                                                                >
-                                                                    <DeleteOutlineIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </div>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-
-                                            {filteredUsers.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={6}
-                                                        align="center"
-                                                        className={styles.emptyCell}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ color: '#ffffffb3' }}
                                                     >
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            Пользователи не найдены. Попробуйте
-                                                            изменить фильтры.
-                                                        </Typography>
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                                        {user.department}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ color: '#ffffffb3' }}
+                                                    >
+                                                        {user.position}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        variant="outlined"
+                                                        color={roleChipColor[user.role]}
+                                                        label={roleLabels[user.role]}
+                                                        sx={{
+                                                            color: '#ffffff',
+                                                            borderColor: '#ffffff66',
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        variant={
+                                                            user.status === 'active'
+                                                                ? 'filled'
+                                                                : 'outlined'
+                                                        }
+                                                        color={
+                                                            user.status === 'active'
+                                                                ? 'success'
+                                                                : 'default'
+                                                        }
+                                                        label={
+                                                            user.status === 'active'
+                                                                ? 'Активен'
+                                                                : 'Заблокирован'
+                                                        }
+                                                        sx={{
+                                                            color: '#ffffff',
+                                                            ...(user.status !== 'active' && {
+                                                                borderColor: '#ffffff66',
+                                                            }),
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <div className={styles.actions}>
+                                                        <Tooltip title="Редактировать">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => openEditDialog(user)}
+                                                            >
+                                                                <EditOutlinedIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Сменить пароль">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() =>
+                                                                    openPasswordDialog(user)
+                                                                }
+                                                            >
+                                                                <LockResetIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Удалить">
+                                                            <IconButton
+                                                                size="small"
+                                                                color="error"
+                                                                onClick={() =>
+                                                                    openDeleteDialog(user)
+                                                                }
+                                                            >
+                                                                <DeleteOutlineIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
 
-                                <Typography variant="caption" color="text.secondary">
-                                    Показано {filteredUsers.length} из {users.length} пользователей
-                                </Typography>
-                            </div>
+                                        {filteredUsers.length === 0 && (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={6}
+                                                    align="center"
+                                                    className={styles.emptyCell}
+                                                >
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ color: '#ffffffb3' }}
+                                                    >
+                                                        Пользователи не найдены. Попробуйте изменить
+                                                        фильтры.
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </div>
                     </>
                 )}

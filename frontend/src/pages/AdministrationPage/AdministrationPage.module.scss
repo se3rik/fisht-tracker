@@ -20,19 +20,6 @@
     flex-wrap: wrap;
 }
 
-.search {
-    flex: 1;
-    min-width: 220px;
-}
-
-.filter {
-    min-width: 160px;
-}
-
-.spacer {
-    flex: 1;
-}
-
 .tableWrapper {
     display: flex;
     flex-direction: column;
@@ -41,6 +28,31 @@
 
 .tableContainer {
     border-radius: 10px;
+    background-color: #ffffff26 !important;
+    border-color: #ffffff33 !important;
+}
+
+/* все ячейки — белый текст и мягкие разделители */
+.tableContainer :global(.MuiTableCell-root) {
+    color: #ffffff;
+    border-bottom-color: #ffffff1a;
+}
+
+/* заголовок таблицы */
+.tableContainer :global(.MuiTableHead-root .MuiTableCell-root) {
+    color: #ffffff;
+    font-weight: 600;
+    border-bottom-color: #ffffff33;
+}
+
+/* hover строки — чуть светлее фона */
+.tableContainer :global(.MuiTableRow-root.MuiTableRow-hover:hover) {
+    background-color: #ffffff14;
+}
+
+/* убираем нижнюю границу у последней строки */
+.tableContainer :global(.MuiTableRow-root:last-child .MuiTableCell-root) {
+    border-bottom: none;
 }
 
 .userCell {
@@ -53,6 +65,22 @@
     display: flex;
     justify-content: flex-end;
     gap: 4px;
+}
+
+/* иконки действий — белые, с мягким hover */
+.actions :global(.MuiIconButton-root) {
+    color: #ffffff;
+}
+.actions :global(.MuiIconButton-root):hover {
+    background-color: #ffffff1f;
+}
+
+/* кнопка удаления — мягкий красный, чтобы не «резала» глаз */
+.actions :global(.MuiIconButton-root.MuiIconButton-colorError) {
+    color: #ff8a80;
+}
+.actions :global(.MuiIconButton-root.MuiIconButton-colorError):hover {
+    background-color: #ff8a8026;
 }
 
 .emptyCell {
