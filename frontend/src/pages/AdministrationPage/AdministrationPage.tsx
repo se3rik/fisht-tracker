@@ -143,6 +143,7 @@ export const AdministrationPage = () => {
 
     // { type: 'create' | 'edit' | 'password' | 'delete', user? }
     const [dialog, setDialog] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     const [form, setForm] = useState(emptyForm);
     const [tempPassword, setTempPassword] = useState(generatePassword());
     const [forcePasswordReset, setForcePasswordReset] = useState(true);
@@ -171,29 +172,39 @@ export const AdministrationPage = () => {
         setStatusFilter('');
     };
 
+    const openDialog = (type, user = null) => {
+        setDialog({ type, user });
+        setIsOpen(true);
+    };
+
     const openCreateDialog = () => {
         setForm(emptyForm);
         setTempPassword(generatePassword());
-        setDialog({ type: 'create' });
+        openDialog('create');
     };
 
     const openEditDialog = (user) => {
         const { id, status, ...rest } = user;
         setForm(rest);
-        setDialog({ type: 'edit', user });
+        openDialog('edit', user);
     };
 
     const openPasswordDialog = (user) => {
         setTempPassword(generatePassword());
         setForcePasswordReset(true);
-        setDialog({ type: 'password', user });
+        openDialog('password', user);
     };
 
-    const openDeleteDialog = (user) => {
-        setDialog({ type: 'delete', user });
-    };
+    const openDeleteDialog = (user) => openDialog('delete', user);
 
-    const closeDialog = () => setDialog(null);
+    const closeDialog = () => setIsOpen(false);
+
+    const handleExited = () => {
+        setDialog(null);
+        setForm(emptyForm);
+        setTempPassword(generatePassword());
+        setForcePasswordReset(true);
+    };
 
     const handleFormChange = (field, value) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -452,10 +463,11 @@ export const AdministrationPage = () => {
 
             {/* ==== диалог: создание / редактирование ==== */}
             <Dialog
-                open={dialog?.type === 'create' || dialog?.type === 'edit'}
+                open={isOpen && (dialog?.type === 'create' || dialog?.type === 'edit')}
                 onClose={closeDialog}
                 fullWidth
                 maxWidth="sm"
+                slotProps={{ transition: { onExited: handleExited } }}
             >
                 <DialogTitle>
                     {dialog?.type === 'edit'
@@ -575,10 +587,11 @@ export const AdministrationPage = () => {
 
             {/* ==== диалог: смена пароля ==== */}
             <Dialog
-                open={dialog?.type === 'password'}
+                open={isOpen && dialog?.type === 'password'}
                 onClose={closeDialog}
                 fullWidth
                 maxWidth="xs"
+                slotProps={{ transition: { onExited: handleExited } }}
             >
                 <DialogTitle>Сменить пароль</DialogTitle>
                 <DialogContent className={styles.dialogContent}>
@@ -626,7 +639,13 @@ export const AdministrationPage = () => {
             </Dialog>
 
             {/* ==== диалог: удаление ==== */}
-            <Dialog open={dialog?.type === 'delete'} onClose={closeDialog} fullWidth maxWidth="xs">
+            <Dialog
+                open={isOpen && dialog?.type === 'delete'}
+                onClose={closeDialog}
+                fullWidth
+                maxWidth="xs"
+                slotProps={{ transition: { onExited: handleExited } }}
+            >
                 <DialogTitle>Удалить пользователя</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
@@ -635,8 +654,7 @@ export const AdministrationPage = () => {
                             {dialog?.user?.lastName} {dialog?.user?.firstName}{' '}
                             {dialog?.user?.middleName}
                         </b>
-                        ? Пользователь потеряет доступ к системе. Задачи, назначенные на него,
-                        останутся в системе, но будут помечены как «без исполнителя».
+                        ? Пользователь потеряет доступ к системе.
                     </Typography>
                 </DialogContent>
                 <DialogActions>
