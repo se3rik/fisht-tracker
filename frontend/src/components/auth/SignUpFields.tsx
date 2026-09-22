@@ -1,36 +1,41 @@
-import type { UseFormReturn } from 'react-hook-form';
+// import type { UseFormReturn } from 'react-hook-form';
 
-import {
-    FormControl,
-    FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+// import {
+//     FormControl,
+//     FormHelperText,
+//     IconButton,
+//     InputAdornment,
+//     InputLabel,
+//     OutlinedInput,
+// } from '@mui/material';
+// import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import type { SignUpForm } from '@/types/auth';
+// import type { SignUpForm } from '@/types/auth';
 
-type SignUpFieldsProps = {
-    showPassword: boolean;
-    form: UseFormReturn<SignUpForm>;
-    handleClickShowPassword: () => void;
-};
+// type SignUpFieldsProps = {
+//     showPassword: boolean;
+//     form: UseFormReturn<SignUpForm>;
+//     handleClickShowPassword: () => void;
+// };
 
-export const SignUpFields = ({
-    showPassword,
-    form,
-    handleClickShowPassword,
-}: SignUpFieldsProps) => {
-    const {
-        register,
-        formState: { errors },
-    } = form;
+export const SignUpFields = () =>
+    // 	{
+    //     showPassword,
+    //     form,
+    //     handleClickShowPassword,
+    // }: SignUpFieldsProps
+    {
+        // const {
+        //     register,
+        //     formState: { errors },
+        // } = form;
 
-    return (
-        <>
-            <FormControl variant="outlined" error={!!errors.email}>
+        return (
+            <>
+                <h2 style={{ color: 'black', textAlign: 'center' }}>
+                    Для регистрации аккаунта обратитесь к администратору
+                </h2>
+                {/* <FormControl variant="outlined" error={!!errors.email}>
                 <InputLabel htmlFor="email">Почта</InputLabel>
                 <OutlinedInput
                     id="email"
@@ -86,7 +91,7 @@ export const SignUpFields = ({
                     }
                 />
                 <FormHelperText>{errors.password?.message}</FormHelperText>
-            </FormControl>
-        </>
-    );
-};
+            </FormControl> */}
+            </>
+        );
+    };

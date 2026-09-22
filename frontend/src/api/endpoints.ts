@@ -1,6 +1,5 @@
 export const endpoints = {
     auth: {
-        registration: '/registration',
         login: '/login',
         logout: '/logout',
         refresh: '/refresh',
@@ -12,5 +11,10 @@ export const endpoints = {
     tasks: {
         getAllTasks: '/tasks',
         getTaskById: '/tasks',
+    },
+    admin: {
+        users: {
+            base: '/admin/users',
+        },
     },
 };

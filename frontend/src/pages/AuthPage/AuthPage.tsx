@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 
-import { login, registration } from '@/stores/slices/authSlice';
+import { login } from '@/stores/slices/authSlice';
 
 import styles from './AuthPage.module.scss';
 
@@ -40,11 +40,11 @@ export const AuthPage = () => {
         navigate('/', { replace: true });
     };
 
-    const onSignUpSubmit = async (data: SignUpForm) => {
-        signUpForm.reset();
-        await dispatch(registration(data));
-        navigate('/', { replace: true });
-    };
+    // const onSignUpSubmit = async (data: SignUpForm) => {
+    //     signUpForm.reset();
+    //     await dispatch(registration(data));
+    //     navigate('/', { replace: true });
+    // };
 
     const changePasswordVisibility = () => setShowPassword((show) => !show);
 
@@ -62,7 +62,7 @@ export const AuthPage = () => {
                     <AuthTabs activeTab={activeTab} changeActiveTab={changeActiveTab} />
                 </section>
 
-                <form
+                {/* <form
                     className={styles.authForm}
                     onSubmit={
                         activeTab === 'signIn'
@@ -86,6 +86,32 @@ export const AuthPage = () => {
                     <Button size="large" variant="contained" type="submit">
                         {activeTab === 'signIn' ? 'Войти' : 'Зарегистрироваться'}
                     </Button>
+                </form> */}
+                <form
+                    className={styles.authForm}
+                    onSubmit={signInForm.handleSubmit(onSignInSubmit)}
+                >
+                    {activeTab === 'signIn' ? (
+                        <>
+                            <SignInFields
+                                showPassword={showPassword}
+                                form={signInForm}
+                                handleClickShowPassword={changePasswordVisibility}
+                            />
+                            <Button size="large" variant="contained" type="submit">
+                                Войти
+                            </Button>
+                        </>
+                    ) : (
+                        <SignUpFields
+                        // showPassword={showPassword}
+                        // form={signUpForm}
+                        // handleClickShowPassword={changePasswordVisibility}
+                        />
+                    )}
+                    {/* <Button size="large" variant="contained" type="submit">
+                        {activeTab === 'signIn' ? 'Войти' : 'Зарегистрироваться'}
+                    </Button> */}
                 </form>
             </section>
         </div>

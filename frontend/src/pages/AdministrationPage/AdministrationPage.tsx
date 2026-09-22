@@ -1,38 +1,31 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import {
     Avatar,
     Button,
     Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     IconButton,
     InputAdornment,
-    MenuItem,
     Paper,
-    Switch,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    TextField,
     Tooltip,
     Typography,
+    CircularProgress,
 } from '@mui/material';
 
 import styles from './AdministrationPage.module.scss';
+
+import { adminUsersApi } from '@/api';
+import type { AdminUser } from '@/api/api-types/user';
 
 import { PageHeading } from '@/components/pageHeading/PageHeading';
 import { BaseTabs } from '@/components/tabs/BaseTabs';
@@ -43,125 +36,99 @@ import type { TabValue } from '@/types/tabs/TabValue';
 
 import { TABS } from '@/constants/administrationTabs';
 import { taskDepartments } from '@/constants/taskDepartments';
-
-// ==== моковые данные ====
+import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
+import { SPECIALTY_LABELS } from '@/constants/specialityLabels';
+import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 
 const roleLabels = {
-    admin: 'Администратор',
-    lead: 'Руководитель',
-    employee: 'Сотрудник',
+    ADMIN: 'Администратор',
+    USER: 'Сотрудник',
 };
 
-const roleChipColor = {
-    admin: 'primary',
-    lead: 'warning',
-    employee: 'default',
-};
+// const emptyForm = {
+//     lastName: '',
+//     firstName: '',
+//     middleName: '',
+//     email: '',
+//     department: departments[0],
+//     position: '',
+//     role: 'employee',
+// };
 
-const departments = ['Слаботочные системы', 'Пожарная сигнализация', 'Видеонаблюдение'];
+// const generatePassword = () => {
+//     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$';
+//     return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
+//         '',
+//     );
+// };
 
-const avatarColors = ['#5c6bd6', '#4a90a4', '#b5804f', '#585e77', '#4b7bec', '#3fae7a'];
-
-const initialUsers = [
-    {
-        id: '1',
-        lastName: 'Рындин',
-        firstName: 'Сергей',
-        middleName: 'Иванович',
-        email: 'se3rik@mail.ru',
-        department: 'Слаботочные системы',
-        position: 'Ведущий специалист, инженер',
-        role: 'admin',
-        status: 'active',
-    },
-    {
-        id: '2',
-        lastName: 'Сварковский',
-        firstName: 'Кирилл',
-        middleName: 'Олегович',
-        email: 'k.svarkovsky@mail.ru',
-        department: 'Слаботочные системы',
-        position: 'Инженер',
-        role: 'employee',
-        status: 'active',
-    },
-    {
-        id: '3',
-        lastName: 'Петрова',
-        firstName: 'Ольга',
-        middleName: 'Николаевна',
-        email: 'o.petrova@mail.ru',
-        department: 'Пожарная сигнализация',
-        position: 'Руководитель отдела',
-        role: 'lead',
-        status: 'active',
-    },
-    {
-        id: '4',
-        lastName: 'Морозов',
-        firstName: 'Дмитрий',
-        middleName: 'Андреевич',
-        email: 'd.morozov@mail.ru',
-        department: 'Слаботочные системы',
-        position: 'Инженер-проектировщик',
-        role: 'employee',
-        status: 'blocked',
-    },
-];
-
-const emptyForm = {
-    lastName: '',
-    firstName: '',
-    middleName: '',
-    email: '',
-    department: departments[0],
-    position: '',
-    role: 'employee',
-};
-
-const generatePassword = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$';
-    return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
-        '',
-    );
-};
-
-const getInitials = (user) => `${user.lastName[0] ?? ''}${user.firstName[0] ?? ''}`.toUpperCase();
-
-const getAvatarColor = (id) => {
-    const hash = [...id].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return avatarColors[hash % avatarColors.length];
-};
+const getInitials = (user: AdminUser) =>
+    `${user.secondName[0] ?? ''}${user.firstName[0] ?? ''}`.toUpperCase();
 
 export const AdministrationPage = () => {
     const [activeTab, setActiveTab] = useState<TabValue>('users');
-    const [users, setUsers] = useState(initialUsers);
+    const [users, setUsers] = useState<AdminUser[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadError, setLoadError] = useState(null);
+
     const [search, setSearch] = useState('');
-    const [departmentFilter, setDepartmentFilter] = useState('');
+    const [departmentFilter, setDepartmentFilter] = useState<TaskDepartmentValues | ''>('');
     const [roleFilter, setRoleFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
 
     // { type: 'create' | 'edit' | 'password' | 'delete', user? }
-    const [dialog, setDialog] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
-    const [form, setForm] = useState(emptyForm);
-    const [tempPassword, setTempPassword] = useState(generatePassword());
-    const [forcePasswordReset, setForcePasswordReset] = useState(true);
+    // const [dialog, setDialog] = useState(null);
+    // const [isOpen, setIsOpen] = useState(false);
+    // const [form, setForm] = useState(emptyForm);
+    // const [tempPassword, setTempPassword] = useState(generatePassword());
+    // const [forcePasswordReset, setForcePasswordReset] = useState(true);
 
-    const filteredUsers = useMemo(() => {
-        const query = search.trim().toLowerCase();
+    // debounce поиска, чтобы не дёргать бэк на каждое нажатие клавиши
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
-        return users.filter((user) => {
-            const fullName = `${user.lastName} ${user.firstName} ${user.middleName}`.toLowerCase();
-            const matchesSearch =
-                !query || fullName.includes(query) || user.email.toLowerCase().includes(query);
-            const matchesDepartment = !departmentFilter || user.department === departmentFilter;
-            const matchesRole = !roleFilter || user.role === roleFilter;
-            const matchesStatus = !statusFilter || user.status === statusFilter;
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search.trim()), 400);
+        return () => clearTimeout(timer);
+    }, [search]);
 
-            return matchesSearch && matchesDepartment && matchesRole && matchesStatus;
-        });
-    }, [users, search, departmentFilter, roleFilter, statusFilter]);
+    useEffect(() => {
+        if (activeTab !== 'users') return;
+
+        let cancelled = false;
+
+        const fetchUsers = async () => {
+            setIsLoading(true);
+            setLoadError(null);
+
+            try {
+                const data = await adminUsersApi.getAll({
+                    search: debouncedSearch || undefined,
+                    department: departmentFilter || undefined,
+                    // role: roleFilter || undefined,
+                    isActive:
+                        statusFilter === 'active'
+                            ? true
+                            : statusFilter === 'blocked'
+                              ? false
+                              : undefined,
+                });
+
+                if (!cancelled) {
+                    setUsers(data);
+                }
+            } finally {
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchUsers();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [activeTab, debouncedSearch, departmentFilter, roleFilter, statusFilter]);
 
     const hasActiveFilters = Boolean(search || departmentFilter || roleFilter || statusFilter);
 
@@ -172,66 +139,66 @@ export const AdministrationPage = () => {
         setStatusFilter('');
     };
 
-    const openDialog = (type, user = null) => {
-        setDialog({ type, user });
-        setIsOpen(true);
-    };
+    // const openDialog = (type, user = null) => {
+    //     setDialog({ type, user });
+    //     setIsOpen(true);
+    // };
 
-    const openCreateDialog = () => {
-        setForm(emptyForm);
-        setTempPassword(generatePassword());
-        openDialog('create');
-    };
+    // const openCreateDialog = () => {
+    //     setForm(emptyForm);
+    //     setTempPassword(generatePassword());
+    //     openDialog('create');
+    // };
 
-    const openEditDialog = (user) => {
-        const { id, status, ...rest } = user;
-        setForm(rest);
-        openDialog('edit', user);
-    };
+    // const openEditDialog = (user) => {
+    //     const { id, status, ...rest } = user;
+    //     setForm(rest);
+    //     openDialog('edit', user);
+    // };
 
-    const openPasswordDialog = (user) => {
-        setTempPassword(generatePassword());
-        setForcePasswordReset(true);
-        openDialog('password', user);
-    };
+    // const openPasswordDialog = (user) => {
+    //     setTempPassword(generatePassword());
+    //     setForcePasswordReset(true);
+    //     openDialog('password', user);
+    // };
 
-    const openDeleteDialog = (user) => openDialog('delete', user);
+    // const openDeleteDialog = (user) => openDialog('delete', user);
 
-    const closeDialog = () => setIsOpen(false);
+    // const closeDialog = () => setIsOpen(false);
 
-    const handleExited = () => {
-        setDialog(null);
-        setForm(emptyForm);
-        setTempPassword(generatePassword());
-        setForcePasswordReset(true);
-    };
+    // const handleExited = () => {
+    //     setDialog(null);
+    //     setForm(emptyForm);
+    //     setTempPassword(generatePassword());
+    //     setForcePasswordReset(true);
+    // };
 
-    const handleFormChange = (field, value) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-    };
+    // const handleFormChange = (field, value) => {
+    //     setForm((prev) => ({ ...prev, [field]: value }));
+    // };
 
-    const handleSubmitForm = () => {
-        if (dialog?.type === 'edit') {
-            setUsers((prev) =>
-                prev.map((user) => (user.id === dialog.user.id ? { ...user, ...form } : user)),
-            );
-        } else {
-            setUsers((prev) => [...prev, { ...form, id: crypto.randomUUID(), status: 'active' }]);
-        }
-        closeDialog();
-    };
+    // const handleSubmitForm = () => {
+    //     if (dialog?.type === 'edit') {
+    //         setUsers((prev) =>
+    //             prev.map((user) => (user.id === dialog.user.id ? { ...user, ...form } : user)),
+    //         );
+    //     } else {
+    //         setUsers((prev) => [...prev, { ...form, id: crypto.randomUUID(), status: 'active' }]);
+    //     }
+    //     closeDialog();
+    // };
 
-    const handleSubmitPassword = () => {
-        // здесь будет запрос на смену пароля
-        closeDialog();
-    };
+    // const handleSubmitPassword = () => {
+    //     // здесь будет запрос на смену пароля
+    //     closeDialog();
+    // };
 
-    const handleConfirmDelete = () => {
-        setUsers((prev) => prev.filter((user) => user.id !== dialog.user.id));
-        closeDialog();
-    };
+    // const handleConfirmDelete = () => {
+    //     setUsers((prev) => prev.filter((user) => user.id !== dialog.user.id));
+    //     closeDialog();
+    // };
 
-    const isFormValid = form.lastName && form.firstName && form.email && form.position;
+    // const isFormValid = form.lastName && form.firstName && form.email && form.position;
 
     return (
         <>
@@ -290,12 +257,18 @@ export const AdministrationPage = () => {
                             <Button
                                 variant="contained"
                                 startIcon={<AddIcon />}
-                                onClick={openCreateDialog}
+                                // onClick={openCreateDialog}
                                 sx={{ marginLeft: 'auto' }}
                             >
                                 Зарегистрировать пользователя
                             </Button>
                         </div>
+
+                        {loadError && (
+                            <Typography variant="body2" color="error">
+                                {loadError}
+                            </Typography>
+                        )}
 
                         <div className={styles.tableWrapper}>
                             <TableContainer
@@ -315,128 +288,142 @@ export const AdministrationPage = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredUsers.map((user) => (
-                                            <TableRow key={user.id} hover>
-                                                <TableCell>
-                                                    <div className={styles.userCell}>
-                                                        <Avatar
-                                                            sx={{
-                                                                bgcolor: getAvatarColor(user.id),
-                                                            }}
-                                                        >
-                                                            {getInitials(user)}
-                                                        </Avatar>
-                                                        <div>
-                                                            <Typography
-                                                                variant="body2"
-                                                                sx={{
-                                                                    fontWeight: 500,
-                                                                    color: '#ffffff',
-                                                                }}
-                                                            >
-                                                                {user.lastName} {user.firstName}{' '}
-                                                                {user.middleName}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="caption"
-                                                                sx={{ color: '#ffffff99' }}
-                                                            >
-                                                                {user.email}
-                                                            </Typography>
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{ color: '#ffffffb3' }}
-                                                    >
-                                                        {user.department}
-                                                    </Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{ color: '#ffffffb3' }}
-                                                    >
-                                                        {user.position}
-                                                    </Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        size="small"
-                                                        variant="outlined"
-                                                        color={roleChipColor[user.role]}
-                                                        label={roleLabels[user.role]}
-                                                        sx={{
-                                                            color: '#ffffff',
-                                                            borderColor: '#ffffff66',
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        size="small"
-                                                        variant={
-                                                            user.status === 'active'
-                                                                ? 'filled'
-                                                                : 'outlined'
-                                                        }
-                                                        color={
-                                                            user.status === 'active'
-                                                                ? 'success'
-                                                                : 'default'
-                                                        }
-                                                        label={
-                                                            user.status === 'active'
-                                                                ? 'Активен'
-                                                                : 'Заблокирован'
-                                                        }
-                                                        sx={{
-                                                            color: '#ffffff',
-                                                            ...(user.status !== 'active' && {
-                                                                borderColor: '#ffffff66',
-                                                            }),
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    <div className={styles.actions}>
-                                                        <Tooltip title="Редактировать">
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => openEditDialog(user)}
-                                                            >
-                                                                <EditOutlinedIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title="Сменить пароль">
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() =>
-                                                                    openPasswordDialog(user)
-                                                                }
-                                                            >
-                                                                <LockResetIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title="Удалить">
-                                                            <IconButton
-                                                                size="small"
-                                                                color="error"
-                                                                onClick={() =>
-                                                                    openDeleteDialog(user)
-                                                                }
-                                                            >
-                                                                <DeleteOutlineIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </div>
+                                        {isLoading && (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={6}
+                                                    align="center"
+                                                    className={styles.emptyCell}
+                                                >
+                                                    <CircularProgress size={24} />
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
+                                        )}
 
-                                        {filteredUsers.length === 0 && (
+                                        {!isLoading &&
+                                            users.map((user) => (
+                                                <TableRow key={user.id} hover>
+                                                    <TableCell>
+                                                        <div className={styles.userCell}>
+                                                            <Avatar>{getInitials(user)}</Avatar>
+                                                            <div>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{
+                                                                        fontWeight: 500,
+                                                                        color: '#ffffff',
+                                                                    }}
+                                                                >
+                                                                    {user.secondName}{' '}
+                                                                    {user.firstName}{' '}
+                                                                    {user.patronymic ?? ''}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ color: '#ffffff99' }}
+                                                                >
+                                                                    {user.email}
+                                                                </Typography>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{ color: '#ffffffb3' }}
+                                                        >
+                                                            {user.department
+                                                                ? DEPARTMENT_LABELS[user.department]
+                                                                : '—'}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{ color: '#ffffffb3' }}
+                                                        >
+                                                            {user.speciality
+                                                                ? SPECIALTY_LABELS[user.speciality]
+                                                                : '—'}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Chip
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color={'default'}
+                                                            label={roleLabels[user.roles]}
+                                                            sx={{
+                                                                color: '#ffffff',
+                                                                borderColor: '#ffffff66',
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Chip
+                                                            size="small"
+                                                            variant={
+                                                                user.isActive
+                                                                    ? 'filled'
+                                                                    : 'outlined'
+                                                            }
+                                                            color={
+                                                                user.isActive
+                                                                    ? 'success'
+                                                                    : 'default'
+                                                            }
+                                                            label={
+                                                                user.isActive
+                                                                    ? 'Активен'
+                                                                    : 'Заблокирован'
+                                                            }
+                                                            sx={{
+                                                                color: '#ffffff',
+                                                                ...(!user.isActive && {
+                                                                    borderColor: '#ffffff66',
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        <div className={styles.actions}>
+                                                            <Tooltip title="Редактировать">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    // onClick={() =>
+                                                                    //     openEditDialog(user)
+                                                                    // }
+                                                                >
+                                                                    <EditOutlinedIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Сменить пароль">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    // onClick={() =>
+                                                                    //     openPasswordDialog(user)
+                                                                    // }
+                                                                >
+                                                                    <LockResetIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Заблокировать">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    color="error"
+                                                                    // onClick={() =>
+                                                                    //     openDeleteDialog(user)
+                                                                    // }
+                                                                >
+                                                                    <DeleteOutlineIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+
+                                        {!isLoading && users.length === 0 && (
                                             <TableRow>
                                                 <TableCell
                                                     colSpan={6}
@@ -462,7 +449,7 @@ export const AdministrationPage = () => {
             </section>
 
             {/* ==== диалог: создание / редактирование ==== */}
-            <Dialog
+            {/* <Dialog
                 open={isOpen && (dialog?.type === 'create' || dialog?.type === 'edit')}
                 onClose={closeDialog}
                 fullWidth
@@ -566,13 +553,6 @@ export const AdministrationPage = () => {
                                     },
                                 }}
                             />
-                            <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                className={styles.hint}
-                            >
-                                Пользователю нужно будет сменить пароль при первом входе.
-                            </Typography>
                         </div>
                     )}
                 </DialogContent>
@@ -583,10 +563,10 @@ export const AdministrationPage = () => {
                         {dialog?.type === 'edit' ? 'Сохранить изменения' : 'Зарегистрировать'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
 
             {/* ==== диалог: смена пароля ==== */}
-            <Dialog
+            {/* <Dialog
                 open={isOpen && dialog?.type === 'password'}
                 onClose={closeDialog}
                 fullWidth
@@ -636,20 +616,20 @@ export const AdministrationPage = () => {
                         Сохранить пароль
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
 
-            {/* ==== диалог: удаление ==== */}
-            <Dialog
+            {/* ==== диалог: Блокировка ==== */}
+            {/* <Dialog
                 open={isOpen && dialog?.type === 'delete'}
                 onClose={closeDialog}
                 fullWidth
                 maxWidth="xs"
                 slotProps={{ transition: { onExited: handleExited } }}
             >
-                <DialogTitle>Удалить пользователя</DialogTitle>
+                <DialogTitle>Заблокировать пользователя</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
-                        Вы уверены, что хотите удалить{' '}
+                        Вы уверены, что хотите заблокировать{' '}
                         <b>
                             {dialog?.user?.lastName} {dialog?.user?.firstName}{' '}
                             {dialog?.user?.middleName}
@@ -660,10 +640,10 @@ export const AdministrationPage = () => {
                 <DialogActions>
                     <Button onClick={closeDialog}>Отменить</Button>
                     <Button variant="contained" color="error" onClick={handleConfirmDelete}>
-                        Удалить пользователя
+                        Заблокировать пользователя
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
         </>
     );
 };
