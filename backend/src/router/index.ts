@@ -74,6 +74,7 @@ router.put(
 
 // Users
 router.get('/users/search', authMiddleware, userController.searchUsers);
+router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);
 
 // Tasks
 router.get('/tasks', authMiddleware, taskController.getAllTasks);

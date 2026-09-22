@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import userService from '~/services/user-service.js';
 import ApiError from '~/exceptions/api-error.js';
+import type { Department, UserRole } from '../../generated/prisma/enums.js';
 
 class UserController {
     async searchUsers(req: Request, res: Response, next: NextFunction) {
@@ -11,6 +12,23 @@ class UserController {
 
             const users = await userService.searchUsers(query as string);
             res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getAllUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { search, department, role, isActive } = req.query;
+
+            const users = await userService.getAllUsers({
+                search: typeof search === 'string' ? search : undefined,
+                department: typeof department === 'string' ? (department as Department) : undefined,
+                role: typeof role === 'string' ? (role as UserRole) : undefined,
+                isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+            });
+
+            return res.json(users);
         } catch (error) {
             next(error);
         }

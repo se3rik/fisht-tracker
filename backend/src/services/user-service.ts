@@ -7,6 +7,7 @@ import { UserDto } from '~/dtos/user-dto.js';
 import ApiError from '~/exceptions/api-error.js';
 
 import type { Department, Specialty, UserRole } from '../../generated/prisma/enums.js';
+import type { GetAllUsersParams } from '~/types/user.js';
 
 class UserService {
     async searchUsers(query: string) {
@@ -26,6 +27,36 @@ class UserService {
                 speciality: true,
             },
             take: 10,
+        });
+    }
+
+    async getAllUsers({ search, department, role, isActive }: GetAllUsersParams) {
+        return prisma.user.findMany({
+            where: {
+                ...(department && { department }),
+                ...(role && { roles: role }),
+                ...(isActive !== undefined && { isActive }),
+                ...(search && {
+                    OR: [
+                        { firstName: { contains: search, mode: 'insensitive' } },
+                        { secondName: { contains: search, mode: 'insensitive' } },
+                        { patronymic: { contains: search, mode: 'insensitive' } },
+                        { email: { contains: search, mode: 'insensitive' } },
+                    ],
+                }),
+            },
+            orderBy: { department: 'asc' },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                secondName: true,
+                patronymic: true,
+                department: true,
+                speciality: true,
+                roles: true,
+                isActive: true,
+            },
         });
     }
 
