@@ -8,6 +8,7 @@ import commentController from '~/controllers/comment-controller.js';
 import userController from '~/controllers/user-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
+import adminMiddleware from '~/middlewares/admin-middleware.js';
 
 import { Department, Specialty } from '../../generated/prisma/enums.js';
 
@@ -15,17 +16,48 @@ const router = express.Router();
 
 // Auth
 router.post('/login', authController.login);
-router.post(
-    '/registration',
-    body('email').isEmail(),
-    body('password').isLength({
-        min: 3,
-        max: 32,
-    }),
-    authController.registration,
-);
 router.post('/logout', authController.logout);
 router.get('/refresh', authController.refresh);
+
+// Admin: управление пользователями
+router.post(
+    '/admin/users',
+    authMiddleware,
+    adminMiddleware,
+    body('email').isEmail(),
+    body('password').isLength({ min: 3, max: 32 }),
+    body('firstName').isString().isLength({ min: 1, max: 64 }),
+    body('secondName').isString().isLength({ min: 1, max: 64 }),
+    userController.createUser,
+);
+
+router.put(
+    '/admin/users/:id',
+    authMiddleware,
+    adminMiddleware,
+    body('firstName').optional().isString().isLength({ min: 1, max: 64 }),
+    body('secondName').optional().isString().isLength({ min: 1, max: 64 }),
+    body('patronymic').optional({ nullable: true }).isString().isLength({ max: 64 }),
+    body('department').optional({ nullable: true }).isIn(Object.values(Department)),
+    body('specialty').optional({ nullable: true }).isIn(Object.values(Specialty)),
+    userController.updateUser,
+);
+
+router.patch(
+    '/admin/users/:id/password',
+    authMiddleware,
+    adminMiddleware,
+    body('password').isLength({ min: 3, max: 32 }),
+    userController.resetPassword,
+);
+
+router.patch('/admin/users/:id/block', authMiddleware, adminMiddleware, userController.blockUser);
+router.patch(
+    '/admin/users/:id/unblock',
+    authMiddleware,
+    adminMiddleware,
+    userController.unblockUser,
+);
 
 // Profile
 router.get('/profile', authMiddleware, profileController.getProfile);

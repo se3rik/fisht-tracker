@@ -6,6 +6,7 @@ export class UserDto {
     firstName: string;
     secondName: string;
     roles: 'USER' | 'ADMIN';
+    isActive: boolean;
 
     constructor(model: User) {
         this.id = model.id;
@@ -13,5 +14,6 @@ export class UserDto {
         this.firstName = model.firstName;
         this.secondName = model.secondName;
         this.roles = model.roles;
+        this.isActive = model.isActive;
     }
 }
