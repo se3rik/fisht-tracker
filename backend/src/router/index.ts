@@ -71,6 +71,13 @@ router.put(
     body('specialty').optional({ nullable: true }).isIn(Object.values(Specialty)),
     profileController.updateProfile,
 );
+router.patch(
+    '/profile/password',
+    authMiddleware,
+    body('oldPassword').isString().notEmpty(),
+    body('newPassword').isLength({ min: 3, max: 32 }),
+    profileController.changePassword,
+);
 
 // Users
 router.get('/users/search', authMiddleware, userController.searchUsers);

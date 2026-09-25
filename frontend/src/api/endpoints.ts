@@ -7,6 +7,7 @@ export const endpoints = {
     profile: {
         getInfo: '/profile',
         updateData: '/updateProfile',
+        changePassword: '/profile/password',
     },
     tasks: {
         getAllTasks: '/tasks',
