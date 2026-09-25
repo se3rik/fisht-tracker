@@ -5,4 +5,5 @@ export type NavigationItem = {
     title: string;
     link: string;
     icon: SvgIconComponent;
+    adminOnly?: boolean;
 };
