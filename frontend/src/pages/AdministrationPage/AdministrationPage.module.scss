@@ -1,0 +1,111 @@
+@use '@/styles/variables' as *;
+
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    padding: 16px;
+}
+
+.tabs {
+    border-bottom: 1px solid $devider-color;
+    min-height: 40px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tableWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tableContainer {
+    border-radius: 10px;
+    background-color: #ffffff26 !important;
+    border-color: #ffffff33 !important;
+}
+
+/* все ячейки — белый текст и мягкие разделители */
+.tableContainer :global(.MuiTableCell-root) {
+    color: #ffffff;
+    border-bottom-color: #ffffff1a;
+}
+
+/* заголовок таблицы */
+.tableContainer :global(.MuiTableHead-root .MuiTableCell-root) {
+    color: #ffffff;
+    font-weight: 600;
+    border-bottom-color: #ffffff33;
+}
+
+/* hover строки — чуть светлее фона */
+.tableContainer :global(.MuiTableRow-root.MuiTableRow-hover:hover) {
+    background-color: #ffffff14;
+}
+
+/* убираем нижнюю границу у последней строки */
+.tableContainer :global(.MuiTableRow-root:last-child .MuiTableCell-root) {
+    border-bottom: none;
+}
+
+.userCell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+/* иконки действий — белые, с мягким hover */
+.actions :global(.MuiIconButton-root) {
+    color: #ffffff;
+}
+.actions :global(.MuiIconButton-root):hover {
+    background-color: #ffffff1f;
+}
+
+/* кнопка удаления — мягкий красный, чтобы не «резала» глаз */
+.actions :global(.MuiIconButton-root.MuiIconButton-colorError) {
+    color: #ff8a80;
+}
+.actions :global(.MuiIconButton-root.MuiIconButton-colorError):hover {
+    background-color: #ff8a8026;
+}
+
+.emptyCell {
+    padding: 32px 0;
+}
+
+.dialogContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px !important;
+}
+
+.formRow {
+    display: flex;
+    gap: 14px;
+}
+
+.hint {
+    display: block;
+    margin-top: 6px;
+}
+
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

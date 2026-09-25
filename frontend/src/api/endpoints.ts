@@ -1,6 +1,5 @@
 export const endpoints = {
     auth: {
-        registration: '/registration',
         login: '/login',
         logout: '/logout',
         refresh: '/refresh',
@@ -8,9 +7,15 @@ export const endpoints = {
     profile: {
         getInfo: '/profile',
         updateData: '/updateProfile',
+        changePassword: '/profile/password',
     },
     tasks: {
         getAllTasks: '/tasks',
         getTaskById: '/tasks',
+    },
+    admin: {
+        users: {
+            base: '/admin/users',
+        },
     },
 };

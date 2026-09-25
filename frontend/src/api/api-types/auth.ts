@@ -11,13 +11,6 @@ export type AuthResponse = {
     user: UserDto;
 };
 
-export type RegistrationRequest = {
-    email: string;
-    firstName: string;
-    secondName: string;
-    password: string;
-};
-
 export type LoginRequest = {
     email: string;
     password: string;

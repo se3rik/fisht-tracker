@@ -37,6 +37,24 @@ class ProfileController {
             next(error);
         }
     }
+
+    async changePassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+            }
+
+            const userId = res.locals.user.id;
+            const { oldPassword, newPassword } = req.body;
+
+            const result = await profileService.changePassword(userId, oldPassword, newPassword);
+
+            return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new ProfileController();

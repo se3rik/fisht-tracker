@@ -19,6 +19,10 @@ export const BaseSidebar = () => {
     const dispatch = useAppDispatch();
     const { profileData } = useAppSelector((state) => state.profile);
 
+    const isAdmin = profileData?.roles === 'ADMIN';
+
+    const visibleNavigationList = navigationList.filter((item) => !item.adminOnly || isAdmin);
+
     const onLogoutIconClick = async (event: MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
         await dispatch(logout());
@@ -34,7 +38,7 @@ export const BaseSidebar = () => {
             </section>
             <section className={styles.navSection}>
                 <ul className={styles.navList}>
-                    {navigationList.map((el) => (
+                    {visibleNavigationList.map((el) => (
                         <li key={el.id}>
                             <NavLink
                                 className={({ isActive }) =>

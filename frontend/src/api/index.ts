@@ -1,3 +1,4 @@
 export * from './auth.api';
 export * from './profile.api';
 export * from './tasks.api';
+export * from './adminUsers.api';

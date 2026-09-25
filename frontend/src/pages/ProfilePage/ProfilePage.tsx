@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Avatar, Button } from '@mui/material';
+import {
+    Avatar,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    InputAdornment,
+    TextField,
+    Typography,
+} from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import styles from './ProfilePage.module.scss';
 
@@ -8,6 +21,8 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { getProfileData, updateProfileData } from '@/stores/slices/profileSlice';
+
+import { profileApi } from '@/api';
 
 import { PageHeading } from '@/components/pageHeading/PageHeading';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
@@ -36,6 +51,18 @@ type ProfileFormValues = {
     speciality: string;
 };
 
+type PasswordFormState = {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+};
+
+const emptyPasswordForm: PasswordFormState = {
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+};
+
 export const ProfilePage = () => {
     const dispatch = useAppDispatch();
     const { profileData } = useAppSelector((state) => state.profile);
@@ -52,6 +79,15 @@ export const ProfilePage = () => {
         },
     });
     const selectedDepartment = watch('department');
+
+    // ==== смена пароля ====
+    const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+    const [passwordForm, setPasswordForm] = useState<PasswordFormState>(emptyPasswordForm);
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
     const filteredSpecialtyItems =
         selectedDepartment && DEPARTMENT_SPECIALTY_MAP[selectedDepartment]
@@ -107,6 +143,60 @@ export const ProfilePage = () => {
             });
         }
         setIsEditing(false);
+    };
+
+    // ==== смена пароля: хендлеры ====
+
+    const openPasswordDialog = () => {
+        setPasswordForm(emptyPasswordForm);
+        setPasswordError(null);
+        setPasswordSuccess(null);
+        setShowOldPassword(false);
+        setShowNewPassword(false);
+        setIsPasswordOpen(true);
+    };
+
+    const closePasswordDialog = () => setIsPasswordOpen(false);
+
+    const handlePasswordExited = () => {
+        setPasswordForm(emptyPasswordForm);
+        setPasswordError(null);
+        setPasswordSuccess(null);
+    };
+
+    const handlePasswordFieldChange = (field: keyof PasswordFormState, value: string) => {
+        setPasswordForm((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const isPasswordFormValid =
+        passwordForm.oldPassword.trim().length > 0 &&
+        passwordForm.newPassword.trim().length >= 3 &&
+        passwordForm.newPassword === passwordForm.confirmPassword;
+
+    const passwordMismatch =
+        passwordForm.confirmPassword.length > 0 &&
+        passwordForm.newPassword !== passwordForm.confirmPassword;
+
+    const handleSubmitPasswordChange = async () => {
+        if (!isPasswordFormValid) return;
+
+        setIsPasswordSubmitting(true);
+        setPasswordError(null);
+        setPasswordSuccess(null);
+
+        try {
+            await profileApi.changePassword({
+                oldPassword: passwordForm.oldPassword,
+                newPassword: passwordForm.newPassword,
+            });
+
+            setPasswordSuccess('Пароль успешно изменён');
+            setPasswordForm(emptyPasswordForm);
+        } catch (error) {
+            setPasswordError((error as Error).message);
+        } finally {
+            setIsPasswordSubmitting(false);
+        }
     };
 
     return (
@@ -196,17 +286,124 @@ export const ProfilePage = () => {
                                 </Button>
                             </>
                         ) : (
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => setIsEditing(true)}
-                            >
-                                Редактировать
-                            </Button>
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={openPasswordDialog}
+                                >
+                                    Сменить пароль
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={() => setIsEditing(true)}
+                                >
+                                    Редактировать
+                                </Button>
+                            </>
                         )}
                     </div>
                 </section>
             </div>
+
+            {/* ==== диалог: смена пароля ==== */}
+            <Dialog
+                open={isPasswordOpen}
+                onClose={closePasswordDialog}
+                fullWidth
+                maxWidth="xs"
+                slotProps={{ transition: { onExited: handlePasswordExited } }}
+            >
+                <DialogTitle>Сменить пароль</DialogTitle>
+                <DialogContent className={styles.passwordDialogContent}>
+                    <TextField
+                        label="Текущий пароль"
+                        type={showOldPassword ? 'text' : 'password'}
+                        value={passwordForm.oldPassword}
+                        onChange={(e) => handlePasswordFieldChange('oldPassword', e.target.value)}
+                        fullWidth
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowOldPassword((prev) => !prev)}
+                                        >
+                                            {showOldPassword ? (
+                                                <VisibilityOffIcon fontSize="small" />
+                                            ) : (
+                                                <VisibilityIcon fontSize="small" />
+                                            )}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            },
+                        }}
+                    />
+
+                    <TextField
+                        label="Новый пароль"
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={passwordForm.newPassword}
+                        onChange={(e) => handlePasswordFieldChange('newPassword', e.target.value)}
+                        fullWidth
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowNewPassword((prev) => !prev)}
+                                        >
+                                            {showNewPassword ? (
+                                                <VisibilityOffIcon fontSize="small" />
+                                            ) : (
+                                                <VisibilityIcon fontSize="small" />
+                                            )}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            },
+                        }}
+                    />
+
+                    <TextField
+                        label="Повторите новый пароль"
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) =>
+                            handlePasswordFieldChange('confirmPassword', e.target.value)
+                        }
+                        error={passwordMismatch}
+                        helperText={passwordMismatch ? 'Пароли не совпадают' : ' '}
+                        fullWidth
+                    />
+
+                    {passwordError && (
+                        <Typography variant="body2" color="error">
+                            {passwordError}
+                        </Typography>
+                    )}
+
+                    {passwordSuccess && (
+                        <Typography variant="body2" color="success.main">
+                            {passwordSuccess}
+                        </Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closePasswordDialog} disabled={isPasswordSubmitting}>
+                        Закрыть
+                    </Button>
+                    <Button
+                        variant="contained"
+                        disabled={!isPasswordFormValid || isPasswordSubmitting}
+                        onClick={handleSubmitPasswordChange}
+                    >
+                        {isPasswordSubmitting ? 'Сохранение...' : 'Сохранить пароль'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

@@ -37,6 +37,7 @@ export const navigationList: NavigationItem[] = [
         title: 'Администрирование',
         link: '/administration',
         icon: BuildRoundedIcon,
+        adminOnly: true,
     },
     {
         id: 6,

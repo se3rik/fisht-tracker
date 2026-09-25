@@ -11,4 +11,9 @@ export type ProfileDataResponse = {
     roles: 'USER' | 'ADMIN';
 };
 
+export type ChangePasswordRequest = {
+    oldPassword: string;
+    newPassword: string;
+};
+
 export type UpdateProfileRequest = Partial<Omit<ProfileDataResponse, 'id'>>;
