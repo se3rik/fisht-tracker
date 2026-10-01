@@ -16,6 +16,7 @@ import { UserAutocomplete } from '@/components/userAutocomplete/UsersAutocomplet
 
 import { useTasksItem } from '@/hooks/useTaskItem';
 import { useAppSelector } from '@/hooks/useAppSelector';
+import { useNotify } from '@/hooks/useNotify';
 
 import { taskPriorities } from '@/constants/taskPriorities';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
@@ -44,6 +45,7 @@ type TaskUpdateForm = {
 
 export const TaskDetailsPage = () => {
     const urlParams = useParams();
+    const notify = useNotify();
     const { taskData, setTaskData } = useTasksItem(urlParams.id ?? '');
     const { profileData } = useAppSelector((state) => state.profile);
 
@@ -153,6 +155,7 @@ export const TaskDetailsPage = () => {
                 initiatorId: formData.initiatorId || taskData.initiatorId,
                 department: formData.department,
             });
+            notify('success', 'Изменения сохранены');
 
             setTaskData((prev) =>
                 prev
@@ -176,7 +179,10 @@ export const TaskDetailsPage = () => {
 
             setEditMode(null);
         } catch (err) {
-            console.error(err);
+            notify(
+                'error',
+                err instanceof Error ? err.message : 'Не удалось внести изменения в задачу',
+            );
         }
     });
 

@@ -42,6 +42,8 @@ import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 
 import type { TabValue } from '@/types/tabs/TabValue';
 
+import { useNotify } from '@/hooks/useNotify';
+
 import { TABS } from '@/constants/administrationTabs';
 import { taskDepartments } from '@/constants/taskDepartments';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
@@ -85,6 +87,8 @@ const getInitials = (user: AdminUser) =>
     `${user.secondName[0] ?? ''}${user.firstName[0] ?? ''}`.toUpperCase();
 
 export const AdministrationPage = () => {
+    const notify = useNotify();
+
     const [activeTab, setActiveTab] = useState<TabValue>('users');
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -246,10 +250,15 @@ export const AdministrationPage = () => {
                 patronymic: createForm.patronymic || undefined,
             });
 
+            notify('success', 'Пользователь зарегестрирован');
             closeCreateDialog();
             await fetchUsers();
         } catch (error) {
             setCreateError((error as Error).message);
+            notify(
+                'error',
+                error instanceof Error ? error.message : 'Не удалось создать пользователя',
+            );
         } finally {
             setIsCreateSubmitting(false);
         }
@@ -310,9 +319,14 @@ export const AdministrationPage = () => {
             });
 
             closeEditDialog();
+            notify('success', 'Данные пользователя сохранены');
             await fetchUsers();
         } catch (error) {
             setEditError((error as Error).message);
+            notify(
+                'error',
+                error instanceof Error ? error.message : 'Не удалось обновить данные пользователя',
+            );
         } finally {
             setIsEditSubmitting(false);
         }
@@ -345,9 +359,14 @@ export const AdministrationPage = () => {
 
         try {
             await adminUsersApi.resetPassword(passwordUser.id, { password: newPassword });
+            notify('success', 'Пароль пользователя успешно изменен');
             closePasswordDialog();
         } catch (error) {
             setPasswordError((error as Error).message);
+            notify(
+                'error',
+                error instanceof Error ? error.message : 'Не удалось изменить пароль пользователя',
+            );
         } finally {
             setIsPasswordSubmitting(false);
         }
@@ -376,10 +395,15 @@ export const AdministrationPage = () => {
 
         try {
             await adminUsersApi.block(blockingUser.id);
+            notify('success', 'Пользователь успешно заблокирован');
             closeBlockDialog();
             await fetchUsers();
         } catch (error) {
             setBlockError((error as Error).message);
+            notify(
+                'error',
+                error instanceof Error ? error.message : 'Не удалось заблокировать пользователя',
+            );
         } finally {
             setIsBlockSubmitting(false);
         }

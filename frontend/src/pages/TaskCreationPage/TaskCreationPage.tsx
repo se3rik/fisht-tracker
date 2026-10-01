@@ -8,6 +8,8 @@ import styles from './TaskCreationPage.module.scss';
 
 import { tasksApi } from '@/api';
 
+import { useNotify } from '@/hooks/useNotify';
+
 import { BaseTextarea } from '@/components/ui/BaseTextarea/BaseTextarea';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { BaseDatePicker } from '@/components/ui/BaseDatePicker/BaseDatePicker';
@@ -34,6 +36,7 @@ type TaskCreationForm = {
 
 export const TaskCreationPage = () => {
     const navigate = useNavigate();
+    const notify = useNotify();
 
     const {
         register,
@@ -245,9 +248,10 @@ export const TaskCreationPage = () => {
                 deadline: data.deadline ?? undefined,
             });
 
+            notify('success', 'Задача успешно создана');
             navigate('/tasks');
         } catch (err) {
-            console.error(err);
+            notify('error', err instanceof Error ? err.message : 'Не удалось создать задачу');
         }
     });
 
