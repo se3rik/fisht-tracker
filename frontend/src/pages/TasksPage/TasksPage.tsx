@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Pagination } from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import styles from './TasksPage.module.scss';
 
@@ -25,17 +23,11 @@ import { taskDepartments } from '@/constants/taskDepartments';
 
 type SortDirection = 'asc' | 'desc' | '';
 
-const nextSortDirection = (current: SortDirection): SortDirection => {
-    if (current === '') return 'asc';
-    if (current === 'asc') return 'desc';
-    return '';
-};
-
 export const TasksPage = () => {
     const navigate = useNavigate();
     const { profileData } = useAppSelector((state) => state.profile);
 
-    const LIMIT = 9;
+    const LIMIT = 8;
     const [page, setPage] = useState(1);
     const [name, setName] = useState('');
     const [status, setStatus] = useState<TasksStatusValue>('');
@@ -43,7 +35,7 @@ export const TasksPage = () => {
     const [department, setDepartment] = useState<TaskDepartmentValues | ''>('');
     const [role, setRole] = useState<TaskRoleValue>('');
     const [dateFilter, setDateFilter] = useState<SortDirection>('');
-    const [deadlineFilter, setDeadlineFilter] = useState<SortDirection>('');
+    const [deadlineFilter, setDeadlineFilter] = useState<SortDirection>('asc');
 
     const isFiltersEmpty =
         !name && !status && !priority && !role && !dateFilter && !department && !deadlineFilter;
@@ -69,10 +61,6 @@ export const TasksPage = () => {
         setDateFilter('');
         setDeadlineFilter('');
         setPage(1);
-    };
-
-    const toggleDeadlineSort = () => {
-        setDeadlineFilter((prev) => nextSortDirection(prev));
     };
 
     useEffect(() => {
@@ -177,18 +165,46 @@ export const TasksPage = () => {
                     <div>Статус</div>
                     <div>Приоритет</div>
                     <div>Отдел</div>
-                    <div
-                        className={styles.sortableHeader}
-                        onClick={toggleDeadlineSort}
-                        role="button"
-                        tabIndex={0}
-                    >
+                    <div className={styles.sortableHeader} role="button" tabIndex={0}>
                         Дедлайн
-                        {deadlineFilter === 'asc' && <ArrowUpwardIcon fontSize="inherit" />}
-                        {deadlineFilter === 'desc' && <ArrowDownwardIcon fontSize="inherit" />}
                     </div>
                     <div>Исполнитель</div>
                 </div>
+                {tasks.length === 0 && (
+                    <>
+                        <span
+                            style={{
+                                color: '#ffffff',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                textAlign: 'center',
+                                marginTop: '20px',
+                            }}
+                        >
+                            {`По заданым фильтрам задач не нашлось`}
+                        </span>
+                        <span
+                            style={{
+                                color: '#ffffff',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                textAlign: 'center',
+                            }}
+                        >
+                            {`или`}
+                        </span>
+                        <span
+                            style={{
+                                color: '#ffffff',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                textAlign: 'center',
+                            }}
+                        >
+                            {`Список задач пуст`}
+                        </span>
+                    </>
+                )}
                 {tasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
                 ))}
