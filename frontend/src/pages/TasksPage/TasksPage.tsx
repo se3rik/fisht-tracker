@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Pagination } from '@mui/material';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import styles from './TasksPage.module.scss';
 
@@ -21,6 +23,14 @@ import { taskPriorities } from '@/constants/taskPriorities';
 import { taskRoles } from '@/constants/taskRoles';
 import { taskDepartments } from '@/constants/taskDepartments';
 
+type SortDirection = 'asc' | 'desc' | '';
+
+const nextSortDirection = (current: SortDirection): SortDirection => {
+    if (current === '') return 'asc';
+    if (current === 'asc') return 'desc';
+    return '';
+};
+
 export const TasksPage = () => {
     const navigate = useNavigate();
     const { profileData } = useAppSelector((state) => state.profile);
@@ -32,9 +42,11 @@ export const TasksPage = () => {
     const [priority, setPriority] = useState<TaskPriorityValue>('');
     const [department, setDepartment] = useState<TaskDepartmentValues | ''>('');
     const [role, setRole] = useState<TaskRoleValue>('');
-    const [dateFilter, setDateFilter] = useState<'asc' | 'desc' | ''>('');
+    const [dateFilter, setDateFilter] = useState<SortDirection>('');
+    const [deadlineFilter, setDeadlineFilter] = useState<SortDirection>('');
 
-    const isFiltersEmpty = !name && !status && !priority && !role && !dateFilter && !department;
+    const isFiltersEmpty =
+        !name && !status && !priority && !role && !dateFilter && !department && !deadlineFilter;
 
     const { tasks, total } = useTasksList({
         name,
@@ -43,6 +55,7 @@ export const TasksPage = () => {
         department: department || undefined,
         priority: priority || undefined,
         sortByDate: dateFilter || undefined,
+        sortByDeadline: deadlineFilter || undefined,
         limit: LIMIT,
         skip: (page - 1) * LIMIT,
     });
@@ -54,7 +67,12 @@ export const TasksPage = () => {
         setDepartment('');
         setRole('');
         setDateFilter('');
+        setDeadlineFilter('');
         setPage(1);
+    };
+
+    const toggleDeadlineSort = () => {
+        setDeadlineFilter((prev) => nextSortDirection(prev));
     };
 
     useEffect(() => {
@@ -67,7 +85,7 @@ export const TasksPage = () => {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setPage(1);
-    }, [name, status, priority, department, role, dateFilter]);
+    }, [name, status, priority, department, role, dateFilter, deadlineFilter]);
 
     return (
         <section className={styles.pageWrapper}>
@@ -120,6 +138,16 @@ export const TasksPage = () => {
                             ]}
                             onChange={setDateFilter}
                         />
+
+                        <BaseSelect
+                            label="Дедлайн"
+                            value={deadlineFilter}
+                            menuItems={[
+                                { id: 1, value: 'asc', title: 'Сначала ближайшие' },
+                                { id: 2, value: 'desc', title: 'Сначала дальние' },
+                            ]}
+                            onChange={setDeadlineFilter}
+                        />
                     </div>
                     <div className={styles.filterActions}>
                         <Button
@@ -149,7 +177,16 @@ export const TasksPage = () => {
                     <div>Статус</div>
                     <div>Приоритет</div>
                     <div>Отдел</div>
-                    <div>Дедлайн</div>
+                    <div
+                        className={styles.sortableHeader}
+                        onClick={toggleDeadlineSort}
+                        role="button"
+                        tabIndex={0}
+                    >
+                        Дедлайн
+                        {deadlineFilter === 'asc' && <ArrowUpwardIcon fontSize="inherit" />}
+                        {deadlineFilter === 'desc' && <ArrowDownwardIcon fontSize="inherit" />}
+                    </div>
                     <div>Исполнитель</div>
                 </div>
                 {tasks.map((task) => (

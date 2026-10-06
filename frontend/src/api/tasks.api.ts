@@ -15,6 +15,7 @@ type GetAllTasksParams = {
     department?: TaskDepartmentValues;
     priority?: TaskPriorityValue;
     sortByDate?: 'asc' | 'desc';
+    sortByDeadline?: 'asc' | 'desc';
     limit?: number;
     skip?: number;
 };
@@ -29,6 +30,7 @@ export const tasksApi = {
         if (params.department) query.append('department', params.department);
         if (params.priority) query.append('priority', params.priority);
         if (params.sortByDate) query.append('sortByDate', params.sortByDate);
+        if (params.sortByDeadline) query.append('sortByDeadline', params.sortByDeadline);
         if (params.limit) query.append('limit', params.limit.toString());
         if (params.skip) query.append('skip', params.skip.toString());
 
