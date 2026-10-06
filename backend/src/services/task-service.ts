@@ -48,6 +48,7 @@ class TaskService {
                     priority: true,
                     department: true,
                     createdAt: true,
+                    deadline: true,
                     executors: {
                         select: {
                             firstName: true,

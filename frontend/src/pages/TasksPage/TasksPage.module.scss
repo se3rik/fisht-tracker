@@ -69,6 +69,10 @@
     }
 
     & > :nth-child(5) {
+        flex: 1.5;
+    }
+
+    & > :nth-child(6) {
         flex: 2;
     }
 }

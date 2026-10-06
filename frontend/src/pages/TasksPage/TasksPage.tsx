@@ -149,6 +149,7 @@ export const TasksPage = () => {
                     <div>Статус</div>
                     <div>Приоритет</div>
                     <div>Отдел</div>
+                    <div>Дедлайн</div>
                     <div>Исполнитель</div>
                 </div>
                 {tasks.map((task) => (
