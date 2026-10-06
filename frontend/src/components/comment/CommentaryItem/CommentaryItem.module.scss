@@ -5,12 +5,25 @@
     flex-direction: column;
 }
 
+.commentTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .commentAuthor {
     display: flex;
     align-items: center;
     height: 32px;
     font-weight: 500;
     font-size: $font-size-md;
+    margin-bottom: 8px;
+}
+
+.commentDate {
+    font-weight: 500;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
     margin-bottom: 8px;
 }
 
