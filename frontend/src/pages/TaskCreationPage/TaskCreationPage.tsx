@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,6 +10,7 @@ import styles from './TaskCreationPage.module.scss';
 import { tasksApi } from '@/api';
 
 import { useNotify } from '@/hooks/useNotify';
+import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { BaseTextarea } from '@/components/ui/BaseTextarea/BaseTextarea';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
@@ -21,6 +23,7 @@ import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
 import { createTaskValidationSchema } from '@/validation/taskValidation';
 
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
+import type { UserSearchResult } from '@/api/users.api';
 
 type TaskCreationForm = {
     name: string;
@@ -37,12 +40,14 @@ type TaskCreationForm = {
 export const TaskCreationPage = () => {
     const navigate = useNavigate();
     const notify = useNotify();
+    const { profileData } = useAppSelector((state) => state.profile);
 
     const {
         register,
         handleSubmit,
         control,
         watch,
+        setValue,
         formState: { errors },
     } = useForm<TaskCreationForm>({
         defaultValues: {
@@ -58,6 +63,22 @@ export const TaskCreationPage = () => {
         },
         resolver: yupResolver(createTaskValidationSchema),
     });
+
+    useEffect(() => {
+        if (profileData?.id) {
+            setValue('initiatorId', profileData.id);
+        }
+    }, [profileData?.id, setValue]);
+
+    const currentUserAsOption: UserSearchResult | null = profileData
+        ? {
+              id: profileData.id,
+              firstName: profileData.firstName,
+              secondName: profileData.secondName,
+              department: profileData.department,
+              speciality: profileData.speciality,
+          }
+        : null;
 
     const startDateValue = watch('startDate');
 
@@ -146,23 +167,7 @@ export const TaskCreationPage = () => {
             id: 4,
             label: 'Инициатор',
             component: (
-                <Controller
-                    name="initiatorId"
-                    control={control}
-                    render={({ field }) => (
-                        <div>
-                            <UserAutocomplete
-                                onChange={field.onChange}
-                                error={!!errors.initiatorId}
-                            />
-                            {errors.initiatorId && (
-                                <span className={styles.errorText}>
-                                    {errors.initiatorId.message}
-                                </span>
-                            )}
-                        </div>
-                    )}
-                />
+                <UserAutocomplete value={currentUserAsOption} disabled onChange={() => {}} />
             ),
         },
         {

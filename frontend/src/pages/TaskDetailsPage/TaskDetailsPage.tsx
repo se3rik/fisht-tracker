@@ -92,6 +92,10 @@ export const TaskDetailsPage = () => {
 
     const canFullEdit = profileData?.roles === 'ADMIN' || profileData?.id === originalInitiatorId;
 
+    const isAdmin = profileData?.roles === 'ADMIN';
+
+    const canEditInitiator = isAdmin && editMode === 'full';
+
     const canEditStatus =
         canFullEdit ||
         taskData?.executors.some((e) => e.id === profileData?.id) ||
@@ -330,7 +334,7 @@ export const TaskDetailsPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
-                                disabled={editMode !== 'full'}
+                                disabled={!canEditInitiator}
                                 value={
                                     editMode !== null ? initiator : (taskData?.initiator ?? null)
                                 }
