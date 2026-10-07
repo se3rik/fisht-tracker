@@ -42,6 +42,7 @@ export const TaskCreationPage = () => {
         register,
         handleSubmit,
         control,
+        watch,
         formState: { errors },
     } = useForm<TaskCreationForm>({
         defaultValues: {
@@ -57,6 +58,8 @@ export const TaskCreationPage = () => {
         },
         resolver: yupResolver(createTaskValidationSchema),
     });
+
+    const startDateValue = watch('startDate');
 
     const departmentItems = Object.entries(DEPARTMENT_LABELS).map(([value, title], id) => ({
         id,
@@ -97,12 +100,18 @@ export const TaskCreationPage = () => {
                     name="startDate"
                     control={control}
                     render={({ field }) => (
-                        <BaseDatePicker
-                            value={field.value ? dayjs(field.value) : null}
-                            onChange={(newValue) =>
-                                field.onChange(newValue ? newValue.toISOString() : null)
-                            }
-                        />
+                        <div>
+                            <BaseDatePicker
+                                value={field.value ? dayjs(field.value) : null}
+                                minDate={dayjs().startOf('day')}
+                                onChange={(newValue) =>
+                                    field.onChange(newValue ? newValue.toISOString() : null)
+                                }
+                            />
+                            {errors.startDate && (
+                                <span className={styles.errorText}>{errors.startDate.message}</span>
+                            )}
+                        </div>
                     )}
                 />
             ),
@@ -115,12 +124,20 @@ export const TaskCreationPage = () => {
                     name="deadline"
                     control={control}
                     render={({ field }) => (
-                        <BaseDatePicker
-                            value={field.value ? dayjs(field.value) : null}
-                            onChange={(newValue) =>
-                                field.onChange(newValue ? newValue.toISOString() : null)
-                            }
-                        />
+                        <div>
+                            <BaseDatePicker
+                                value={field.value ? dayjs(field.value) : null}
+                                minDate={
+                                    startDateValue ? dayjs(startDateValue) : dayjs().startOf('day')
+                                }
+                                onChange={(newValue) =>
+                                    field.onChange(newValue ? newValue.toISOString() : null)
+                                }
+                            />
+                            {errors.deadline && (
+                                <span className={styles.errorText}>{errors.deadline.message}</span>
+                            )}
+                        </div>
                     )}
                 />
             ),

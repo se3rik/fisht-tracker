@@ -309,6 +309,7 @@ export const TaskDetailsPage = () => {
                                       ? dayjs(taskData.deadline)
                                       : null
                             }
+                            minDate={startDate ?? undefined}
                             disabled={editMode !== 'full'}
                             onChange={(newValue) => {
                                 setDeadline(newValue);
