@@ -10,6 +10,7 @@ import attachmentController from '~/controllers/attachment-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
 import adminMiddleware from '~/middlewares/admin-middleware.js';
+import { uploadCommentFiles } from '~/middlewares/upload-middleware.js';
 
 import { Department, Specialty } from '../../generated/prisma/enums.js';
 
@@ -91,7 +92,12 @@ router.post('/tasks', authMiddleware, taskController.createTask);
 router.patch('/tasks/:id', authMiddleware, taskController.updateTask);
 router.delete('/tasks/:id', authMiddleware, taskController.deleteTask);
 // Tasks-Comments
-router.post('/tasks/:id/comments', authMiddleware, commentController.createComment);
+router.post(
+    '/tasks/:id/comments',
+    authMiddleware,
+    uploadCommentFiles,
+    commentController.createComment,
+);
 router.delete(
     '/tasks/:taskId/comments/:commentId',
     authMiddleware,
