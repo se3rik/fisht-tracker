@@ -6,6 +6,7 @@ import profileController from '~/controllers/profile-controller.js';
 import taskController from '~/controllers/task-controller.js';
 import commentController from '~/controllers/comment-controller.js';
 import userController from '~/controllers/user-controller.js';
+import attachmentController from '~/controllers/attachment-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
 import adminMiddleware from '~/middlewares/admin-middleware.js';
@@ -96,5 +97,10 @@ router.delete(
     authMiddleware,
     commentController.deleteComment,
 );
+
+// Attachments
+// Без authMiddleware намеренно: теги <img> и <video> не умеют отправлять заголовок Authorization.
+// Защита: id файла это случайный uuid, угадать его практически нереально.
+router.get('/attachments/:id', attachmentController.getFile);
 
 export default router;
