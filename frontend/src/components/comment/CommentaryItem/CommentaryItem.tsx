@@ -1,6 +1,8 @@
 import { Avatar, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
+import { CommentAttachments } from '@/components/comment/CommentAttachments/CommentAttachments';
+
 import styles from './CommentaryItem.module.scss';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
@@ -28,7 +30,8 @@ export const CommentaryItem = ({ comment, canDelete, onDelete }: CommentaryItemP
                     <span className={styles.commentAuthor}>{author}</span>
                     <span className={styles.commentDate}>{formatDateTime(comment.createdAt)}</span>
                 </div>
-                <span className={styles.commentText}>{comment.text}</span>
+                {comment.text && <span className={styles.commentText}>{comment.text}</span>}
+                <CommentAttachments attachments={comment.attachments} />
             </div>
             {canDelete && (
                 <IconButton

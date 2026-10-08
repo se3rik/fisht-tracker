@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { useParams } from 'react-router';
-import { Button } from '@mui/material';
+import { Button, Chip, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import dayjs, { type Dayjs } from 'dayjs';
 
 import styles from './TaskDetailsPage.module.scss';
@@ -18,8 +19,15 @@ import { useTasksItem } from '@/hooks/useTaskItem';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { useNotify } from '@/hooks/useNotify';
 
+import { formatFileSize } from '@/helpers/formatFileSize';
+
 import { taskPriorities } from '@/constants/taskPriorities';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
+import {
+    MAX_COMMENT_FILES,
+    MAX_COMMENT_FILE_SIZE,
+    COMMENT_FILE_ACCEPT,
+} from '@/constants/commentAttachments';
 
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -56,6 +64,9 @@ export const TaskDetailsPage = () => {
 
     const [editMode, setEditMode] = useState<'full' | 'status' | null>(null);
     const [commentValue, setCommentValue] = useState('');
+    const [commentFiles, setCommentFiles] = useState<File[]>([]);
+    const [isSendingComment, setIsSendingComment] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const {
         handleSubmit,
@@ -190,16 +201,59 @@ export const TaskDetailsPage = () => {
         }
     });
 
+    const handleFilesSelected = (event: ChangeEvent<HTMLInputElement>) => {
+        const selected = Array.from(event.target.files ?? []);
+        event.target.value = '';
+
+        if (selected.length === 0) return;
+
+        const valid = selected.filter((file) => {
+            if (file.size > MAX_COMMENT_FILE_SIZE) {
+                notify('error', `Файл «${file.name}» больше 50 МБ`);
+                return false;
+            }
+
+            return true;
+        });
+
+        const next = [...commentFiles, ...valid];
+
+        if (next.length > MAX_COMMENT_FILES) {
+            notify('error', `Можно прикрепить не более ${MAX_COMMENT_FILES} файлов`);
+        }
+
+        setCommentFiles(next.slice(0, MAX_COMMENT_FILES));
+    };
+
+    const handleRemoveFile = (index: number) => {
+        setCommentFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const handleSendComment = async () => {
-        if (!commentValue.trim()) return;
+        if (isSendingComment) return;
+        if (!commentValue.trim() && commentFiles.length === 0) return;
+
+        setIsSendingComment(true);
+
         try {
-            const newComment = await tasksApi.createComment(urlParams.id ?? '', commentValue);
+            const newComment = await tasksApi.createComment(
+                urlParams.id ?? '',
+                commentValue.trim(),
+                commentFiles,
+            );
+
             setCommentValue('');
+            setCommentFiles([]);
             setTaskData((prev) =>
                 prev ? { ...prev, comments: [...prev.comments, newComment] } : prev,
             );
         } catch (err) {
-            console.error(err);
+            notify(
+                'error',
+                err instanceof Error ? err.message : 'Не удалось отправить комментарий',
+            );
+        } finally {
+            setIsSendingComment(false);
         }
     };
 
@@ -212,7 +266,7 @@ export const TaskDetailsPage = () => {
                     : prev,
             );
         } catch (err) {
-            console.error(err);
+            notify('error', err instanceof Error ? err.message : 'Не удалось удалить комментарий');
         }
     };
 
@@ -526,10 +580,39 @@ export const TaskDetailsPage = () => {
                                     onChange={(e) => setCommentValue(e.target.value)}
                                     style={{ paddingBottom: '46px' }}
                                 />
-                                {commentValue && (
+
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    multiple
+                                    accept={COMMENT_FILE_ACCEPT}
+                                    hidden
+                                    onChange={handleFilesSelected}
+                                />
+
+                                <IconButton
+                                    aria-label="Прикрепить файл"
+                                    size="small"
+                                    disabled={
+                                        isSendingComment || commentFiles.length >= MAX_COMMENT_FILES
+                                    }
+                                    onClick={() => fileInputRef.current?.click()}
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: '10px',
+                                        left: '6px',
+                                        color: '#ffffff99',
+                                        '&:hover': { color: 'white' },
+                                    }}
+                                >
+                                    <AttachFileIcon fontSize="small" />
+                                </IconButton>
+
+                                {(commentValue || commentFiles.length > 0) && (
                                     <Button
                                         variant="contained"
                                         size="small"
+                                        disabled={isSendingComment}
                                         onClick={handleSendComment}
                                         startIcon={<SendIcon />}
                                         sx={{
@@ -538,10 +621,29 @@ export const TaskDetailsPage = () => {
                                             right: '6px',
                                         }}
                                     >
-                                        Отправить
+                                        {isSendingComment ? 'Отправка...' : 'Отправить'}
                                     </Button>
                                 )}
                             </div>
+
+                            {commentFiles.length > 0 && (
+                                <div className={styles.pendingFiles}>
+                                    {commentFiles.map((file, index) => (
+                                        <Chip
+                                            key={`${file.name}-${file.size}-${index}`}
+                                            size="small"
+                                            label={`${file.name} (${formatFileSize(file.size)})`}
+                                            onDelete={() => handleRemoveFile(index)}
+                                            sx={{
+                                                maxWidth: '100%',
+                                                color: 'white',
+                                                backgroundColor: '#3a3942',
+                                                '& .MuiChip-deleteIcon': { color: '#ffffff99' },
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </section>
 
                         {(canFullEdit || canEditStatus) && (

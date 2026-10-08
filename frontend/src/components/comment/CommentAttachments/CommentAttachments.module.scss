@@ -1,0 +1,61 @@
+@use '@/styles/variables' as *;
+
+.attachments {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.mediaGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.image {
+    display: block;
+    max-width: 240px;
+    max-height: 180px;
+    border-radius: 4px;
+    object-fit: cover;
+    cursor: zoom-in;
+}
+
+.video {
+    max-width: 360px;
+    max-height: 240px;
+    border-radius: 4px;
+    background: #000;
+}
+
+.document {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 360px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: #ffffff0d;
+    color: $color-text-primary;
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+        background: #ffffff1a;
+    }
+}
+
+.documentName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.documentSize {
+    flex-shrink: 0;
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+}
