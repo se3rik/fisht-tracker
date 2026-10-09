@@ -8,6 +8,7 @@ import { TASK_PRIORITY_CONFIG } from '@/constants/taskPriorities';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 import { formatDate } from '@/helpers/formatDate';
+import { getDeadlineInfo } from '@/helpers/getDeadlineInfo';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -17,12 +18,21 @@ type TaskItemProps = {
     task: TaskListItem;
 };
 
+const urgencyColor: Record<string, string> = {
+    overdue: '#f87171',
+    urgent: '#fbbf24',
+    normal: 'inherit',
+    none: '#ffffff80',
+};
+
 export const TaskItem = ({ task }: TaskItemProps) => {
     const status = task.status.toLowerCase() as TasksStatusValue;
 
     const executorsFullNames = task.executors
         .map((e) => `${e.firstName} ${e.secondName}`)
         .join(', ');
+
+    const deadlineInfo = getDeadlineInfo(task.deadline);
 
     return (
         <Link to={`/tasks/${task.id}`} className={styles.taskItem}>
@@ -63,15 +73,18 @@ export const TaskItem = ({ task }: TaskItemProps) => {
                 <div className={styles.taskDepartment}>{DEPARTMENT_LABELS[task.department]}</div>
             )}
 
-            {/* <div className={styles.taskExecutor}>
-                <Avatar
-                    {...stringAvatar(task.executor.firstName + ' ' + task.executor.secondName)}
-                    sx={{ width: 32, height: 32, fontSize: 16 }}
-                />
-                <span>
-                    {task.executor.firstName} {task.executor.secondName}
+            <div className={styles.taskDeadline}>
+                <span className={styles.taskDeadlineDate}>
+                    {task.deadline ? formatDate(task.deadline) : '—'}
                 </span>
-            </div> */}
+                <span
+                    className={styles.taskDeadlineLabel}
+                    style={{ color: urgencyColor[deadlineInfo.urgency] }}
+                >
+                    {deadlineInfo.label}
+                </span>
+            </div>
+
             <div className={styles.taskExecutor} title={executorsFullNames}>
                 <AvatarGroup
                     max={3}

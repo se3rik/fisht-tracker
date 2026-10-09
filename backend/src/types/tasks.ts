@@ -12,6 +12,7 @@ export type GetAllTasksParams = {
     department?: Department;
     priority?: TaskPriority;
     sortByDate?: SortOrder;
+    sortByDeadline?: SortOrder;
     limit?: number;
     skip?: number;
 };

@@ -11,16 +11,17 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
     const { body, headers, _retry, ...rest } = options;
 
     const token = store.getState().auth.token;
+    const isFormData = body instanceof FormData;
 
     const response = await fetch(`${BASE_API}${url}`, {
         ...rest,
         headers: {
-            'Content-Type': 'application/json',
+            ...(!isFormData && { 'Content-Type': 'application/json' }),
             ...(token && { Authorization: `Bearer ${token}` }),
             ...headers,
         },
         credentials: 'include',
-        body: body ? JSON.stringify(body) : undefined,
+        body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
     });
 
     if (response.status === 401 && !_retry) {

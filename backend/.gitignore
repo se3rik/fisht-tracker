@@ -57,3 +57,8 @@ temp/
 *.sqlite
 *.sqlite3
 /generated/prisma
+
+# ----------------------------
+# Uploads
+# ----------------------------
+uploads/

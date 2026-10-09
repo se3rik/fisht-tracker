@@ -33,6 +33,10 @@
     }
 
     & > :nth-child(5) {
+        flex: 1.5;
+    }
+
+    & > :nth-child(6) {
         flex: 2;
     }
 
@@ -59,6 +63,20 @@
 .taskDate {
     font-size: $font-size-xs;
     color: $color-text-secondary;
+}
+
+.taskDeadline {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.taskDeadlineDate {
+    font-size: $font-size-sm;
+}
+
+.taskDeadlineLabel {
+    font-size: $font-size-xs;
 }
 
 .taskExecutor {

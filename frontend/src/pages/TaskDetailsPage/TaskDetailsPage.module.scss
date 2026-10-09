@@ -97,3 +97,9 @@
     font-size: $font-size-xs;
     color: #dc2626;
 }
+
+.pendingFiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}

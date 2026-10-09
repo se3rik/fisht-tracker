@@ -15,6 +15,7 @@ type Filters = {
     department?: TaskDepartmentValues;
     priority?: TaskPriorityValue;
     sortByDate?: 'asc' | 'desc';
+    sortByDeadline?: 'asc' | 'desc';
     limit?: number;
     skip?: number;
 };
@@ -48,6 +49,7 @@ export const useTasksList = (filters: Filters) => {
         filters.department,
         filters.priority,
         filters.sortByDate,
+        filters.sortByDeadline,
         filters.limit,
         filters.skip,
     ]);

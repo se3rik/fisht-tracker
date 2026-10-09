@@ -1,3 +1,10 @@
+export type CommentAttachment = {
+    id: string;
+    fileName: string;
+    mimeType: string;
+    size: number;
+};
+
 export type Commentary = {
     id: string;
     text: string;
@@ -10,4 +17,5 @@ export type Commentary = {
         firstName: string;
         secondName: string;
     };
+    attachments: CommentAttachment[];
 };

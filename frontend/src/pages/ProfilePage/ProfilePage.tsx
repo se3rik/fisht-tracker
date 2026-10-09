@@ -19,6 +19,7 @@ import styles from './ProfilePage.module.scss';
 
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
+import { useNotify } from '@/hooks/useNotify';
 
 import { getProfileData, updateProfileData } from '@/stores/slices/profileSlice';
 
@@ -65,6 +66,7 @@ const emptyPasswordForm: PasswordFormState = {
 
 export const ProfilePage = () => {
     const dispatch = useAppDispatch();
+    const notify = useNotify();
     const { profileData } = useAppSelector((state) => state.profile);
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -128,6 +130,7 @@ export const ProfilePage = () => {
             }),
         );
 
+        notify('success', 'Профиль успешно сохранён');
         setIsEditing(false);
     });
 
@@ -190,10 +193,13 @@ export const ProfilePage = () => {
                 newPassword: passwordForm.newPassword,
             });
 
+            notify('success', 'Пароль успешно изменён');
             setPasswordSuccess('Пароль успешно изменён');
             setPasswordForm(emptyPasswordForm);
+            closePasswordDialog();
         } catch (error) {
             setPasswordError((error as Error).message);
+            notify('error', error instanceof Error ? error.message : 'Не удалось изменить пароль');
         } finally {
             setIsPasswordSubmitting(false);
         }

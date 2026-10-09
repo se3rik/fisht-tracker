@@ -15,6 +15,7 @@ class TaskService {
         department,
         priority,
         sortByDate,
+        sortByDeadline,
         limit,
         skip,
     }: GetAllTasksParams) {
@@ -35,10 +36,24 @@ class TaskService {
             ...(priority && { priority }),
         };
 
+        const orderBy: Prisma.TaskOrderByWithRelationInput[] = [];
+
+        if (sortByDeadline) {
+            orderBy.push({ deadline: sortByDeadline });
+        }
+
+        if (sortByDate) {
+            orderBy.push({ createdAt: sortByDate });
+        }
+
+        if (orderBy.length === 0) {
+            orderBy.push({ createdAt: 'desc' });
+        }
+
         const [tasks, total] = await prisma.$transaction([
             prisma.task.findMany({
                 where,
-                orderBy: { createdAt: sortByDate ?? 'desc' },
+                orderBy,
                 take: limit,
                 skip,
                 select: {
@@ -48,6 +63,7 @@ class TaskService {
                     priority: true,
                     department: true,
                     createdAt: true,
+                    deadline: true,
                     executors: {
                         select: {
                             firstName: true,
@@ -72,6 +88,10 @@ class TaskService {
                 comments: {
                     include: {
                         author: { select: { id: true, firstName: true, secondName: true } },
+                        attachments: {
+                            select: { id: true, fileName: true, mimeType: true, size: true },
+                            orderBy: { createdAt: 'asc' },
+                        },
                     },
                     orderBy: { createdAt: 'asc' },
                 },

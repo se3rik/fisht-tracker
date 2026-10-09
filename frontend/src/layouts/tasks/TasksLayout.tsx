@@ -1,5 +1,7 @@
 import { Outlet, useLocation, useParams } from 'react-router';
 
+import styles from './TasksLayout.module.scss';
+
 import { PageHeading } from '@/components/pageHeading/PageHeading';
 
 export const TasksLayout = () => {
@@ -13,9 +15,11 @@ export const TasksLayout = () => {
           : 'Задачи';
 
     return (
-        <>
+        <div className={styles.layoutWrapper}>
             <PageHeading title={title} />
-            <Outlet />
-        </>
+            <div className={styles.content}>
+                <Outlet />
+            </div>
+        </div>
     );
 };

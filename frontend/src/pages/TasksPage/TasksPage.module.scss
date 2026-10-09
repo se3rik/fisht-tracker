@@ -5,7 +5,16 @@
     flex-direction: column;
     gap: 20px;
     height: 100%;
+    min-height: 0;
     padding: 16px;
+}
+
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
 }
 
 .filterSection {
@@ -69,6 +78,10 @@
     }
 
     & > :nth-child(5) {
+        flex: 1.5;
+    }
+
+    & > :nth-child(6) {
         flex: 2;
     }
 }
