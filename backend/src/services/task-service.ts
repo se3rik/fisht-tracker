@@ -88,6 +88,10 @@ class TaskService {
                 comments: {
                     include: {
                         author: { select: { id: true, firstName: true, secondName: true } },
+                        attachments: {
+                            select: { id: true, fileName: true, mimeType: true, size: true },
+                            orderBy: { createdAt: 'asc' },
+                        },
                     },
                     orderBy: { createdAt: 'asc' },
                 },

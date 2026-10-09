@@ -2,19 +2,9 @@ import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 import type { TaskPriorityValue } from '@/types/task/TaskPriority';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
 
-export type Comment = {
-    id: string;
-    text: string;
-    taskId: string;
-    authorId: string;
-    createdAt: string;
-    updatedAt: string;
-    author: {
-        id: string;
-        firstName: string;
-        secondName: string;
-    };
-};
+import type { Commentary } from '@/types/comment/Commentary';
+
+export type Comment = Commentary;
 
 export type TaskData = {
     id: string;

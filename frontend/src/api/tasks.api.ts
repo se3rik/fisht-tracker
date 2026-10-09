@@ -62,10 +62,14 @@ export const tasksApi = {
         });
     },
 
-    createComment: async (taskId: string, text: string) => {
+    createComment: async (taskId: string, text: string, files: File[] = []) => {
+        const formData = new FormData();
+        formData.append('text', text);
+        files.forEach((file) => formData.append('files', file));
+
         return request<Comment>(`/tasks/${taskId}/comments`, {
             method: 'POST',
-            body: { text },
+            body: formData,
         });
     },
 

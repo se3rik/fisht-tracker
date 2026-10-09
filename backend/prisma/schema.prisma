@@ -172,8 +172,26 @@ model Comment {
   authorId  String   @map("author_id")
   author    User     @relation("CommentAuthor", fields: [authorId], references: [id])
 
+  attachments CommentAttachment[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("comments")
+}
+
+model CommentAttachment {
+  id         String   @id @default(uuid())
+
+  commentId  String   @map("comment_id")
+  comment    Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  fileName   String   @map("file_name")    // оригинальное имя, его видит пользователь
+  storedName String   @map("stored_name")  // имя файла на диске (uuid + расширение)
+  mimeType   String   @map("mime_type")
+  size       Int
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("comment_attachments")
 }
