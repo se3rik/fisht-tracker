@@ -10,6 +10,21 @@ import type { Department, Specialty, UserRole } from '../../generated/prisma/enu
 import type { GetAllUsersParams } from '~/types/user.js';
 
 class UserService {
+    async getDirectoryUsers() {
+        return prisma.user.findMany({
+            where: { isActive: true },
+            orderBy: [{ secondName: 'asc' }, { firstName: 'asc' }],
+            select: {
+                id: true,
+                firstName: true,
+                secondName: true,
+                patronymic: true,
+                department: true,
+                speciality: true,
+            },
+        });
+    }
+
     async searchUsers(query: string) {
         return prisma.user.findMany({
             where: {

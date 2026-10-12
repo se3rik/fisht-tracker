@@ -1,9 +1,11 @@
 @use '@/styles/variables' as *;
 
+.introWrapper { padding: 24px 24px 0; }
+
 .pageWrapper {
     display: flex;
-    justify-content: center;
-    padding: 16px;
+    justify-content: flex-start;
+    padding: 24px;
 }
 
 .avatarComponent {
@@ -13,7 +15,7 @@
 .profileInfoWrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     height: fit-content;
     width: 100%;
     max-width: 1000px;
@@ -23,8 +25,9 @@
     width: 100%;
     padding: 20px;
     margin-bottom: 10px;
-    border: 1px solid $devider-color;
-    border-radius: 12px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
 }
 
 .profileInfoForm {
@@ -45,7 +48,13 @@
 .profileInfoItem {
     display: flex;
     flex-direction: column;
-    gap: 6 px;
+    gap: 6px;
+}
+
+@media (max-width: 700px) {
+    .introWrapper { padding: 16px 16px 0; }
+    .pageWrapper { padding: 16px; }
+    .buttonBlock { flex-wrap: wrap; align-self: stretch; }
 }
 
 .profileInfoItem > :first-child {

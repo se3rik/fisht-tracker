@@ -6,14 +6,17 @@
     justify-content: space-between;
     gap: 12px;
     padding: 12px 18px;
-    border-radius: 4px;
+    border: 1px solid #ffffff19;
+    border-radius: 14px;
+    background: #ffffff0b;
     cursor: pointer;
     font-size: $font-size-sm;
     color: $color-text-primary;
     text-decoration: none;
 
     &:hover {
-        background: #ffffff1a;
+        background: #ffffff14;
+        border-color: #8fb5ff66;
     }
 
     & > :nth-child(1) {
@@ -44,6 +47,12 @@
         user-select: none;
         min-width: 0;
     }
+}
+
+@media (max-width: 700px) {
+    .taskItem { flex-wrap: wrap; padding: 16px; }
+    .taskItem > :first-child { flex: 1 1 100%; }
+    .taskItem > :not(:first-child) { flex: 1 1 40%; }
 }
 
 .taskTitleBlock {

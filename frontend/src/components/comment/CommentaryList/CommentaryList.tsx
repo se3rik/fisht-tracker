@@ -19,6 +19,11 @@ export const CommentaryList = ({
 }: CommentaryListProps) => {
     return (
         <ul className={styles.commentList}>
+            {commentaryList.length === 0 && (
+                <li className={styles.emptyState}>
+                    Пока нет комментариев. Начните обсуждение задачи.
+                </li>
+            )}
             {commentaryList.map((comment) => (
                 <li key={comment.id} className={styles.commentItem}>
                     <CommentaryItem

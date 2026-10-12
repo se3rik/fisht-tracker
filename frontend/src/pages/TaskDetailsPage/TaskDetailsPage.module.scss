@@ -1,10 +1,16 @@
 @use '@/styles/variables' as *;
 
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
 .pageWrapper {
     display: flex;
-    gap: 20px;
-    height: 100%;
-    padding: 16px;
+    gap: 16px;
+    padding: 0;
 }
 
 .heroBlock {
@@ -21,8 +27,9 @@
     gap: 12px;
     width: 100%;
     padding: 20px;
-    border: 1px solid $devider-color;
-    border-radius: 8px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
 }
 
 .taskTitle {
@@ -40,11 +47,12 @@
 .commentSection {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     width: 100%;
     padding: 20px;
-    border: 1px solid $devider-color;
-    border-radius: 8px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
 }
 
 .taskInfoButtons {
@@ -54,7 +62,44 @@
 }
 
 .commentAreaWrapper {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #ffffff19;
+    border-radius: 14px;
+    background: #ffffff08;
+}
+
+.commentHeading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.commentHeading h2 {
+    margin: 0;
+    font-size: 18px;
+}
+.commentHeading span {
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #ffffff16;
+    color: #c2c5ce;
+    font-size: 12px;
+}
+.commentAreaWrapper :global(textarea) {
+    border: 0;
+    background: transparent;
+}
+.commentAreaWrapper :global(textarea:focus) {
+    border: 0;
+    outline: none;
+}
+.commentActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .subFormWrapper {
@@ -65,9 +110,34 @@
     height: fit-content;
     gap: 20px;
     padding: 20px;
-    border: 1px solid $devider-color;
-    border-radius: 8px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
     overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+    .pageWrapper {
+        flex-direction: column;
+    }
+    .subFormWrapper {
+        min-width: 0;
+        max-width: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .page {
+        padding: 16px;
+    }
+    .heroSection,
+    .commentSection,
+    .subFormWrapper {
+        padding: 16px;
+    }
+    .subFormItem {
+        grid-template-columns: 1fr;
+    }
 }
 
 .subFormList {

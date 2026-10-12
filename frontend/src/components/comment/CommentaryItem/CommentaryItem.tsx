@@ -1,5 +1,5 @@
-import { Avatar, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { Avatar, IconButton, Tooltip } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import { CommentAttachments } from '@/components/comment/CommentAttachments/CommentAttachments';
 
@@ -21,32 +21,26 @@ export const CommentaryItem = ({ comment, canDelete, onDelete }: CommentaryItemP
 
     return (
         <>
-            <Avatar
-                {...stringAvatar(author)}
-                sx={{ width: 32, height: 32, fontSize: 16, mr: '10px' }}
-            />
+            <Avatar {...stringAvatar(author)} sx={{ width: 38, height: 38, fontSize: 14 }} />
             <div className={styles.commentInfo}>
                 <div className={styles.commentTitle}>
                     <span className={styles.commentAuthor}>{author}</span>
                     <span className={styles.commentDate}>{formatDateTime(comment.createdAt)}</span>
                 </div>
-                {comment.text && <span className={styles.commentText}>{comment.text}</span>}
+                {comment.text && <p className={styles.commentText}>{comment.text}</p>}
                 <CommentAttachments attachments={comment.attachments} />
             </div>
             {canDelete && (
-                <IconButton
-                    size="small"
-                    onClick={onDelete}
-                    sx={{
-                        ml: 'auto',
-                        color: '#dc2626',
-                        '&:hover': {
-                            backgroundColor: 'rgba(220, 38, 38, 0.15)',
-                        },
-                    }}
-                >
-                    <CloseIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="Удалить комментарий">
+                    <IconButton
+                        aria-label="Удалить комментарий"
+                        size="small"
+                        onClick={onDelete}
+                        className={styles.deleteButton}
+                    >
+                        <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             )}
         </>
     );

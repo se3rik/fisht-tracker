@@ -6,7 +6,6 @@
 // import styles from './HomePage.module.scss';
 
 // import { AccordionTasksList } from '@/components/accordion/AccordionTasksList';
-// import { PageHeading } from '@/components/PageHeading/PageHeading';
 
 // import type { AccordionTask } from '@/types/accordion/AccordionTask';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
@@ -45,7 +44,6 @@ export const HomePage = () => {
 
     return (
         <>
-            {/* <PageHeading title="Главная страница" /> */}
             <InProgressPage />
             {/* <section className={styles.pageWrapper}>
                 <Accordion className={styles.heroAccordion} defaultExpanded>

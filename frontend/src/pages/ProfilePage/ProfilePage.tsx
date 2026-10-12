@@ -25,7 +25,7 @@ import { getProfileData, updateProfileData } from '@/stores/slices/profileSlice'
 
 import { profileApi } from '@/api';
 
-import { PageHeading } from '@/components/pageHeading/PageHeading';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 
@@ -207,7 +207,13 @@ export const ProfilePage = () => {
 
     return (
         <>
-            <PageHeading title="Страница профиля" />
+            <div className={styles.introWrapper}>
+                <PageIntro
+                    eyebrow="Личный кабинет"
+                    title="Мой профиль"
+                    description="Контактные данные, отдел и настройки доступа."
+                />
+            </div>
             <div className={styles.pageWrapper}>
                 <section className={styles.profileInfoWrapper}>
                     <Avatar

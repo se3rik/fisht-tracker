@@ -1,4 +1,3 @@
-import type { MouseEvent } from 'react';
 import { NavLink } from 'react-router';
 
 import styles from './BaseSidebar.module.scss';
@@ -8,7 +7,7 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { logout } from '@/stores/slices/authSlice';
 
-import { Avatar } from '@mui/material';
+import { Avatar, IconButton, Tooltip } from '@mui/material';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -23,20 +22,22 @@ export const BaseSidebar = () => {
 
     const visibleNavigationList = navigationList.filter((item) => !item.adminOnly || isAdmin);
 
-    const onLogoutIconClick = async (event: MouseEvent<SVGSVGElement>) => {
-        event.preventDefault();
+    const onLogoutIconClick = async () => {
         await dispatch(logout());
     };
 
     return (
         <aside className={styles.sidebarSection}>
-            <section className={styles.heroSection}>
+            <div className={styles.heroSection}>
                 <div className={styles.logoWrapper}>
-                    <AdsClickIcon className={styles.logoIcon} color="primary" fontSize="large" />
+                    <span className={styles.logoMark}>
+                        <AdsClickIcon fontSize="small" />
+                    </span>
                     <span className={styles.logoTitle}>Fisht Tracker</span>
                 </div>
-            </section>
-            <section className={styles.navSection}>
+            </div>
+            <nav className={styles.navSection} aria-label="Основная навигация">
+                <span className={styles.navCaption}>Разделы</span>
                 <ul className={styles.navList}>
                     {visibleNavigationList.map((el) => (
                         <li key={el.id}>
@@ -52,22 +53,40 @@ export const BaseSidebar = () => {
                         </li>
                     ))}
                 </ul>
-            </section>
-            <NavLink
-                to={'/profile'}
-                className={({ isActive }) =>
-                    isActive ? `${styles.profileLink} ${styles.active}` : styles.profileLink
-                }
-            >
-                <div className={styles.profileAvatar}>
+            </nav>
+            <div className={styles.accountSection}>
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        isActive ? `${styles.profileLink} ${styles.active}` : styles.profileLink
+                    }
+                >
                     <Avatar
-                        {...stringAvatar(`${profileData?.firstName} ${profileData?.secondName}`)}
-                        sx={{ width: 32, height: 32, fontSize: 16 }}
+                        {...stringAvatar(
+                            `${profileData?.firstName ?? ''} ${profileData?.secondName ?? ''}`,
+                        )}
+                        sx={{ width: 36, height: 36, fontSize: 14 }}
                     />
-                </div>
-                <span className={styles.profileTitle}>Учетная запись</span>
-                <LogoutIcon className={styles.logoutIcon} onClick={onLogoutIconClick} />
-            </NavLink>
+                    <span className={styles.profileText}>
+                        <strong>
+                            {[profileData?.firstName, profileData?.secondName]
+                                .filter(Boolean)
+                                .join(' ') || 'Мой профиль'}
+                        </strong>
+                        <span>Учетная запись</span>
+                    </span>
+                </NavLink>
+                <Tooltip title="Выйти">
+                    <IconButton
+                        aria-label="Выйти"
+                        onClick={onLogoutIconClick}
+                        size="small"
+                        className={styles.logoutButton}
+                    >
+                        <LogoutIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </div>
         </aside>
     );
 };

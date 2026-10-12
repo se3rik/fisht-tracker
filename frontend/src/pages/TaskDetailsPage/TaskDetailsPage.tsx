@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { useParams } from 'react-router';
-import { Button, Chip, IconButton } from '@mui/material';
+import { Button, Chip } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import dayjs, { type Dayjs } from 'dayjs';
@@ -14,6 +14,7 @@ import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { BaseDatePicker } from '@/components/ui/BaseDatePicker/BaseDatePicker';
 import { CommentaryList } from '@/components/comment/CommentaryList/CommentaryList';
 import { UserAutocomplete } from '@/components/userAutocomplete/UsersAutocomplete';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 
 import { useTasksItem } from '@/hooks/useTaskItem';
 import { useAppSelector } from '@/hooks/useAppSelector';
@@ -510,186 +511,191 @@ export const TaskDetailsPage = () => {
     ];
 
     return (
-        <section className={styles.pageWrapper}>
-            {taskData && (
-                <>
-                    <div className={styles.heroBlock}>
-                        <section className={styles.heroSection}>
-                            <Controller
-                                name="name"
-                                control={control}
-                                render={({ field }) => (
-                                    <div className={styles.textareaWrapper}>
-                                        <BaseTextarea
-                                            placeholder="Введите название задачи"
-                                            value={editMode !== null ? field.value : taskData?.name}
-                                            onChange={field.onChange}
-                                            disabled={editMode !== 'full'}
-                                            error={!!errors.name}
-                                            style={{ fontSize: '18px', fontWeight: 500 }}
-                                        />
-                                        {errors.name && (
-                                            <span className={styles.errorText}>
-                                                {errors.name.message}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-                            />
-                            <Controller
-                                name="description"
-                                control={control}
-                                render={({ field }) => (
-                                    <div className={styles.textareaWrapper}>
-                                        <BaseTextarea
-                                            minRows={6}
-                                            placeholder="Введите описание задачи"
-                                            value={
-                                                editMode !== null
-                                                    ? field.value
-                                                    : taskData?.description
-                                            }
-                                            onChange={field.onChange}
-                                            disabled={editMode !== 'full'}
-                                            error={!!errors.description}
-                                            style={{ fontSize: '15px' }}
-                                        />
-                                        {errors.description && (
-                                            <span className={styles.errorText}>
-                                                {errors.description.message}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-                            />
-                        </section>
-
-                        <section className={styles.commentSection}>
-                            <span>Комментарии</span>
-                            <CommentaryList
-                                commentaryList={taskData.comments}
-                                currentUserId={profileData?.id ?? ''}
-                                isAdmin={profileData?.roles === 'ADMIN'}
-                                onDeleteComment={handleDeleteComment}
-                            />
-                            <div className={styles.commentAreaWrapper}>
-                                <BaseTextarea
-                                    minRows={4}
-                                    placeholder="Комментарий"
-                                    value={commentValue}
-                                    onChange={(e) => setCommentValue(e.target.value)}
-                                    style={{ paddingBottom: '46px' }}
+        <section className={styles.page}>
+            <PageIntro
+                eyebrow="Задачи"
+                title={taskData?.name ?? 'Задача'}
+                description="Детали поручения, участники и обсуждение."
+            />
+            <div className={styles.pageWrapper}>
+                {taskData && (
+                    <>
+                        <div className={styles.heroBlock}>
+                            <section className={styles.heroSection}>
+                                <Controller
+                                    name="name"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <div className={styles.textareaWrapper}>
+                                            <BaseTextarea
+                                                placeholder="Введите название задачи"
+                                                value={
+                                                    editMode !== null ? field.value : taskData?.name
+                                                }
+                                                onChange={field.onChange}
+                                                disabled={editMode !== 'full'}
+                                                error={!!errors.name}
+                                                style={{ fontSize: '18px', fontWeight: 500 }}
+                                            />
+                                            {errors.name && (
+                                                <span className={styles.errorText}>
+                                                    {errors.name.message}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 />
-
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    multiple
-                                    accept={COMMENT_FILE_ACCEPT}
-                                    hidden
-                                    onChange={handleFilesSelected}
+                                <Controller
+                                    name="description"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <div className={styles.textareaWrapper}>
+                                            <BaseTextarea
+                                                minRows={6}
+                                                placeholder="Введите описание задачи"
+                                                value={
+                                                    editMode !== null
+                                                        ? field.value
+                                                        : taskData?.description
+                                                }
+                                                onChange={field.onChange}
+                                                disabled={editMode !== 'full'}
+                                                error={!!errors.description}
+                                                style={{ fontSize: '15px' }}
+                                            />
+                                            {errors.description && (
+                                                <span className={styles.errorText}>
+                                                    {errors.description.message}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 />
+                            </section>
 
-                                <IconButton
-                                    aria-label="Прикрепить файл"
-                                    size="small"
-                                    disabled={
-                                        isSendingComment || commentFiles.length >= MAX_COMMENT_FILES
-                                    }
-                                    onClick={() => fileInputRef.current?.click()}
-                                    sx={{
-                                        position: 'absolute',
-                                        bottom: '10px',
-                                        left: '6px',
-                                        color: '#ffffff99',
-                                        '&:hover': { color: 'white' },
-                                    }}
-                                >
-                                    <AttachFileIcon fontSize="small" />
-                                </IconButton>
-
-                                {(commentValue || commentFiles.length > 0) && (
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        disabled={isSendingComment}
-                                        onClick={handleSendComment}
-                                        startIcon={<SendIcon />}
-                                        sx={{
-                                            position: 'absolute',
-                                            bottom: '10px',
-                                            right: '6px',
-                                        }}
-                                    >
-                                        {isSendingComment ? 'Отправка...' : 'Отправить'}
-                                    </Button>
-                                )}
-                            </div>
-
-                            {commentFiles.length > 0 && (
-                                <div className={styles.pendingFiles}>
-                                    {commentFiles.map((file, index) => (
-                                        <Chip
-                                            key={`${file.name}-${file.size}-${index}`}
-                                            size="small"
-                                            label={`${file.name} (${formatFileSize(file.size)})`}
-                                            onDelete={() => handleRemoveFile(index)}
-                                            sx={{
-                                                maxWidth: '100%',
-                                                color: 'white',
-                                                backgroundColor: '#3a3942',
-                                                '& .MuiChip-deleteIcon': { color: '#ffffff99' },
-                                            }}
-                                        />
-                                    ))}
+                            <section className={styles.commentSection}>
+                                <div className={styles.commentHeading}>
+                                    <h2>Комментарии</h2>
+                                    <span>{taskData.comments.length}</span>
                                 </div>
-                            )}
-                        </section>
+                                <CommentaryList
+                                    commentaryList={taskData.comments}
+                                    currentUserId={profileData?.id ?? ''}
+                                    isAdmin={profileData?.roles === 'ADMIN'}
+                                    onDeleteComment={handleDeleteComment}
+                                />
+                                <div className={styles.commentAreaWrapper}>
+                                    <BaseTextarea
+                                        minRows={3}
+                                        placeholder="Напишите комментарий…"
+                                        value={commentValue}
+                                        onChange={(e) => setCommentValue(e.target.value)}
+                                    />
 
-                        {(canFullEdit || canEditStatus) && (
-                            <div className={styles.taskInfoButtons}>
-                                {editMode !== null ? (
-                                    <>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        multiple
+                                        accept={COMMENT_FILE_ACCEPT}
+                                        hidden
+                                        onChange={handleFilesSelected}
+                                    />
+
+                                    <div className={styles.commentActions}>
+                                        <Button
+                                            variant="text"
+                                            size="small"
+                                            disabled={
+                                                isSendingComment ||
+                                                commentFiles.length >= MAX_COMMENT_FILES
+                                            }
+                                            onClick={() => fileInputRef.current?.click()}
+                                            startIcon={<AttachFileIcon />}
+                                        >
+                                            Прикрепить файл
+                                        </Button>
                                         <Button
                                             variant="contained"
                                             size="small"
-                                            onClick={handleSave}
+                                            disabled={
+                                                isSendingComment ||
+                                                (!commentValue.trim() && commentFiles.length === 0)
+                                            }
+                                            onClick={handleSendComment}
+                                            startIcon={<SendIcon />}
                                         >
-                                            Сохранить
+                                            {isSendingComment ? 'Отправка...' : 'Отправить'}
                                         </Button>
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={handleCancelEditing}
-                                        >
-                                            Отменить
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        onClick={handleStartEditing}
-                                    >
-                                        Редактировать
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                                    </div>
+                                </div>
 
-                    <div className={styles.subFormWrapper}>
-                        <ul className={styles.subFormList}>
-                            {subFormItems.map((item) => (
-                                <li key={item.id} className={styles.subFormItem}>
-                                    <span>{item.label}</span>
-                                    <div className={styles.subFormComponent}>{item.component}</div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </>
-            )}
+                                {commentFiles.length > 0 && (
+                                    <div className={styles.pendingFiles}>
+                                        {commentFiles.map((file, index) => (
+                                            <Chip
+                                                key={`${file.name}-${file.size}-${index}`}
+                                                size="small"
+                                                label={`${file.name} (${formatFileSize(file.size)})`}
+                                                onDelete={() => handleRemoveFile(index)}
+                                                sx={{
+                                                    maxWidth: '100%',
+                                                    color: 'white',
+                                                    backgroundColor: '#3a3942',
+                                                    '& .MuiChip-deleteIcon': { color: '#ffffff99' },
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </section>
+
+                            {(canFullEdit || canEditStatus) && (
+                                <div className={styles.taskInfoButtons}>
+                                    {editMode !== null ? (
+                                        <>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                onClick={handleSave}
+                                            >
+                                                Сохранить
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                onClick={handleCancelEditing}
+                                            >
+                                                Отменить
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            onClick={handleStartEditing}
+                                        >
+                                            Редактировать
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.subFormWrapper}>
+                            <ul className={styles.subFormList}>
+                                {subFormItems.map((item) => (
+                                    <li key={item.id} className={styles.subFormItem}>
+                                        <span>{item.label}</span>
+                                        <div className={styles.subFormComponent}>
+                                            {item.component}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </>
+                )}
+            </div>
         </section>
     );
 };

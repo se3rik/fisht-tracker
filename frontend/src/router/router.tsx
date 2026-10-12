@@ -13,6 +13,7 @@ import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { AdministrationPage } from '@/pages/AdministrationPage/AdministrationPage';
+import { EmployeesPage } from '@/pages/EmployeesPage/EmployeesPage';
 
 export const router = createBrowserRouter([
     { element: <AuthLayout />, children: [{ path: '/auth', element: <AuthPage /> }] },
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
             { path: '/boards', element: <InProgressPage /> },
             { path: '/goals', element: <InProgressPage /> },
             { path: '/administration', element: <AdministrationPage /> },
-            { path: '/employees', element: <InProgressPage /> },
+            { path: '/employees', element: <EmployeesPage /> },
             { path: '/profile', element: <ProfilePage /> },
 
             { path: '*', element: <NotFoundPage /> },

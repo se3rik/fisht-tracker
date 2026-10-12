@@ -35,7 +35,7 @@ import styles from './AdministrationPage.module.scss';
 import { adminUsersApi } from '@/api';
 import type { AdminUser, CreateUserRequest, UpdateUserRequest } from '@/api/api-types/user';
 
-import { PageHeading } from '@/components/pageHeading/PageHeading';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 import { BaseTabs } from '@/components/tabs/BaseTabs';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
@@ -411,8 +411,12 @@ export const AdministrationPage = () => {
 
     return (
         <>
-            <PageHeading title={'Администрирование'} />
             <section className={styles.pageWrapper}>
+                <PageIntro
+                    eyebrow="Управление"
+                    title="Администрирование"
+                    description="Управляйте учетными записями сотрудников и их доступом."
+                />
                 <BaseTabs<TabValue>
                     value={activeTab}
                     onChange={setActiveTab}

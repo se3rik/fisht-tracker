@@ -5,6 +5,15 @@ import ApiError from '~/exceptions/api-error.js';
 import type { Department, UserRole } from '../../generated/prisma/enums.js';
 
 class UserController {
+    async getDirectoryUsers(_req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = await userService.getDirectoryUsers();
+            return res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async searchUsers(req: Request, res: Response, next: NextFunction) {
         try {
             const { query } = req.query;
