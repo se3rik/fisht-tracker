@@ -1,9 +1,11 @@
 @use '@/styles/variables' as *;
 
+.page { display: flex; flex-direction: column; gap: 24px; padding: 24px; }
+
 .pageWrapper {
     display: flex;
     gap: 20px;
-    padding: 16px;
+    padding: 0;
 }
 
 .heroForm {
@@ -11,6 +13,11 @@
     flex-direction: column;
     gap: 12px;
     flex: 2;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
 }
 
 .heroFormButtonsSection {
@@ -27,9 +34,21 @@
     height: fit-content;
     gap: 20px;
     padding: 20px;
-    border: 1px solid $devider-color;
-    border-radius: 8px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
     overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+    .pageWrapper { flex-direction: column; }
+    .subFormWrapper { min-width: 0; max-width: none; }
+}
+
+@media (max-width: 700px) {
+    .page { padding: 16px; }
+    .heroForm { padding: 16px; }
+    .subFormItem { grid-template-columns: 1fr; }
 }
 
 .subFormList {

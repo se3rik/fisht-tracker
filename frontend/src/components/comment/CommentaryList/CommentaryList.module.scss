@@ -4,16 +4,28 @@
     gap: 12px;
     margin: 0;
     padding: 0;
+    list-style: none;
 }
-
 .commentItem {
     display: flex;
     align-items: flex-start;
-    padding: 12px;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-        background-color: #ffffff40;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #ffffff19;
+    border-radius: 14px;
+    background: #ffffff08;
+}
+.emptyState {
+    padding: 28px 18px;
+    border: 1px dashed #ffffff30;
+    border-radius: 14px;
+    color: #aeb5c3;
+    font-size: 14px;
+    text-align: center;
+}
+@media (max-width: 700px) {
+    .commentItem {
+        gap: 10px;
+        padding: 14px;
     }
 }

@@ -6,6 +6,7 @@ import styles from './TasksPage.module.scss';
 
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { TaskItem } from '@/components/tasks/TaskItem/TaskItem';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -77,6 +78,16 @@ export const TasksPage = () => {
 
     return (
         <section className={styles.pageWrapper}>
+            <PageIntro
+                eyebrow="Рабочее пространство"
+                title="Задачи"
+                description="Следите за поручениями, сроками и ответственными в одном месте."
+                action={
+                    <Button variant="contained" onClick={() => navigate('/tasks/new-task')}>
+                        Создать задачу
+                    </Button>
+                }
+            />
             <section className={styles.filterSection}>
                 <div className={styles.filterToolsWrapper}>
                     <div className={styles.filterTools}>
@@ -148,15 +159,6 @@ export const TasksPage = () => {
                         </Button>
                     </div>
                 </div>
-
-                <Button
-                    variant="contained"
-                    onClick={() => navigate('/tasks/new-task')}
-                    size="small"
-                    className={styles.createTaskButton}
-                >
-                    Создать задачу
-                </Button>
             </section>
 
             <section className={styles.mainContent}>
@@ -171,39 +173,11 @@ export const TasksPage = () => {
                     <div>Исполнитель</div>
                 </div>
                 {tasks.length === 0 && (
-                    <>
-                        <span
-                            style={{
-                                color: '#ffffff',
-                                fontWeight: 'bold',
-                                fontSize: '14px',
-                                textAlign: 'center',
-                                marginTop: '20px',
-                            }}
-                        >
-                            {`По заданым фильтрам задач не нашлось`}
-                        </span>
-                        <span
-                            style={{
-                                color: '#ffffff',
-                                fontWeight: 'bold',
-                                fontSize: '14px',
-                                textAlign: 'center',
-                            }}
-                        >
-                            {`или`}
-                        </span>
-                        <span
-                            style={{
-                                color: '#ffffff',
-                                fontWeight: 'bold',
-                                fontSize: '14px',
-                                textAlign: 'center',
-                            }}
-                        >
-                            {`Список задач пуст`}
-                        </span>
-                    </>
+                    <div className={styles.emptyState}>
+                        {isFiltersEmpty
+                            ? 'Задач пока нет.'
+                            : 'По выбранным фильтрам задач не найдено.'}
+                    </div>
                 )}
                 {tasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
@@ -217,7 +191,8 @@ export const TasksPage = () => {
                 variant="outlined"
                 color="primary"
                 sx={{
-                    margin: '0 auto',
+                    margin: 'auto auto 0',
+                    flexShrink: 0,
                     '& .MuiPaginationItem-root': {
                         color: 'white',
                         borderColor: '#bdbdbd',

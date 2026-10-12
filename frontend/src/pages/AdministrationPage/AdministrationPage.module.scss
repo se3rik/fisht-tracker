@@ -3,9 +3,9 @@
 .pageWrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    height: 100%;
-    padding: 16px;
+    gap: 24px;
+    min-height: 100%;
+    padding: 24px;
 }
 
 .tabs {
@@ -18,6 +18,10 @@
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    padding: 20px;
+    border: 1px solid #ffffff19;
+    border-radius: 16px;
+    background: #ffffff0b;
 }
 
 .tableWrapper {
@@ -27,9 +31,15 @@
 }
 
 .tableContainer {
-    border-radius: 10px;
-    background-color: #ffffff26 !important;
-    border-color: #ffffff33 !important;
+    border-radius: 16px;
+    background-color: #ffffff0b !important;
+    border-color: #ffffff19 !important;
+}
+
+@media (max-width: 700px) {
+    .pageWrapper { padding: 16px; }
+    .toolbar > * { width: 100%; }
+    .formRow { flex-direction: column; }
 }
 
 /* все ячейки — белый текст и мягкие разделители */

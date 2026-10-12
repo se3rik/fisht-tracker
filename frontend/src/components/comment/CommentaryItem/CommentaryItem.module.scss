@@ -1,32 +1,41 @@
-@use '@/styles/variables' as *;
-
 .commentInfo {
     display: flex;
     flex-direction: column;
-}
-
-.commentTitle {
-    display: flex;
-    align-items: center;
+    flex: 1;
+    min-width: 0;
     gap: 8px;
 }
-
-.commentAuthor {
+.commentTitle {
     display: flex;
-    align-items: center;
-    height: 32px;
-    font-weight: 500;
-    font-size: $font-size-md;
-    margin-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    min-height: 38px;
+    padding-top: 2px;
 }
-
+.commentAuthor {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f5f5f7;
+}
 .commentDate {
-    font-weight: 500;
-    font-size: $font-size-sm;
-    color: $color-text-secondary;
-    margin-bottom: 8px;
+    font-size: 12px;
+    color: #aeb5c3;
 }
-
 .commentText {
-    font-size: 15px;
+    margin: 0;
+    color: #d9dce4;
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.deleteButton {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    color: #9da8bb !important;
+}
+.deleteButton:hover {
+    color: #ff9a9a !important;
+    background: #ff9a9a18 !important;
 }

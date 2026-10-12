@@ -6,7 +6,7 @@ import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import styles from './EmployeesPage.module.scss';
 
 import { usersApi, type DirectoryUser } from '@/api/users.api';
-import { PageHeading } from '@/components/pageHeading/PageHeading';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { useAppSelector } from '@/hooks/useAppSelector';
@@ -133,25 +133,19 @@ export const EmployeesPage = () => {
 
     return (
         <>
-            <PageHeading title="Сотрудники" />
             <section className={styles.page}>
-                <div className={styles.intro}>
-                    <div>
-                        <span className={styles.eyebrow}>Справочник сотрудников</span>
-                        <h1>
-                            {department === 'all' ? 'Все отделы' : DEPARTMENT_LABELS[department]}
-                        </h1>
-                        <p>
-                            Узнайте, кто работает в вашем отделе, и найдите коллег из других
-                            подразделений.
-                        </p>
-                    </div>
-                    <div className={styles.count}>
-                        <GroupsRoundedIcon />
-                        <strong>{visiblePeople.length}</strong>
-                        <span>{employeeCountLabel(visiblePeople.length)}</span>
-                    </div>
-                </div>
+                <PageIntro
+                    eyebrow="Справочник сотрудников"
+                    title={department === 'all' ? 'Все отделы' : DEPARTMENT_LABELS[department]}
+                    description="Узнайте, кто работает в вашем отделе, и найдите коллег из других подразделений."
+                    action={
+                        <div className={styles.count}>
+                            <GroupsRoundedIcon />
+                            <strong>{visiblePeople.length}</strong>
+                            <span>{employeeCountLabel(visiblePeople.length)}</span>
+                        </div>
+                    }
+                />
 
                 <div className={styles.filters}>
                     <BaseInput

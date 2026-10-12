@@ -16,6 +16,7 @@ import { BaseTextarea } from '@/components/ui/BaseTextarea/BaseTextarea';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { BaseDatePicker } from '@/components/ui/BaseDatePicker/BaseDatePicker';
 import { UserAutocomplete } from '@/components/userAutocomplete/UsersAutocomplete';
+import { PageIntro } from '@/components/pageIntro/PageIntro';
 
 import { taskPriorities } from '@/constants/taskPriorities';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
@@ -278,47 +279,56 @@ export const TaskCreationPage = () => {
     });
 
     return (
-        <section className={styles.pageWrapper}>
-            <div className={styles.heroForm}>
-                <div className={styles.textareaWrapper}>
-                    <BaseTextarea
-                        placeholder="Введите название задачи"
-                        style={{ fontSize: '18px', fontWeight: 500 }}
-                        error={!!errors.name}
-                        {...register('name')}
-                    />
-                    {errors.name && <span className={styles.errorText}>{errors.name.message}</span>}
+        <section className={styles.page}>
+            <PageIntro
+                eyebrow="Задачи"
+                title="Новая задача"
+                description="Опишите поручение, назначьте ответственных и укажите сроки."
+            />
+            <div className={styles.pageWrapper}>
+                <div className={styles.heroForm}>
+                    <div className={styles.textareaWrapper}>
+                        <BaseTextarea
+                            placeholder="Введите название задачи"
+                            style={{ fontSize: '18px', fontWeight: 500 }}
+                            error={!!errors.name}
+                            {...register('name')}
+                        />
+                        {errors.name && (
+                            <span className={styles.errorText}>{errors.name.message}</span>
+                        )}
+                    </div>
+                    <div className={styles.textareaWrapper}>
+                        <BaseTextarea
+                            minRows={6}
+                            placeholder="Введите описание задачи"
+                            style={{ fontSize: '15px' }}
+                            error={!!errors.description}
+                            {...register('description')}
+                        />
+                        {errors.description && (
+                            <span className={styles.errorText}>{errors.description.message}</span>
+                        )}
+                    </div>
+                    <div className={styles.heroFormButtonsSection}>
+                        <Button variant="contained" size="small" onClick={onTaskCreate}>
+                            Создать задачу
+                        </Button>
+                        <Button variant="outlined" size="small" onClick={() => navigate('/tasks')}>
+                            Отменить
+                        </Button>
+                    </div>
                 </div>
-                <div className={styles.textareaWrapper}>
-                    <BaseTextarea
-                        minRows={6}
-                        placeholder="Введите описание задачи"
-                        style={{ fontSize: '15px' }}
-                        error={!!errors.description}
-                        {...register('description')}
-                    />
-                    {errors.description && (
-                        <span className={styles.errorText}>{errors.description.message}</span>
-                    )}
+                <div className={styles.subFormWrapper}>
+                    <ul className={styles.subFormList}>
+                        {subFormItems.map((item) => (
+                            <li key={item.id} className={styles.subFormItem}>
+                                <span>{item.label}</span>
+                                <div className={styles.subFormComponent}>{item.component}</div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-                <div className={styles.heroFormButtonsSection}>
-                    <Button variant="contained" size="small" onClick={onTaskCreate}>
-                        Создать задачу
-                    </Button>
-                    <Button variant="outlined" size="small" onClick={() => navigate('/tasks')}>
-                        Отменить
-                    </Button>
-                </div>
-            </div>
-            <div className={styles.subFormWrapper}>
-                <ul className={styles.subFormList}>
-                    {subFormItems.map((item) => (
-                        <li key={item.id} className={styles.subFormItem}>
-                            <span>{item.label}</span>
-                            <div className={styles.subFormComponent}>{item.component}</div>
-                        </li>
-                    ))}
-                </ul>
             </div>
         </section>
     );
