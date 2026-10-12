@@ -68,8 +68,9 @@ export const TaskCreationPage = () => {
     useEffect(() => {
         if (profileData?.id) {
             setValue('initiatorId', profileData.id);
+            setValue('department', profileData.department ?? '');
         }
-    }, [profileData?.id, setValue]);
+    }, [profileData?.id, profileData?.department, setValue]);
 
     const currentUserAsOption: UserSearchResult | null = profileData
         ? {
@@ -181,6 +182,7 @@ export const TaskCreationPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
+                                assignableOnly
                                 onChange={field.onChange}
                                 error={!!errors.answerableId}
                             />
@@ -204,6 +206,7 @@ export const TaskCreationPage = () => {
                     render={({ field }) => (
                         <div>
                             <UserAutocomplete
+                                assignableOnly
                                 multiple
                                 onChange={field.onChange}
                                 error={!!errors.executorIds}
@@ -242,6 +245,7 @@ export const TaskCreationPage = () => {
                                     },
                                 }}
                                 onChange={field.onChange}
+                                disabled
                                 error={!!errors.department}
                                 fullWidth
                             />

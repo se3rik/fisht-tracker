@@ -159,7 +159,9 @@ export const TaskDetailsPage = () => {
     const handleSave = handleSubmit(async (formData) => {
         if (!taskData) return;
         try {
-            await tasksApi.updateTask(taskData.id, {
+            await tasksApi.updateTask(taskData.id, editMode === 'status' ? {
+                status: formData.status.toUpperCase(),
+            } : {
                 name: formData.name,
                 description: formData.description,
                 priority: formData.priority,

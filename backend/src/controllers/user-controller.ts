@@ -26,6 +26,14 @@ class UserController {
         }
     }
 
+    async searchAssignableUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            res.json(await userService.getAssignableUsers(res.locals.user.id));
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
             const { search, department, role, isActive } = req.query;

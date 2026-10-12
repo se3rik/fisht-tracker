@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Autocomplete, TextField } from '@mui/material';
 
 import { usersApi, type UserSearchResult } from '@/api/users.api';
@@ -20,6 +20,7 @@ type MultiProps = {
 type UserAutocompleteProps = (SingleProps | MultiProps) & {
     disabled?: boolean;
     error?: boolean;
+    assignableOnly?: boolean;
 };
 
 export const UserAutocomplete = (props: UserAutocompleteProps) => {
@@ -30,11 +31,21 @@ export const UserAutocomplete = (props: UserAutocompleteProps) => {
     const [internalSingle, setInternalSingle] = useState<UserSearchResult | null>(null);
     const [internalMulti, setInternalMulti] = useState<UserSearchResult[]>([]);
 
+    useEffect(() => {
+        if (!props.assignableOnly || disabled) return;
+        let active = true;
+        usersApi.getAssignableUsers()
+            .then((users) => { if (active) setOptions(users); })
+            .catch(() => { if (active) setOptions([]); });
+        return () => { active = false; };
+    }, [props.assignableOnly, disabled]);
+
     const currentValue = multiple
         ? ((props as MultiProps).value ?? internalMulti)
         : ((props as SingleProps).value ?? internalSingle);
 
     const handleInputChange = async (_: unknown, inputValue: string) => {
+        if (props.assignableOnly) return;
         if (!inputValue) {
             setOptions([]);
             return;
@@ -66,6 +77,8 @@ export const UserAutocomplete = (props: UserAutocompleteProps) => {
         <Autocomplete
             multiple={multiple}
             options={options}
+            openOnFocus={props.assignableOnly}
+            filterSelectedOptions={props.assignableOnly && multiple}
             value={currentValue}
             disabled={disabled}
             getOptionLabel={(option) => `${option.firstName} ${option.secondName}`}
@@ -113,7 +126,7 @@ export const UserAutocomplete = (props: UserAutocompleteProps) => {
                 <TextField
                     {...params}
                     size="small"
-                    placeholder={disabled ? '' : 'Введите текст для поиска'}
+                    placeholder={disabled ? '' : props.assignableOnly ? 'Выберите сотрудника' : 'Введите текст для поиска'}
                     variant="outlined"
                     autoComplete="off"
                     error={error}

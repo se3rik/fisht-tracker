@@ -5,6 +5,7 @@ import ApiError from '~/exceptions/api-error.js';
 import { TaskStatus } from '../../generated/prisma/enums.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
+import { canAssignTask } from './task-assignment.js';
 
 class TaskService {
     async getAllTasks({
@@ -103,12 +104,29 @@ class TaskService {
         return task;
     }
 
-    async createTask(params: CreateTaskParams) {
-        const { executorIds, startDate, deadline, ...rest } = params;
+    async createTask(params: CreateTaskParams, userId: string) {
+        const { executorIds, startDate, deadline, initiatorId: _initiatorId, ...rest } = params;
+        const creator = await prisma.user.findUnique({ where: { id: userId } });
+        if (!creator?.department || !creator.speciality || !creator.isActive) {
+            throw ApiError.Forbidden('Укажите подразделение и должность в профиле');
+        }
+        if (!Array.isArray(executorIds) || !executorIds.length || typeof params.answerableId !== 'string') {
+            throw ApiError.BadRequest('Укажите ответственного и исполнителей');
+        }
+        const recipients = [...new Set([params.answerableId, ...executorIds])];
+        if (recipients.some((id) => typeof id !== 'string')) {
+            throw ApiError.BadRequest('Некорректные исполнители');
+        }
+        const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
+        if (users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
+            throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в своём подразделении');
+        }
 
         return prisma.task.create({
             data: {
                 ...rest,
+                department: creator.department,
+                initiatorId: userId,
                 executors: { connect: executorIds.map((id) => ({ id })) },
                 startDate: startDate ? new Date(startDate) : undefined,
                 deadline: deadline ? new Date(deadline) : undefined,
@@ -133,17 +151,39 @@ class TaskService {
         });
     }
 
-    async updateTask(id: string, data: UpdateTaskParams) {
+    async updateTask(id: string, data: UpdateTaskParams, userId: string) {
         const task = await prisma.task.findUnique({ where: { id } });
 
         if (!task) throw ApiError.NotFound('Задача не найдена');
 
-        const { executorIds, deadline, ...rest } = data;
+        const actor = await prisma.user.findUnique({ where: { id: userId } });
+        if (!actor || ((data.executorIds || data.answerableId) && actor.id !== task.initiatorId && actor.roles !== 'ADMIN')) {
+            throw ApiError.Forbidden('Изменять назначение может только инициатор задачи');
+        }
+
+        if (data.executorIds || data.answerableId) {
+            const creator = await prisma.user.findUnique({ where: { id: task.initiatorId } });
+            const recipients = [...new Set([data.answerableId ?? task.answerableId, ...(data.executorIds ?? [])])];
+            const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
+            if (!creator || users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
+                throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в подразделении инициатора');
+            }
+        }
+
+        if (data.department && data.department !== task.department) {
+            throw ApiError.Forbidden('Подразделение задачи изменить нельзя');
+        }
+
+        const { executorIds, deadline, name, description, status, priority, answerableId } = data;
 
         return prisma.task.update({
             where: { id },
             data: {
-                ...rest,
+                name,
+                description,
+                status,
+                priority,
+                answerableId,
                 ...(executorIds && {
                     executors: { set: executorIds.map((id) => ({ id })) },
                 }),

@@ -8,6 +8,7 @@ import ApiError from '~/exceptions/api-error.js';
 
 import type { Department, Specialty, UserRole } from '../../generated/prisma/enums.js';
 import type { GetAllUsersParams } from '~/types/user.js';
+import { canAssignTask } from './task-assignment.js';
 
 class UserService {
     async getDirectoryUsers() {
@@ -43,6 +44,20 @@ class UserService {
             },
             take: 10,
         });
+    }
+
+    async getAssignableUsers(userId: string) {
+        const sender = await prisma.user.findUnique({ where: { id: userId } });
+        if (!sender?.department || !sender.speciality) return [];
+        const candidates = await prisma.user.findMany({
+            where: {
+                isActive: true,
+                department: sender.department,
+            },
+            orderBy: [{ secondName: 'asc' }, { firstName: 'asc' }],
+            select: { id: true, firstName: true, secondName: true, department: true, speciality: true, isActive: true },
+        });
+        return candidates.filter((user) => canAssignTask(sender, user));
     }
 
     async getAllUsers({ search, department, role, isActive }: GetAllUsersParams) {
