@@ -25,4 +25,5 @@ export const usersApi = {
             method: 'GET',
         });
     },
+    getAssignableUsers: () => request<UserSearchResult[]>('/users/assignable', { method: 'GET' }),
 };

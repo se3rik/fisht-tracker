@@ -84,6 +84,7 @@ router.patch(
 // Users
 router.get('/users/directory', authMiddleware, userController.getDirectoryUsers);
 router.get('/users/search', authMiddleware, userController.searchUsers);
+router.get('/users/assignable', authMiddleware, userController.searchAssignableUsers);
 router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);
 
 // Tasks

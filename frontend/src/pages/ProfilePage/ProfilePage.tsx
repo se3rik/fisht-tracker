@@ -263,7 +263,7 @@ export const ProfilePage = () => {
                                         {...field}
                                         id="department"
                                         label="Отдел"
-                                        disabled={!isEditing}
+                                        disabled
                                         menuItems={departmentItems}
                                     />
                                 )}
@@ -276,7 +276,7 @@ export const ProfilePage = () => {
                                         {...field}
                                         id="speciality"
                                         label="Должность"
-                                        disabled={!isEditing}
+                                        disabled
                                         menuItems={filteredSpecialtyItems}
                                     />
                                 )}

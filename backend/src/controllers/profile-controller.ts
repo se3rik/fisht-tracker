@@ -23,13 +23,11 @@ class ProfileController {
             }
 
             const userId = res.locals.user.id;
-            const { firstName, secondName, patronymic, department, speciality } = req.body;
+            const { firstName, secondName, patronymic } = req.body;
             const updatedProfileData = await profileService.updateProfile(userId, {
                 firstName,
                 secondName,
                 patronymic,
-                department,
-                speciality,
             });
 
             return res.json(updatedProfileData);

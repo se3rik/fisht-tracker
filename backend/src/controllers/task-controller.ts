@@ -55,7 +55,7 @@ class TaskController {
 
     async createTask(req: Request, res: Response, next: NextFunction) {
         try {
-            const task = await taskService.createTask(req.body);
+            const task = await taskService.createTask(req.body, res.locals.user.id);
             res.status(201).json(task);
         } catch (error) {
             next(error);
@@ -67,7 +67,7 @@ class TaskController {
             const { id } = req.params;
             if (!id) throw ApiError.BadRequest('Id задачи не указан');
 
-            const task = await taskService.updateTask(id as string, req.body);
+            const task = await taskService.updateTask(id as string, req.body, res.locals.user.id);
             res.json(task);
         } catch (error) {
             next(error);
