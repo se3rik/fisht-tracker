@@ -10,6 +10,8 @@ const initialState: NotificationState = {
     items: [],
 };
 
+let nextNotificationId = 0;
+
 const notificationSlice = createSlice({
     name: 'notification',
     initialState,
@@ -20,7 +22,7 @@ const notificationSlice = createSlice({
             },
             prepare: (type: NotificationType, message: string) => ({
                 payload: {
-                    id: crypto.randomUUID(),
+                    id: String(++nextNotificationId),
                     type,
                     message,
                 },
