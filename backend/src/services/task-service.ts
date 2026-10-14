@@ -119,7 +119,7 @@ class TaskService {
         }
         const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
         if (users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-            throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в своём подразделении');
+            throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в своём подразделении');
         }
 
         return prisma.task.create({
@@ -166,7 +166,7 @@ class TaskService {
             const recipients = [...new Set([data.answerableId ?? task.answerableId, ...(data.executorIds ?? [])])];
             const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
             if (!creator || users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-                throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в подразделении инициатора');
+                throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в подразделении инициатора');
             }
         }
 

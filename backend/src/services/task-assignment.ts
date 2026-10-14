@@ -1,9 +1,9 @@
 import type { Department, Specialty } from '../../generated/prisma/enums.js';
 
-type Assignee = { department: Department | null; speciality: Specialty | null; isActive: boolean };
+type Assignee = { id: string; department: Department | null; speciality: Specialty | null; isActive: boolean };
 
 // The staffing table orders management first, then chief/lead/category specialists and workers.
-// Equal positions cannot assign tasks to one another.
+// Peers can assign tasks to each other, but users cannot assign tasks to themselves.
 export function specialtyRank(specialty: Specialty | null): number | null {
     if (!specialty) return null;
     if (specialty === 'HEAD') return 1;
@@ -18,7 +18,7 @@ export function specialtyRank(specialty: Specialty | null): number | null {
 export function canAssignTask(sender: Assignee, recipient: Assignee): boolean {
     const senderRank = specialtyRank(sender.speciality);
     const recipientRank = specialtyRank(recipient.speciality);
-    return sender.isActive && recipient.isActive && !!sender.department &&
+    return sender.id !== recipient.id && sender.isActive && recipient.isActive && !!sender.department &&
         sender.department === recipient.department && senderRank !== null &&
-        recipientRank !== null && senderRank < recipientRank;
+        recipientRank !== null && senderRank <= recipientRank;
 }
