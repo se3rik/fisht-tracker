@@ -3,9 +3,11 @@ import { TaskStatus, TaskPriority, Department } from '../../generated/prisma/enu
 export type TaskRole = 'all' | 'executor' | 'answerable' | 'initiator';
 
 export type SortOrder = 'asc' | 'desc';
+export type TaskOverviewFilter = 'actionRequired' | 'overdue' | 'upcoming';
 
 export type GetAllTasksParams = {
     userId: string;
+    overview?: TaskOverviewFilter;
     name?: string;
     role?: TaskRole;
     status?: TaskStatus;

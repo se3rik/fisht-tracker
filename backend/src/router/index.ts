@@ -94,6 +94,7 @@ router.get('/users/assignable', authMiddleware, userController.searchAssignableU
 router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);
 
 // Tasks
+router.get('/tasks/overview', authMiddleware, taskController.getOverview);
 router.get('/tasks', authMiddleware, taskController.getAllTasks);
 router.get('/tasks/:id', authMiddleware, taskController.getTaskById);
 router.post('/tasks', authMiddleware, taskController.createTask);

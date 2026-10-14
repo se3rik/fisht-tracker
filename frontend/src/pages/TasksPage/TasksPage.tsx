@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Button, Pagination } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { Alert, Button, Chip, CircularProgress, Pagination } from '@mui/material';
 
 import styles from './TasksPage.module.scss';
 
@@ -26,7 +26,21 @@ type SortDirection = 'asc' | 'desc' | '';
 
 export const TasksPage = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const overviewParam = searchParams.get('overview');
+    const overview =
+        overviewParam === 'actionRequired' || overviewParam === 'overdue' || overviewParam === 'upcoming'
+            ? overviewParam
+            : undefined;
+    const overviewLabel = overview === 'actionRequired'
+        ? 'Требуют внимания'
+        : overview === 'overdue'
+          ? 'Просрочены'
+          : overview === 'upcoming'
+            ? 'Ближайшие 7 дней'
+            : null;
     const { profileData } = useAppSelector((state) => state.profile);
+    const departmentInitialized = useRef(false);
 
     const LIMIT = 8;
     const [page, setPage] = useState(1);
@@ -36,12 +50,13 @@ export const TasksPage = () => {
     const [department, setDepartment] = useState<TaskDepartmentValues | ''>('');
     const [role, setRole] = useState<TaskRoleValue>('');
     const [dateFilter, setDateFilter] = useState<SortDirection>('');
-    const [deadlineFilter, setDeadlineFilter] = useState<SortDirection>('asc');
+    const [deadlineFilter, setDeadlineFilter] = useState<SortDirection>(overview ? '' : 'asc');
 
     const isFiltersEmpty =
-        !name && !status && !priority && !role && !dateFilter && !department && !deadlineFilter;
+        !overview && !name && !status && !priority && !role && !dateFilter && !department && !deadlineFilter;
 
-    const { tasks, total } = useTasksList({
+    const { tasks, total, isLoading, error } = useTasksList({
+        overview,
         name,
         role: role || undefined,
         status: status || undefined,
@@ -62,19 +77,23 @@ export const TasksPage = () => {
         setDateFilter('');
         setDeadlineFilter('');
         setPage(1);
+        setSearchParams({});
     };
 
     useEffect(() => {
-        if (profileData?.department) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setDepartment(profileData.department);
+        if (profileData && !departmentInitialized.current) {
+            departmentInitialized.current = true;
+            if (profileData.department && !overview) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setDepartment(profileData.department);
+            }
         }
-    }, [profileData?.department]);
+    }, [profileData, overview]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setPage(1);
-    }, [name, status, priority, department, role, dateFilter, deadlineFilter]);
+    }, [overview, name, status, priority, department, role, dateFilter, deadlineFilter]);
 
     return (
         <section className={styles.pageWrapper}>
@@ -90,6 +109,7 @@ export const TasksPage = () => {
             />
             <section className={styles.filterSection}>
                 <div className={styles.filterToolsWrapper}>
+                    {overviewLabel && <Chip label={`Подборка: ${overviewLabel}`} onDelete={() => setSearchParams({})} />}
                     <div className={styles.filterTools}>
                         <BaseInput
                             id="taskName"
@@ -162,6 +182,8 @@ export const TasksPage = () => {
             </section>
 
             <section className={styles.mainContent}>
+                {error && <Alert severity="error">{error}</Alert>}
+                {isLoading && <div className={styles.emptyState}><CircularProgress aria-label="Загрузка задач" /></div>}
                 <div className={styles.tasksHeader}>
                     <div>Название</div>
                     <div>Статус</div>
@@ -172,14 +194,14 @@ export const TasksPage = () => {
                     </div>
                     <div>Исполнитель</div>
                 </div>
-                {tasks.length === 0 && (
+                {!isLoading && !error && tasks.length === 0 && (
                     <div className={styles.emptyState}>
                         {isFiltersEmpty
                             ? 'Задач пока нет.'
                             : 'По выбранным фильтрам задач не найдено.'}
                     </div>
                 )}
-                {tasks.map((task) => (
+                {!isLoading && !error && tasks.map((task) => (
                     <TaskItem key={task.id} task={task} />
                 ))}
             </section>
