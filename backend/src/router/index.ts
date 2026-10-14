@@ -83,6 +83,12 @@ router.patch(
 
 // Users
 router.get('/users/directory', authMiddleware, userController.getDirectoryUsers);
+router.patch(
+    '/users/:id/speciality',
+    authMiddleware,
+    body('speciality').isIn(Object.values(Specialty)),
+    userController.updateEmployeeSpeciality,
+);
 router.get('/users/search', authMiddleware, userController.searchUsers);
 router.get('/users/assignable', authMiddleware, userController.searchAssignableUsers);
 router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);

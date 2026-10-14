@@ -8,6 +8,7 @@ export type DirectoryUser = {
     patronymic: string | null;
     department: TaskDepartmentValues | null;
     speciality: string | null;
+    editableSpecialties: string[];
 };
 
 export type UserSearchResult = {
@@ -20,6 +21,11 @@ export type UserSearchResult = {
 
 export const usersApi = {
     getDirectoryUsers: () => request<DirectoryUser[]>('/users/directory'),
+    updateEmployeeSpeciality: (id: string, speciality: string) =>
+        request<{ id: string; speciality: string }>(`/users/${id}/speciality`, {
+            method: 'PATCH',
+            body: { speciality },
+        }),
     searchUsers: async (query: string) => {
         return request<UserSearchResult[]>(`/users/search?query=${query}`, {
             method: 'GET',
