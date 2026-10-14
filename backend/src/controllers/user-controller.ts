@@ -2,13 +2,34 @@ import type { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import userService from '~/services/user-service.js';
 import ApiError from '~/exceptions/api-error.js';
-import type { Department, UserRole } from '../../generated/prisma/enums.js';
+import type { Department, Specialty, UserRole } from '../../generated/prisma/enums.js';
 
 class UserController {
     async getDirectoryUsers(_req: Request, res: Response, next: NextFunction) {
         try {
-            const users = await userService.getDirectoryUsers();
+            const users = await userService.getDirectoryUsers(res.locals.user.id);
             return res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateEmployeeSpeciality(req: Request, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return next(ApiError.BadRequest('Некорректная должность', errors.array()));
+            }
+            const id = req.params.id;
+            if (typeof id !== 'string') {
+                return next(ApiError.BadRequest('Некорректный id сотрудника'));
+            }
+            const result = await userService.updateEmployeeSpeciality(
+                res.locals.user.id,
+                id,
+                req.body.speciality as Specialty,
+            );
+            return res.json(result);
         } catch (error) {
             next(error);
         }

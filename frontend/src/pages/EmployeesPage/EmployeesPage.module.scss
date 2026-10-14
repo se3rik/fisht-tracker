@@ -156,6 +156,26 @@
     min-width: 0;
 }
 
+.editButton {
+    flex-shrink: 0;
+    margin-left: auto !important;
+}
+
+.editDialogContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 12px !important;
+
+    p {
+        margin: 0;
+    }
+}
+
+.saveError {
+    color: #d32f2f;
+}
+
 .personHeading {
     display: flex;
     flex-wrap: wrap;
@@ -214,9 +234,13 @@
         width: 100%;
     }
     .card {
+        flex-wrap: wrap;
         gap: 16px;
         min-height: 110px;
         padding: 16px;
+    }
+    .editButton {
+        margin-left: 80px !important;
     }
     .avatar {
         width: 64px !important;

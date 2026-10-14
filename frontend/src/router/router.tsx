@@ -10,10 +10,10 @@ import { TasksPage } from '@/pages/TasksPage/TasksPage';
 import { TaskCreationPage } from '@/pages/TaskCreationPage/TaskCreationPage';
 import { TaskDetailsPage } from '@/pages/TaskDetailsPage/TaskDetailsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
-import { InProgressPage } from '@/pages/InProgressPage/InProgressPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { AdministrationPage } from '@/pages/AdministrationPage/AdministrationPage';
 import { EmployeesPage } from '@/pages/EmployeesPage/EmployeesPage';
+import { GoalsPage } from '@/pages/GoalsPage/GoalsPage';
 
 export const router = createBrowserRouter([
     { element: <AuthLayout />, children: [{ path: '/auth', element: <AuthPage /> }] },
@@ -30,8 +30,7 @@ export const router = createBrowserRouter([
                     { path: 'new-task', element: <TaskCreationPage /> },
                 ],
             },
-            { path: '/boards', element: <InProgressPage /> },
-            { path: '/goals', element: <InProgressPage /> },
+            { path: '/goals', element: <GoalsPage /> },
             { path: '/administration', element: <AdministrationPage /> },
             { path: '/employees', element: <EmployeesPage /> },
             { path: '/profile', element: <ProfilePage /> },

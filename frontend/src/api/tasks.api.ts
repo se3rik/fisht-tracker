@@ -9,6 +9,7 @@ import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 import type { TaskData, Comment, CreateTaskDto, UpdateTaskDto } from '@/api/api-types/tasks';
 
 type GetAllTasksParams = {
+    overview?: 'actionRequired' | 'overdue' | 'upcoming';
     name?: string;
     role?: TaskRoleValue;
     status?: TasksStatusValue;
@@ -21,8 +22,15 @@ type GetAllTasksParams = {
 };
 
 export const tasksApi = {
+    getOverview: () =>
+        request<{
+            overdue: TaskListItem[];
+            upcoming: TaskListItem[];
+            actionRequired: TaskListItem[];
+        }>('/tasks/overview', { method: 'GET' }),
     getAllTasks: async (params: GetAllTasksParams = {}) => {
         const query = new URLSearchParams();
+        if (params.overview) query.append('overview', params.overview);
 
         if (params.name) query.append('name', params.name);
         if (params.role) query.append('role', params.role);

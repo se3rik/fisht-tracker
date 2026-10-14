@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, CircularProgress, InputAdornment } from '@mui/material';
+import {
+    Avatar,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    InputAdornment,
+} from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 
@@ -10,6 +19,7 @@ import { PageIntro } from '@/components/pageIntro/PageIntro';
 import { BaseInput } from '@/components/ui/BaseInput/BaseInput';
 import { BaseSelect } from '@/components/ui/BaseSelect/BaseSelect';
 import { useAppSelector } from '@/hooks/useAppSelector';
+import { useNotify } from '@/hooks/useNotify';
 import { DEPARTMENT_LABELS } from '@/constants/departmentsLabels';
 import { SPECIALTY_LABELS } from '@/constants/specialityLabels';
 import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
@@ -66,11 +76,54 @@ const employeeCountLabel = (count: number) => {
 
 export const EmployeesPage = () => {
     const { profileData, isLoading: isProfileLoading } = useAppSelector((state) => state.profile);
+    const notify = useNotify();
     const [people, setPeople] = useState<DirectoryUser[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [chosenDepartment, setChosenDepartment] = useState<DepartmentFilter | null>(null);
     const [search, setSearch] = useState('');
+    const [editingUser, setEditingUser] = useState<DirectoryUser | null>(null);
+    const [selectedSpeciality, setSelectedSpeciality] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+
+    const openEditDialog = (user: DirectoryUser) => {
+        setEditingUser(user);
+        setSelectedSpeciality(user.speciality ?? '');
+        setSaveError(null);
+    };
+
+    const saveSpeciality = async () => {
+        if (!editingUser || !selectedSpeciality || isSaving) return;
+        setIsSaving(true);
+        setSaveError(null);
+        try {
+            const result = await usersApi.updateEmployeeSpeciality(
+                editingUser.id,
+                selectedSpeciality,
+            );
+            setPeople((current) =>
+                current.map((user) =>
+                    user.id === result.id ? { ...user, speciality: result.speciality } : user,
+                ),
+            );
+            setEditingUser(null);
+            notify('success', 'Должность сотрудника обновлена');
+        } catch (reason) {
+            setSaveError(
+                reason instanceof Error ? reason.message : 'Не удалось обновить должность',
+            );
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const availableSpecialties = editingUser?.editableSpecialties ?? [];
+    const specialityOptions = availableSpecialties.map((value, index) => ({
+        id: index,
+        value,
+        title: SPECIALTY_LABELS[value] ?? value,
+    }));
 
     useEffect(() => {
         let active = true;
@@ -238,6 +291,16 @@ export const EmployeesPage = () => {
                                                         </span>
                                                     )}
                                                 </div>
+                                                {user.editableSpecialties.length > 0 && (
+                                                    <Button
+                                                        className={styles.editButton}
+                                                        variant="outlined"
+                                                        size="small"
+                                                        onClick={() => openEditDialog(user)}
+                                                    >
+                                                        Изменить должность
+                                                    </Button>
+                                                )}
                                             </article>
                                         );
                                     })}
@@ -247,6 +310,46 @@ export const EmployeesPage = () => {
                     </div>
                 )}
             </section>
+            <Dialog
+                open={!!editingUser}
+                onClose={isSaving ? undefined : () => setEditingUser(null)}
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle>Изменить должность</DialogTitle>
+                <DialogContent className={styles.editDialogContent}>
+                    <p>{editingUser ? fullName(editingUser) : ''}</p>
+                    <BaseSelect
+                        id="employee-speciality"
+                        label="Новая должность"
+                        fullWidth
+                        value={selectedSpeciality}
+                        menuItems={specialityOptions}
+                        onChange={setSelectedSpeciality}
+                    />
+                    {saveError && (
+                        <p className={styles.saveError} role="alert">
+                            {saveError}
+                        </p>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEditingUser(null)} disabled={isSaving}>
+                        Отмена
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={saveSpeciality}
+                        disabled={
+                            isSaving ||
+                            !selectedSpeciality ||
+                            selectedSpeciality === editingUser?.speciality
+                        }
+                    >
+                        {isSaving ? 'Сохранение…' : 'Сохранить'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

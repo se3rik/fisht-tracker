@@ -9,6 +9,7 @@ import type { TaskRoleValue } from '@/types/task/TaskRole';
 import type { TaskDepartmentValues } from '@/types/task/TaskDepartment';
 
 type Filters = {
+    overview?: 'actionRequired' | 'overdue' | 'upcoming';
     name?: string;
     role?: TaskRoleValue;
     status?: TasksStatusValue;
@@ -43,6 +44,7 @@ export const useTasksList = (filters: Filters) => {
 
         fetchTasks();
     }, [
+        filters.overview,
         filters.name,
         filters.role,
         filters.status,

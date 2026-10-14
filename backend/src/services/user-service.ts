@@ -9,21 +9,70 @@ import ApiError from '~/exceptions/api-error.js';
 import type { Department, Specialty, UserRole } from '../../generated/prisma/enums.js';
 import type { GetAllUsersParams } from '~/types/user.js';
 import { canAssignTask } from './task-assignment.js';
+import {
+    canManageEmployeeSpeciality,
+    canSetEmployeeSpeciality,
+    getManageableSpecialties,
+} from './employee-speciality-policy.js';
 
 class UserService {
-    async getDirectoryUsers() {
-        return prisma.user.findMany({
-            where: { isActive: true },
-            orderBy: [{ secondName: 'asc' }, { firstName: 'asc' }],
-            select: {
-                id: true,
-                firstName: true,
-                secondName: true,
-                patronymic: true,
-                department: true,
-                speciality: true,
+    async getDirectoryUsers(viewerId: string) {
+        const [viewer, users] = await Promise.all([
+            prisma.user.findUnique({ where: { id: viewerId } }),
+            prisma.user.findMany({
+                where: { isActive: true },
+                orderBy: [{ secondName: 'asc' }, { firstName: 'asc' }],
+                select: {
+                    id: true,
+                    firstName: true,
+                    secondName: true,
+                    patronymic: true,
+                    department: true,
+                    speciality: true,
+                    roles: true,
+                    isActive: true,
+                },
+            }),
+        ]);
+
+        return users.map(({ roles, isActive, ...user }) => ({
+            ...user,
+            editableSpecialties:
+                user.department && canManageEmployeeSpeciality(viewer, { ...user, roles, isActive })
+                    ? getManageableSpecialties(user.department)
+                    : [],
+        }));
+    }
+
+    async updateEmployeeSpeciality(actorId: string, targetId: string, speciality: Specialty) {
+        const [actor, target] = await Promise.all([
+            prisma.user.findUnique({ where: { id: actorId } }),
+            prisma.user.findUnique({ where: { id: targetId } }),
+        ]);
+
+        if (!target) throw ApiError.NotFound('Сотрудник не найден');
+        if (!canManageEmployeeSpeciality(actor, target)) {
+            throw ApiError.Forbidden('Нельзя менять должность этого сотрудника');
+        }
+        if (!target.department || !canSetEmployeeSpeciality(target.department, speciality)) {
+            throw ApiError.BadRequest('Должность недоступна для этого отдела');
+        }
+
+        const updated = await prisma.user.updateMany({
+            where: {
+                id: targetId,
+                department: target.department,
+                speciality: target.speciality,
+                isActive: true,
+                roles: 'USER',
             },
+            data: { speciality },
         });
+        if (updated.count !== 1) {
+            throw ApiError.BadRequest('Данные сотрудника изменились. Обновите страницу');
+        }
+
+        return { id: targetId, speciality };
     }
 
     async searchUsers(query: string) {
@@ -55,7 +104,14 @@ class UserService {
                 department: sender.department,
             },
             orderBy: [{ secondName: 'asc' }, { firstName: 'asc' }],
-            select: { id: true, firstName: true, secondName: true, department: true, speciality: true, isActive: true },
+            select: {
+                id: true,
+                firstName: true,
+                secondName: true,
+                department: true,
+                speciality: true,
+                isActive: true,
+            },
         });
         return candidates.filter((user) => canAssignTask(sender, user));
     }

@@ -4,6 +4,7 @@ import { body } from 'express-validator';
 import authController from '~/controllers/auth-controller.js';
 import profileController from '~/controllers/profile-controller.js';
 import taskController from '~/controllers/task-controller.js';
+import goalController from '~/controllers/goal-controller.js';
 import commentController from '~/controllers/comment-controller.js';
 import userController from '~/controllers/user-controller.js';
 import attachmentController from '~/controllers/attachment-controller.js';
@@ -83,11 +84,23 @@ router.patch(
 
 // Users
 router.get('/users/directory', authMiddleware, userController.getDirectoryUsers);
+router.patch(
+    '/users/:id/speciality',
+    authMiddleware,
+    body('speciality').isIn(Object.values(Specialty)),
+    userController.updateEmployeeSpeciality,
+);
 router.get('/users/search', authMiddleware, userController.searchUsers);
 router.get('/users/assignable', authMiddleware, userController.searchAssignableUsers);
 router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);
 
 // Tasks
+router.get('/goals', authMiddleware, goalController.list);
+router.get('/goals/task-options', authMiddleware, goalController.taskOptions);
+router.post('/goals', authMiddleware, goalController.create);
+router.patch('/goals/:id', authMiddleware, goalController.update);
+
+router.get('/tasks/overview', authMiddleware, taskController.getOverview);
 router.get('/tasks', authMiddleware, taskController.getAllTasks);
 router.get('/tasks/:id', authMiddleware, taskController.getTaskById);
 router.post('/tasks', authMiddleware, taskController.createTask);

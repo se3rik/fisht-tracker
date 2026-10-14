@@ -7,9 +7,85 @@ import type { Prisma } from '../../generated/prisma/client.js';
 import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
 import { canAssignTask } from './task-assignment.js';
 
+const getOverviewWhere = (userId: string) => {
+    const now = new Date();
+    const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const activeStatuses = {
+        notIn: [TaskStatus.FINISHED, TaskStatus.CANCELED, TaskStatus.ARCHIVE],
+    };
+    const mine: Prisma.TaskWhereInput = {
+        OR: [
+            { executors: { some: { id: userId } } },
+            { answerableId: userId },
+            { initiatorId: userId },
+        ],
+    };
+    const overdueWhere: Prisma.TaskWhereInput = {
+        AND: [mine, { status: activeStatuses, deadline: { lt: now } }],
+    };
+    const upcomingWhere: Prisma.TaskWhereInput = {
+        AND: [mine, { status: activeStatuses, deadline: { gte: now, lte: weekEnd } }],
+    };
+    const actionWhere: Prisma.TaskWhereInput = {
+        AND: [
+            { status: activeStatuses },
+            {
+                OR: [
+                    {
+                        executors: { some: { id: userId } },
+                        status: { in: [TaskStatus.FOR_EXECUTION, TaskStatus.REWORK] },
+                    },
+                    { answerableId: userId, status: TaskStatus.COMPLETED },
+                    { initiatorId: userId, status: TaskStatus.REVISION },
+                ],
+            },
+        ],
+    };
+
+    return { overdueWhere, upcomingWhere, actionWhere };
+};
+
 class TaskService {
+    async getOverview(userId: string) {
+        const { overdueWhere, upcomingWhere, actionWhere } = getOverviewWhere(userId);
+        const select = {
+            id: true,
+            name: true,
+            status: true,
+            priority: true,
+            department: true,
+            createdAt: true,
+            deadline: true,
+            executors: { select: { firstName: true, secondName: true } },
+        } satisfies Prisma.TaskSelect;
+
+        const [overdue, upcoming, actionRequired] = await prisma.$transaction([
+            prisma.task.findMany({
+                where: overdueWhere,
+                select,
+                orderBy: { deadline: 'asc' },
+                take: 5,
+            }),
+            prisma.task.findMany({
+                where: upcomingWhere,
+                select,
+                orderBy: { deadline: 'asc' },
+                take: 5,
+            }),
+            prisma.task.findMany({
+                where: actionWhere,
+                select,
+                orderBy: { updatedAt: 'desc' },
+                take: 5,
+            }),
+        ]);
+
+        return { overdue, upcoming, actionRequired };
+    }
+
     async getAllTasks({
         userId,
+        overview,
         name,
         role,
         status,
@@ -29,7 +105,17 @@ class TaskService {
                     ? { initiatorId: userId }
                     : {};
 
+        const overviewWheres = overview ? getOverviewWhere(userId) : null;
+        const overviewWhere = overviewWheres
+            ? overview === 'overdue'
+                ? overviewWheres.overdueWhere
+                : overview === 'upcoming'
+                  ? overviewWheres.upcomingWhere
+                  : overviewWheres.actionWhere
+            : undefined;
+
         const where: Prisma.TaskWhereInput = {
+            AND: overviewWhere ? [overviewWhere] : undefined,
             ...roleFilter,
             ...(name && { name: { contains: name, mode: 'insensitive' } }),
             ...(status && { status }),
@@ -48,7 +134,13 @@ class TaskService {
         }
 
         if (orderBy.length === 0) {
-            orderBy.push({ createdAt: 'desc' });
+            orderBy.push(
+                overview === 'overdue' || overview === 'upcoming'
+                    ? { deadline: 'asc' }
+                    : overview === 'actionRequired'
+                      ? { updatedAt: 'desc' }
+                      : { createdAt: 'desc' },
+            );
         }
 
         const [tasks, total] = await prisma.$transaction([
@@ -119,7 +211,7 @@ class TaskService {
         }
         const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
         if (users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-            throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в своём подразделении');
+            throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в своём подразделении');
         }
 
         return prisma.task.create({
@@ -166,7 +258,7 @@ class TaskService {
             const recipients = [...new Set([data.answerableId ?? task.answerableId, ...(data.executorIds ?? [])])];
             const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
             if (!creator || users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-                throw ApiError.Forbidden('Назначать задачи можно только сотрудникам ниже по должности в подразделении инициатора');
+                throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в подразделении инициатора');
             }
         }
 

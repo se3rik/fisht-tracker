@@ -7,6 +7,15 @@ import ApiError from '~/exceptions/api-error.js';
 import { TaskStatus, TaskPriority, Department } from '../../generated/prisma/enums.js';
 
 class TaskController {
+    async getOverview(_req: Request, res: Response, next: NextFunction) {
+        try {
+            const overview = await taskService.getOverview(res.locals.user.id);
+            res.json(overview);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAllTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const { id: userId } = res.locals.user;
@@ -20,10 +29,14 @@ class TaskController {
                 sortByDeadline,
                 limit,
                 skip,
+                overview,
             } = req.query;
 
             const tasks = await taskService.getAllTasks({
                 userId,
+                overview: ['actionRequired', 'overdue', 'upcoming'].includes(String(overview))
+                    ? (overview as 'actionRequired' | 'overdue' | 'upcoming')
+                    : undefined,
                 name: name as string | undefined,
                 role: role as any | undefined,
                 status: status as TaskStatus | undefined,
