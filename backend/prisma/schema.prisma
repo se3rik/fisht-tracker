@@ -89,6 +89,12 @@ enum TaskPriority {
   P4  // Низкий
 }
 
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
 model User {
   id                String   @id @default(uuid())
 
@@ -109,6 +115,7 @@ model User {
   tasksAsAnswerable  Task[] @relation("TaskAnswerable")
   tasksAsInitiator   Task[] @relation("TaskInitiator")
   comments  Comment[] @relation("CommentAuthor")
+  createdGoals Goal[] @relation("GoalCreator")
 
   refreshTokens RefreshToken[]
 
@@ -154,6 +161,7 @@ model Task {
   department Department
 
   comments  Comment[]
+  goals Goal[] @relation("GoalTasks")
 
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
@@ -178,6 +186,23 @@ model Comment {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("comments")
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  department  Department
+  deadline    DateTime?
+  status      GoalStatus @default(ACTIVE)
+  creatorId   String     @map("creator_id")
+  creator     User       @relation("GoalCreator", fields: [creatorId], references: [id])
+  tasks       Task[]     @relation("GoalTasks")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@index([department, status])
+  @@map("goals")
 }
 
 model CommentAttachment {
