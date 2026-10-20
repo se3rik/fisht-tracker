@@ -3,6 +3,11 @@ import { prisma } from '../lib/prisma.js';
 import attachmentService from '~/services/attachment-service.js';
 
 import ApiError from '~/exceptions/api-error.js';
+import {
+    publishTaskActivity,
+    storeNotifications,
+    type NewNotification,
+} from './notification-service.js';
 
 type NewAttachment = {
     fileName: string;
@@ -18,24 +23,46 @@ class CommentService {
         text: string,
         attachments: NewAttachment[] = [],
     ) {
-        const task = await prisma.task.findUnique({ where: { id: taskId } });
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            include: { executors: { select: { id: true } } },
+        });
         if (!task) throw ApiError.NotFound('Задача не найдена');
 
-        return prisma.comment.create({
-            data: {
+        const participants = new Set([
+            task.initiatorId,
+            task.answerableId,
+            ...task.executors.map((user) => user.id),
+        ]);
+        const notifications: NewNotification[] = [...participants]
+            .filter((recipient) => recipient !== authorId)
+            .map((recipient) => ({
+                userId: recipient,
                 taskId,
-                authorId,
-                text,
-                ...(attachments.length > 0 && { attachments: { create: attachments } }),
-            },
-            include: {
-                author: { select: { id: true, firstName: true, secondName: true } },
-                attachments: {
-                    select: { id: true, fileName: true, mimeType: true, size: true },
-                    orderBy: { createdAt: 'asc' },
+                type: 'COMMENT_ADDED',
+                message: `Новый комментарий к задаче «${task.name}»`,
+            }));
+        const comment = await prisma.$transaction(async (tx) => {
+            const created = await tx.comment.create({
+                data: {
+                    taskId,
+                    authorId,
+                    text,
+                    ...(attachments.length > 0 && { attachments: { create: attachments } }),
                 },
-            },
+                include: {
+                    author: { select: { id: true, firstName: true, secondName: true } },
+                    attachments: {
+                        select: { id: true, fileName: true, mimeType: true, size: true },
+                        orderBy: { createdAt: 'asc' },
+                    },
+                },
+            });
+            await storeNotifications(tx, notifications);
+            return created;
         });
+        publishTaskActivity(participants, notifications);
+        return comment;
     }
 
     async deleteComment(commentId: string, userId: string, userRole: string) {

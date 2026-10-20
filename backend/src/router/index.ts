@@ -8,6 +8,7 @@ import goalController from '~/controllers/goal-controller.js';
 import commentController from '~/controllers/comment-controller.js';
 import userController from '~/controllers/user-controller.js';
 import attachmentController from '~/controllers/attachment-controller.js';
+import notificationController from '~/controllers/notification-controller.js';
 
 import authMiddleware from '~/middlewares/auth-middleware.js';
 import adminMiddleware from '~/middlewares/admin-middleware.js';
@@ -95,6 +96,10 @@ router.get('/users/assignable', authMiddleware, userController.searchAssignableU
 router.get('/admin/users', authMiddleware, adminMiddleware, userController.getAllUsers);
 
 // Tasks
+router.get('/events', authMiddleware, notificationController.stream);
+router.get('/notifications', authMiddleware, notificationController.list);
+router.get('/notifications/unread-count', authMiddleware, notificationController.unreadCount);
+router.patch('/notifications/read', authMiddleware, notificationController.markRead);
 router.get('/goals', authMiddleware, goalController.list);
 router.get('/goals/task-options', authMiddleware, goalController.taskOptions);
 router.post('/goals', authMiddleware, goalController.create);

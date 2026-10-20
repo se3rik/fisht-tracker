@@ -34,11 +34,14 @@
 
 .taskList {
     display: grid;
+    min-width: 0;
     gap: 8px;
 }
 
 .taskLink {
     display: flex;
+    min-width: 0;
+    max-width: 100%;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
@@ -57,13 +60,16 @@
 }
 
 .taskInfo {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
 .taskName {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
     font-weight: 600;
 }
 
@@ -99,5 +105,8 @@
     .taskLink {
         align-items: flex-start;
         flex-direction: column;
+    }
+    .taskInfo {
+        width: 100%;
     }
 }

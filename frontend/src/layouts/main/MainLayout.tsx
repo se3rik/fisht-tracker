@@ -10,10 +10,12 @@ import { getProfileData } from '@/stores/slices/profileSlice';
 import { BaseSidebar } from '@/components/sidebar/BaseSidebar';
 
 import styles from './MainLayout.module.scss';
+import { useLiveEvents } from '@/hooks/useLiveEvents';
 
 export const MainLayout = () => {
     const dispatch = useAppDispatch();
     const { isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+    useLiveEvents();
 
     useEffect(() => {
         if (!isInitialized) {

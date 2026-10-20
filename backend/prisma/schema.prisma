@@ -115,6 +115,7 @@ model User {
   tasksAsAnswerable  Task[] @relation("TaskAnswerable")
   tasksAsInitiator   Task[] @relation("TaskInitiator")
   comments  Comment[] @relation("CommentAuthor")
+  notifications Notification[]
   createdGoals Goal[] @relation("GoalCreator")
 
   refreshTokens RefreshToken[]
@@ -161,6 +162,7 @@ model Task {
   department Department
 
   comments  Comment[]
+  notifications Notification[]
   goals Goal[] @relation("GoalTasks")
 
   createdAt   DateTime     @default(now()) @map("created_at")
@@ -186,6 +188,31 @@ model Comment {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("comments")
+}
+
+enum NotificationType {
+  TASK_CREATED
+  ASSIGNED
+  UNASSIGNED
+  STATUS_CHANGED
+  DEADLINE_CHANGED
+  COMMENT_ADDED
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId    String           @map("task_id")
+  task      Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  message   String
+  createdAt DateTime         @default(now()) @map("created_at")
+  readAt    DateTime?        @map("read_at")
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
 
 model Goal {

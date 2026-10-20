@@ -10,6 +10,7 @@ import { TASK_STATUS_CONFIG } from '@/constants/taskStatuses';
 import { formatDate } from '@/helpers/formatDate';
 import { getDeadlineInfo } from '@/helpers/getDeadlineInfo';
 import { useAppSelector } from '@/hooks/useAppSelector';
+import { TASKS_CHANGED_EVENT } from '@/hooks/useLiveEvents';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -95,20 +96,32 @@ export const HomePage = () => {
 
     useEffect(() => {
         let active = true;
-        tasksApi
-            .getOverview()
-            .then((data) => {
-                if (active) setOverview(data);
-            })
-            .catch((err: unknown) => {
-                if (active)
-                    setError(err instanceof Error ? err.message : 'Не удалось загрузить задачи');
-            })
-            .finally(() => {
-                if (active) setLoading(false);
-            });
+        let latestRequest = 0;
+        const reload = () => {
+            const requestId = ++latestRequest;
+            void tasksApi
+                .getOverview()
+                .then((data) => {
+                    if (active && requestId === latestRequest) {
+                        setOverview(data);
+                        setError(null);
+                    }
+                })
+                .catch((err: unknown) => {
+                    if (active && requestId === latestRequest)
+                        setError(
+                            err instanceof Error ? err.message : 'Не удалось загрузить задачи',
+                        );
+                })
+                .finally(() => {
+                    if (active && requestId === latestRequest) setLoading(false);
+                });
+        };
+        reload();
+        window.addEventListener(TASKS_CHANGED_EVENT, reload);
         return () => {
             active = false;
+            window.removeEventListener(TASKS_CHANGED_EVENT, reload);
         };
     }, []);
 

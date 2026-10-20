@@ -6,6 +6,17 @@ import { TaskStatus } from '../../generated/prisma/enums.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import type { GetAllTasksParams, CreateTaskParams, UpdateTaskParams } from '~/types/tasks.js';
 import { canAssignTask } from './task-assignment.js';
+import {
+    publishTaskActivity,
+    storeNotifications,
+    type NewNotification,
+} from './notification-service.js';
+
+const taskParticipants = (task: {
+    initiatorId: string;
+    answerableId: string;
+    executors: { id: string }[];
+}) => new Set([task.initiatorId, task.answerableId, ...task.executors.map((user) => user.id)]);
 
 const getOverviewWhere = (userId: string) => {
     const now = new Date();
@@ -33,7 +44,9 @@ const getOverviewWhere = (userId: string) => {
                 OR: [
                     {
                         executors: { some: { id: userId } },
-                        status: { in: [TaskStatus.FOR_EXECUTION, TaskStatus.REWORK] },
+                        status: {
+                            in: [TaskStatus.DRAFT, TaskStatus.FOR_EXECUTION, TaskStatus.REWORK],
+                        },
                     },
                     { answerableId: userId, status: TaskStatus.COMPLETED },
                     { initiatorId: userId, status: TaskStatus.REVISION },
@@ -202,7 +215,12 @@ class TaskService {
         if (!creator?.department || !creator.speciality || !creator.isActive) {
             throw ApiError.Forbidden('Укажите подразделение и должность в профиле');
         }
-        if (!Array.isArray(executorIds) || !executorIds.length || typeof params.answerableId !== 'string') {
+        const department = creator.department;
+        if (
+            !Array.isArray(executorIds) ||
+            !executorIds.length ||
+            typeof params.answerableId !== 'string'
+        ) {
             throw ApiError.BadRequest('Укажите ответственного и исполнителей');
         }
         const recipients = [...new Set([params.answerableId, ...executorIds])];
@@ -210,55 +228,93 @@ class TaskService {
             throw ApiError.BadRequest('Некорректные исполнители');
         }
         const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
-        if (users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-            throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в своём подразделении');
+        if (
+            users.length !== recipients.length ||
+            users.some((user) => !canAssignTask(creator, user))
+        ) {
+            throw ApiError.Forbidden(
+                'Назначать задачи можно только другим сотрудникам своего или более низкого уровня в своём подразделении',
+            );
         }
 
-        return prisma.task.create({
-            data: {
-                ...rest,
-                department: creator.department,
-                initiatorId: userId,
-                executors: { connect: executorIds.map((id) => ({ id })) },
-                startDate: startDate ? new Date(startDate) : undefined,
-                deadline: deadline ? new Date(deadline) : undefined,
-            },
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                status: true,
-                priority: true,
-                department: true,
-                startDate: true,
-                deadline: true,
-                executors: {
-                    select: { id: true, firstName: true, secondName: true },
+        const task = await prisma.$transaction(async (tx) => {
+            const created = await tx.task.create({
+                data: {
+                    ...rest,
+                    department,
+                    initiatorId: userId,
+                    executors: { connect: executorIds.map((id) => ({ id })) },
+                    startDate: startDate ? new Date(startDate) : undefined,
+                    deadline: deadline ? new Date(deadline) : undefined,
                 },
-                answerableId: true,
-                initiatorId: true,
-                createdAt: true,
-                updatedAt: true,
-            },
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    status: true,
+                    priority: true,
+                    department: true,
+                    startDate: true,
+                    deadline: true,
+                    executors: {
+                        select: { id: true, firstName: true, secondName: true },
+                    },
+                    answerableId: true,
+                    initiatorId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            });
+            const notifications: NewNotification[] = recipients
+                .filter((id) => id !== userId)
+                .map((id) => ({
+                    userId: id,
+                    taskId: created.id,
+                    type: 'TASK_CREATED',
+                    message: `Вам назначена задача «${created.name}»`,
+                }));
+            await storeNotifications(tx, notifications);
+            return { created, notifications };
         });
+        publishTaskActivity([userId, ...recipients], task.notifications);
+        return task.created;
     }
 
     async updateTask(id: string, data: UpdateTaskParams, userId: string) {
-        const task = await prisma.task.findUnique({ where: { id } });
+        const task = await prisma.task.findUnique({
+            where: { id },
+            include: { executors: { select: { id: true } } },
+        });
 
         if (!task) throw ApiError.NotFound('Задача не найдена');
 
         const actor = await prisma.user.findUnique({ where: { id: userId } });
-        if (!actor || ((data.executorIds || data.answerableId) && actor.id !== task.initiatorId && actor.roles !== 'ADMIN')) {
+        if (
+            !actor ||
+            ((data.executorIds || data.answerableId) &&
+                actor.id !== task.initiatorId &&
+                actor.roles !== 'ADMIN')
+        ) {
             throw ApiError.Forbidden('Изменять назначение может только инициатор задачи');
         }
 
         if (data.executorIds || data.answerableId) {
             const creator = await prisma.user.findUnique({ where: { id: task.initiatorId } });
-            const recipients = [...new Set([data.answerableId ?? task.answerableId, ...(data.executorIds ?? [])])];
+            const recipients = [
+                ...new Set([
+                    data.answerableId ?? task.answerableId,
+                    ...(data.executorIds ?? task.executors.map((user) => user.id)),
+                ]),
+            ];
             const users = await prisma.user.findMany({ where: { id: { in: recipients } } });
-            if (!creator || users.length !== recipients.length || users.some((user) => !canAssignTask(creator, user))) {
-                throw ApiError.Forbidden('Назначать задачи можно только другим сотрудникам своего или более низкого уровня в подразделении инициатора');
+            if (
+                !creator ||
+                users.length !== recipients.length ||
+                users.some((user) => !canAssignTask(creator, user))
+            ) {
+                throw ApiError.Forbidden(
+                    'Назначать задачи можно только другим сотрудникам своего или более низкого уровня в подразделении инициатора',
+                );
             }
         }
 
@@ -268,24 +324,75 @@ class TaskService {
 
         const { executorIds, deadline, name, description, status, priority, answerableId } = data;
 
-        return prisma.task.update({
-            where: { id },
-            data: {
-                name,
-                description,
-                status,
-                priority,
-                answerableId,
-                ...(executorIds && {
-                    executors: { set: executorIds.map((id) => ({ id })) },
-                }),
-                deadline: deadline ? new Date(deadline) : undefined,
-            },
+        const updated = await prisma.$transaction(async (tx) => {
+            const result = await tx.task.update({
+                where: { id },
+                data: {
+                    name,
+                    description,
+                    status,
+                    priority,
+                    answerableId,
+                    ...(executorIds && {
+                        executors: { set: executorIds.map((id) => ({ id })) },
+                    }),
+                    deadline: deadline ? new Date(deadline) : undefined,
+                },
+                include: { executors: { select: { id: true } } },
+            });
+            const before = taskParticipants(task);
+            const after = taskParticipants(result);
+            const notifications: NewNotification[] = [];
+            const add = (
+                userIds: Iterable<string>,
+                type: NewNotification['type'],
+                message: string,
+            ) => {
+                for (const recipient of userIds) {
+                    if (recipient !== userId)
+                        notifications.push({ userId: recipient, taskId: id, type, message });
+                }
+            };
+            if (task.answerableId !== result.answerableId) {
+                add(
+                    [result.answerableId],
+                    'ASSIGNED',
+                    `Вы назначены ответственным за задачу «${result.name}»`,
+                );
+                add(
+                    [task.answerableId],
+                    'UNASSIGNED',
+                    `Вы больше не ответственный за задачу «${result.name}»`,
+                );
+            }
+            const oldExecutors = new Set(task.executors.map((executor) => executor.id));
+            const newExecutors = new Set(result.executors.map((executor) => executor.id));
+            add(
+                [...newExecutors].filter((recipient) => !oldExecutors.has(recipient)),
+                'ASSIGNED',
+                `Вы назначены исполнителем задачи «${result.name}»`,
+            );
+            add(
+                [...oldExecutors].filter((recipient) => !newExecutors.has(recipient)),
+                'UNASSIGNED',
+                `Вы больше не исполнитель задачи «${result.name}»`,
+            );
+            if (task.status !== result.status)
+                add(after, 'STATUS_CHANGED', `Изменён статус задачи «${result.name}»`);
+            if (task.deadline?.getTime() !== result.deadline?.getTime())
+                add(after, 'DEADLINE_CHANGED', `Изменён срок задачи «${result.name}»`);
+            await storeNotifications(tx, notifications);
+            return { result, notifications, participants: new Set([...before, ...after]) };
         });
+        publishTaskActivity(updated.participants, updated.notifications);
+        return updated.result;
     }
 
     async deleteTask(id: string, userId: string, userRole: string) {
-        const task = await prisma.task.findUnique({ where: { id } });
+        const task = await prisma.task.findUnique({
+            where: { id },
+            include: { executors: { select: { id: true } } },
+        });
 
         if (!task) throw ApiError.NotFound('Задача не найдена');
 
@@ -296,10 +403,27 @@ class TaskService {
             throw ApiError.Forbidden('Недостаточно прав для удаления задачи');
         }
 
-        return prisma.task.update({
-            where: { id },
-            data: { status: TaskStatus.ARCHIVE },
+        const updated = await prisma.$transaction(async (tx) => {
+            const result = await tx.task.update({
+                where: { id },
+                data: { status: TaskStatus.ARCHIVE },
+            });
+            const notifications: NewNotification[] = [...taskParticipants(task)]
+                .filter((recipient) => recipient !== userId)
+                .map((recipient) => ({
+                    userId: recipient,
+                    taskId: id,
+                    type: 'STATUS_CHANGED',
+                    message: `Задача «${task.name}» перемещена в архив`,
+                }));
+            if (task.status !== TaskStatus.ARCHIVE) await storeNotifications(tx, notifications);
+            return {
+                result,
+                notifications: task.status !== TaskStatus.ARCHIVE ? notifications : [],
+            };
         });
+        publishTaskActivity(taskParticipants(task), updated.notifications);
+        return updated.result;
     }
 }
 
