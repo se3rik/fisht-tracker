@@ -14,6 +14,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { AdministrationPage } from '@/pages/AdministrationPage/AdministrationPage';
 import { EmployeesPage } from '@/pages/EmployeesPage/EmployeesPage';
 import { GoalsPage } from '@/pages/GoalsPage/GoalsPage';
+import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 
 export const router = createBrowserRouter([
     { element: <AuthLayout />, children: [{ path: '/auth', element: <AuthPage /> }] },
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
             { path: '/administration', element: <AdministrationPage /> },
             { path: '/employees', element: <EmployeesPage /> },
             { path: '/profile', element: <ProfilePage /> },
+            { path: '/notifications', element: <NotificationsPage /> },
 
             { path: '*', element: <NotFoundPage /> },
         ],

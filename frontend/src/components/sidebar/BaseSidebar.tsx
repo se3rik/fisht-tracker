@@ -7,9 +7,10 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 
 import { logout } from '@/stores/slices/authSlice';
 
-import { Avatar, IconButton, Tooltip } from '@mui/material';
+import { Avatar } from '@mui/material';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { NotificationsButton } from '@/components/notifications/NotificationsButton';
 
 import { stringAvatar } from '@/helpers/stringAvatar';
 import { navigationList } from '@/constants/navigationList';
@@ -17,12 +18,11 @@ import { navigationList } from '@/constants/navigationList';
 export const BaseSidebar = () => {
     const dispatch = useAppDispatch();
     const { profileData } = useAppSelector((state) => state.profile);
-
     const isAdmin = profileData?.roles === 'ADMIN';
 
     const visibleNavigationList = navigationList.filter((item) => !item.adminOnly || isAdmin);
 
-    const onLogoutIconClick = async () => {
+    const onLogoutClick = async () => {
         await dispatch(logout());
     };
 
@@ -55,37 +55,39 @@ export const BaseSidebar = () => {
                 </ul>
             </nav>
             <div className={styles.accountSection}>
-                <NavLink
-                    to="/profile"
-                    className={({ isActive }) =>
-                        isActive ? `${styles.profileLink} ${styles.active}` : styles.profileLink
-                    }
-                >
-                    <Avatar
-                        {...stringAvatar(
-                            `${profileData?.firstName ?? ''} ${profileData?.secondName ?? ''}`,
-                        )}
-                        sx={{ width: 36, height: 36, fontSize: 14 }}
-                    />
-                    <span className={styles.profileText}>
-                        <strong>
-                            {[profileData?.firstName, profileData?.secondName]
-                                .filter(Boolean)
-                                .join(' ') || 'Мой профиль'}
-                        </strong>
-                        <span>Учетная запись</span>
-                    </span>
-                </NavLink>
-                <Tooltip title="Выйти">
-                    <IconButton
-                        aria-label="Выйти"
-                        onClick={onLogoutIconClick}
-                        size="small"
-                        className={styles.logoutButton}
+                <div className={styles.accountRow}>
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.profileLink} ${styles.active}` : styles.profileLink
+                        }
                     >
-                        <LogoutIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
+                        <Avatar
+                            {...stringAvatar(
+                                `${profileData?.firstName ?? ''} ${profileData?.secondName ?? ''}`,
+                            )}
+                            sx={{ width: 36, height: 36, fontSize: 14 }}
+                        />
+                        <span className={styles.profileText}>
+                            <strong>
+                                {[profileData?.firstName, profileData?.secondName]
+                                    .filter(Boolean)
+                                    .join(' ') || 'Мой профиль'}
+                            </strong>
+                            <span>Учетная запись</span>
+                        </span>
+                    </NavLink>
+                    <NotificationsButton />
+                </div>
+                <button
+                    type="button"
+                    className={styles.logoutButton}
+                    onClick={onLogoutClick}
+                    aria-label="Выйти из аккаунта"
+                >
+                    <LogoutIcon fontSize="small" />
+                    <span>Выйти из аккаунта</span>
+                </button>
             </div>
         </aside>
     );

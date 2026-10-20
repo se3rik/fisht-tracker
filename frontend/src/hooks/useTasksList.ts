@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { tasksApi } from '@/api/tasks.api';
+import { TASKS_CHANGED_EVENT } from '@/hooks/useLiveEvents';
 
 import type { TaskListItem } from '@/types/task/TaskListItem';
 import type { TasksStatusValue } from '@/types/task/TaskStatus';
@@ -22,38 +23,72 @@ type Filters = {
 };
 
 export const useTasksList = (filters: Filters) => {
+    const {
+        overview,
+        name,
+        role,
+        status,
+        department,
+        priority,
+        sortByDate,
+        sortByDeadline,
+        limit,
+        skip,
+    } = filters;
     const [tasks, setTasks] = useState<TaskListItem[]>([]);
     const [total, setTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        let active = true;
+        let latestRequest = 0;
         const fetchTasks = async () => {
+            const requestId = ++latestRequest;
             setIsLoading(true);
             setError(null);
             try {
-                const data = await tasksApi.getAllTasks(filters);
-                setTasks(data.tasks);
-                setTotal(data.total);
+                const data = await tasksApi.getAllTasks({
+                    overview,
+                    name,
+                    role,
+                    status,
+                    department,
+                    priority,
+                    sortByDate,
+                    sortByDeadline,
+                    limit,
+                    skip,
+                });
+                if (active && requestId === latestRequest) {
+                    setTasks(data.tasks);
+                    setTotal(data.total);
+                }
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Ошибка загрузки задач');
+                if (active && requestId === latestRequest)
+                    setError(err instanceof Error ? err.message : 'Ошибка загрузки задач');
             } finally {
-                setIsLoading(false);
+                if (active && requestId === latestRequest) setIsLoading(false);
             }
         };
 
-        fetchTasks();
+        void fetchTasks();
+        window.addEventListener(TASKS_CHANGED_EVENT, fetchTasks);
+        return () => {
+            active = false;
+            window.removeEventListener(TASKS_CHANGED_EVENT, fetchTasks);
+        };
     }, [
-        filters.overview,
-        filters.name,
-        filters.role,
-        filters.status,
-        filters.department,
-        filters.priority,
-        filters.sortByDate,
-        filters.sortByDeadline,
-        filters.limit,
-        filters.skip,
+        overview,
+        name,
+        role,
+        status,
+        department,
+        priority,
+        sortByDate,
+        sortByDeadline,
+        limit,
+        skip,
     ]);
 
     return { tasks, total, isLoading, error };
