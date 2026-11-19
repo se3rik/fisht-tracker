@@ -721,8 +721,8 @@ export const AdministrationPage = () => {
                     </div>
 
                     <TextField
-                        label="Почта"
-                        type="email"
+                        label="Логин"
+                        type="text"
                         value={createForm.email}
                         onChange={(e) => handleCreateFormChange('email', e.target.value)}
                         fullWidth
