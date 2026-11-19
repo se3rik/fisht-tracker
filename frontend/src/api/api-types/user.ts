@@ -32,7 +32,7 @@ export type CreateUserRequest = {
     roles?: UserRoleValue;
 };
 
-export type UpdateUserRequest = Partial<Omit<CreateUserRequest, 'password' | 'email'>>;
+export type UpdateUserRequest = Partial<Omit<CreateUserRequest, 'password'>>;
 
 export type ResetPasswordRequest = {
     password: string;

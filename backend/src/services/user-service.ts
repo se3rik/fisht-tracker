@@ -185,6 +185,7 @@ class UserService {
     async updateUser(
         id: string,
         data: Partial<{
+            email: string;
             firstName: string;
             secondName: string;
             patronymic: string | null;
@@ -199,9 +200,17 @@ class UserService {
             throw ApiError.BadRequest('Пользователь не найден');
         }
 
+        if (data.email && data.email !== user.email) {
+            const candidate = await prisma.user.findUnique({ where: { email: data.email } });
+            if (candidate) {
+                throw ApiError.BadRequest(`Пользователь с почтовым адресом ${data.email} уже существует`);
+            }
+        }
+
         const updated = await prisma.user.update({
             where: { id },
             data: {
+                email: data.email,
                 firstName: data.firstName,
                 secondName: data.secondName,
                 patronymic: data.patronymic,

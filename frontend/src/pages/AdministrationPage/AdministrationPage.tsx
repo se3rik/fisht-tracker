@@ -68,6 +68,7 @@ const emptyCreateForm: CreateUserRequest = {
 };
 
 const emptyEditForm: UpdateUserRequest = {
+    email: '',
     firstName: '',
     secondName: '',
     patronymic: '',
@@ -269,6 +270,7 @@ export const AdministrationPage = () => {
     const openEditDialog = (user: AdminUser) => {
         setEditingUser(user);
         setEditForm({
+            email: user.email,
             firstName: user.firstName,
             secondName: user.secondName,
             patronymic: user.patronymic ?? '',
@@ -304,7 +306,8 @@ export const AdministrationPage = () => {
         ? (DEPARTMENT_SPECIALTY_MAP[editForm.department] ?? [])
         : [];
 
-    const isEditFormValid = editForm.firstName?.trim() && editForm.secondName?.trim();
+    const isEditFormValid =
+        editForm.email?.trim() && editForm.firstName?.trim() && editForm.secondName?.trim();
 
     const handleSubmitEdit = async () => {
         if (!editingUser || !isEditFormValid) return;
@@ -834,6 +837,15 @@ export const AdministrationPage = () => {
                             {editingUser.email}
                         </Typography>
                     )}
+
+                    <div className={styles.formRow}>
+                        <TextField
+                            label="Логин"
+                            value={editForm.email}
+                            onChange={(e) => handleEditFormChange('email', e.target.value)}
+                            fullWidth
+                        />
+                    </div>
 
                     <div className={styles.formRow}>
                         <TextField
