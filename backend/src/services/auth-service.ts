@@ -14,7 +14,7 @@ class AuthService {
             where: { email },
         });
         if (!user) {
-            throw ApiError.BadRequest('Пользователь с таким email не найден');
+            throw ApiError.BadRequest('Пользователь с таким логином не найден');
         }
 
         if (!user.isActive) {

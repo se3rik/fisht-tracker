@@ -28,7 +28,7 @@ router.post(
     '/admin/users',
     authMiddleware,
     adminMiddleware,
-    body('email').isEmail(),
+    body('email').isString().trim().notEmpty().isLength({ max: 255 }),
     body('password').isLength({ min: 3, max: 32 }),
     body('firstName').isString().isLength({ min: 1, max: 64 }),
     body('secondName').isString().isLength({ min: 1, max: 64 }),
